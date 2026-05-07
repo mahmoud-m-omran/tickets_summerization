@@ -1,0 +1,7 @@
+{
+  "status": "error",
+  "filename": "RTPL-0000-0000000000000000.json",
+  "ticket_key": "RTPL-0000",
+  "ticket_title": "Automation Smoke Test",
+  "error": "Folder creation failed: {'message': 'Unauthenticated.'}"
+}
