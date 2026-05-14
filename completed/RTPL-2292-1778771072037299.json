@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "filename": "RTPL-2292-1778771072037299.json",
+  "ticket_key": "RTPL-2292",
+  "ticket_title": "Update Lifecycle Metrics: Add process_parent and account_type Tags to otel.process. Metrics",
+  "folder_id": 403,
+  "folder_name": "RTPL-2292 \u2014 Update Lifecycle Metrics: Add process_parent and account_type Tags to otel.process. Metrics",
+  "cases_created": 3,
+  "case_ids": [
+    3547,
+    3548,
+    3549
+  ]
+}

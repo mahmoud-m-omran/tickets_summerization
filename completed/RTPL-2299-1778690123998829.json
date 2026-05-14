@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "filename": "RTPL-2299-1778690123998829.json",
+  "ticket_key": "RTPL-2299",
+  "ticket_title": "BE - Add MDN to device line items on receipt",
+  "folder_id": 404,
+  "folder_name": "RTPL-2299 \u2014 BE - Add MDN to device line items on receipt",
+  "cases_created": 7,
+  "case_ids": [
+    3550,
+    3551,
+    3552,
+    3553,
+    3554,
+    3555,
+    3556
+  ]
+}
