@@ -1,0 +1,68 @@
+{
+  "ticket_key": "RTPL-2299",
+  "ticket_title": "BE - Add MDN to device line items on receipt",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1778690123.998829",
+  "test_cases": [
+    {
+      "name": "TC-1: MDN renders on device line item for single-line new activation [Priority: High]",
+      "test_data": "Preconditions: Subscriber created; IDV outcome = Validated; one Handset selected; one rate plan attached. | Test Data: deviceType = Handset, storeType = COR, role = Store Rep, mdnLifecycle = new (e.g., 7022345678), inventoryType = D (ASTOCK)",
+      "steps": [
+        {"action": "Complete activation through the Payment step.", "expected": ""},
+        {"action": "Trigger receipt generation in both digital and print form.", "expected": ""},
+        {"action": "Open the receipt and locate the device line item.", "expected": "The device line item displays the activated MDN beside or beneath the device model and IMEI."}
+      ]
+    },
+    {
+      "name": "TC-2: Multi-line activation — each device line shows its own MDN [Priority: High]",
+      "test_data": "Preconditions: Cart contains 2+ devices, each provisioned with distinct MDNs in the same transaction. | Test Data: device1 = Handset (MDN-A), device2 = Wearable paired to a different MDN (MDN-B), storeType = COR, role = Store Rep",
+      "steps": [
+        {"action": "Add two devices to the cart and complete activation for both.", "expected": ""},
+        {"action": "Generate the receipt.", "expected": ""},
+        {"action": "Inspect each device's line item.", "expected": "Each device line shows its correct MDN with no cross-line bleed; values match what the activation API returned."}
+      ]
+    },
+    {
+      "name": "TC-3: Port-in MDN renders correctly on receipt [Priority: High]",
+      "test_data": "Preconditions: Activation flow with port-in path completed; port-in MDN reserved. | Test Data: mdnLifecycle = port-in, sourceCarrier = another prepaid MVNO, deviceType = Handset",
+      "steps": [
+        {"action": "Complete a port-in activation.", "expected": ""},
+        {"action": "Generate the receipt.", "expected": ""},
+        {"action": "Verify the MDN value on the device line item.", "expected": "Receipt shows the ported MDN exactly as it was reserved (not a temporary aging MDN)."}
+      ]
+    },
+    {
+      "name": "TC-4: Receipt without device (accessory-only purchase) does not regress [Priority: Medium]",
+      "test_data": "Preconditions: Cart contains only accessory line items; no activation occurred. | Test Data: lineItems = [Case, Charger], no IMEI, no MDN",
+      "steps": [
+        {"action": "Complete the accessory-only checkout.", "expected": ""},
+        {"action": "Generate the receipt.", "expected": "Receipt renders accessory lines normally with no empty `MDN:` label and no null/undefined string in the rendered output."}
+      ]
+    },
+    {
+      "name": "TC-5: BYOD / BYOP activation — MDN appears on the bring-your-own device line [Priority: Medium]",
+      "test_data": "Preconditions: Customer brings own device; IMEI passes TAC / blacklist check; SIM swapped or eSIM provisioned. | Test Data: sourcing = BYOD, simType = eSIM, deviceType = Handset",
+      "steps": [
+        {"action": "Complete the BYOD activation.", "expected": ""},
+        {"action": "Generate the receipt.", "expected": "The MDN renders on the BYOD device line in the same format as for in-stock ASTOCK devices."}
+      ]
+    },
+    {
+      "name": "TC-6: CPNI-aware display — MDN is masked or full-shown per Metro policy [Priority: High]",
+      "test_data": "Preconditions: CPNI display rule confirmed with product / legal (full vs last-4). | Test Data: role = Store Rep, role = CSR, role = Customer (compare receipt surfaces if they differ)",
+      "steps": [
+        {"action": "Generate a receipt for the Store Rep at a COR store.", "expected": ""},
+        {"action": "Generate a CSR remote view of the same transaction.", "expected": ""},
+        {"action": "Compare the MDN display format on each surface.", "expected": "MDN renders per the documented CPNI display rule on each surface and the audit log records that MDN was displayed."}
+      ]
+    },
+    {
+      "name": "TC-7: Reprint of an old receipt fetches MDN from the persisted line item [Priority: Medium]",
+      "test_data": "Preconditions: An activation receipt printed 24h+ ago is reprinted from EzPOS history. | Test Data: historical transaction id; deviceLine.persistedMDN snapshot",
+      "steps": [
+        {"action": "Open a past activation in the receipt history.", "expected": ""},
+        {"action": "Reprint it.", "expected": "The reprinted receipt shows the MDN that was active at the time of sale (read from the persisted line item) and not a live HLR lookup that could drift if the MDN was later changed."}
+      ]
+    }
+  ]
+}
