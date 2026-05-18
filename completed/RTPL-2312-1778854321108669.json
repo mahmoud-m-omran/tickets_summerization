@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "filename": "RTPL-2312-1778854321108669.json",
+  "ticket_key": "RTPL-2312",
+  "ticket_title": "Lock/Unlock IMEI API returns BadRequest for valid state transitions",
+  "folder_id": 406,
+  "folder_name": "RTPL-2312 \u2014 Lock/Unlock IMEI API returns BadRequest for valid state transitions",
+  "cases_created": 6,
+  "case_ids": [
+    3562,
+    3563,
+    3564,
+    3565,
+    3566,
+    3567
+  ]
+}
