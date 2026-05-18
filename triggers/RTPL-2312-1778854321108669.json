@@ -1,0 +1,65 @@
+{
+  "ticket_key": "RTPL-2312",
+  "ticket_title": "Lock/Unlock IMEI API returns BadRequest for valid state transitions",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1778854321.108669",
+  "test_cases": [
+    {
+      "name": "TC-1: Lock a currently-unlocked IMEI — happy path [Priority: High]",
+      "test_data": "Preconditions: IMEI 999464278370433 is in unlocked state in QA env. User has `AccessLevels.AdjustSerializedInventory`. | Test Data: IMEI = 999464278370433 (unlocked), role = Store Manager, storeType = COR, env = platform-mbyt-qa.rt2.com",
+      "steps": [
+        {"action": "Authenticate as a user with AdjustSerializedInventory access.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/999464278370433/lock`.", "expected": ""},
+        {"action": "Inspect the HTTP response status code and body.", "expected": "API returns 2xx and the IMEI state transitions to locked."}
+      ]
+    },
+    {
+      "name": "TC-2: Unlock a currently-locked IMEI — happy path [Priority: High]",
+      "test_data": "Preconditions: IMEI 999457851018692 is in locked state in QA env. User has `AccessLevels.AdjustSerializedInventory`. | Test Data: IMEI = 999457851018692 (locked), role = Store Manager, storeType = COR, env = platform-mbyt-qa.rt2.com",
+      "steps": [
+        {"action": "Authenticate as a user with AdjustSerializedInventory access.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/999457851018692/unlock`.", "expected": ""},
+        {"action": "Inspect the HTTP response status code and body.", "expected": "API returns 2xx and the IMEI state transitions to unlocked."}
+      ]
+    },
+    {
+      "name": "TC-3: Manual lock releases HotDeviceRegistry cache claim [Priority: High]",
+      "test_data": "Preconditions: IMEI has an active HotDeviceRegistry claim (simulating an in-flight or crashed activation). IMEI is currently unlocked. | Test Data: IMEI = valid 15-digit unlocked IMEI with active cache claim, role = Store Manager, env = QA",
+      "steps": [
+        {"action": "Confirm via logs or cache inspection that the IMEI has an active HotDeviceRegistry claim.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/{imei}/lock` as authorized user.", "expected": ""},
+        {"action": "Verify the response is successful (2xx).", "expected": ""},
+        {"action": "Inspect HotDeviceRegistry cache to confirm the claim entry is released.", "expected": "API returns success and the HotDeviceRegistry cache entry for the IMEI is cleared."}
+      ]
+    },
+    {
+      "name": "TC-4: Unauthorized role is rejected by lock/unlock endpoints [Priority: Medium]",
+      "test_data": "Preconditions: Authenticated as a Store Rep without `AccessLevels.AdjustSerializedInventory`. | Test Data: IMEI = valid 15-digit IMEI, role = Store Rep (no AdjustSerializedInventory), storeType = COR",
+      "steps": [
+        {"action": "Authenticate as a Store Rep without AdjustSerializedInventory access.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/{imei}/lock`.", "expected": ""},
+        {"action": "Inspect the response status and error message.", "expected": "API returns 403 Forbidden with a clear insufficient-permissions error; no state change occurs."}
+      ]
+    },
+    {
+      "name": "TC-5: IMEI format validation — non-15-digit values rejected [Priority: Medium]",
+      "test_data": "Preconditions: Authenticated as authorized user with AdjustSerializedInventory. | Test Data: IMEI-short = \"12345\" (5 digits), IMEI-long = \"9994642783704330000\" (19 digits), role = Store Manager",
+      "steps": [
+        {"action": "Authenticate as authorized user.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/12345/lock`.", "expected": ""},
+        {"action": "Inspect the response status and error body.", "expected": ""},
+        {"action": "POST to `/api/sales/devices/9994642783704330000/lock`.", "expected": ""},
+        {"action": "Inspect the response status and error body.", "expected": "Both requests return 400 with a validation error indicating IMEI must be exactly 15 digits."}
+      ]
+    },
+    {
+      "name": "TC-6: Audit log entry written on manual lock and unlock [Priority: Medium]",
+      "test_data": "Preconditions: Authorized user with AdjustSerializedInventory; IMEI in valid unlocked state. | Test Data: IMEI = 999464278370433, role = Store Manager, timestamp = test execution time",
+      "steps": [
+        {"action": "Authenticate and POST to `/api/sales/devices/999464278370433/lock`.", "expected": ""},
+        {"action": "Confirm response is successful (2xx).", "expected": ""},
+        {"action": "Query the application audit log for the lock event on this IMEI.", "expected": "An audit log entry exists with user ID, timestamp, IMEI, and outcome (success)."}
+      ]
+    }
+  ]
+}
