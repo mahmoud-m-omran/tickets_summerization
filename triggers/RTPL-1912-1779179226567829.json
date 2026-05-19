@@ -1,0 +1,62 @@
+{
+  "ticket_key": "RTPL-1912",
+  "ticket_title": "BE - Replace booleans/strings with typed enums in SubscriberActivation process state",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1779179226.567829",
+  "test_cases": [
+    {
+      "name": "TC-1: New-account Handset activation (Dealer/PSIM/NewNumber/IDV Validated) completes end-to-end [Priority: High]",
+      "test_data": "Preconditions: RTGO Backend deployed with story/RTPL-1912; Metro API sandbox available; clean activation state. | Test Data: role = Store Rep, storeType = COR, deviceType = Handset, inventoryType = D (ASTOCK), simType = PSIM, mdnType = NewNumber, idvType = Validated",
+      "steps": [
+        {"action": "Initiate new subscriber activation for a Handset (Dealer ASTOCK inventory).", "expected": ""},
+        {"action": "Validate IMEI via Metro API; confirm DeviceType=Handset and InventoryType=Dealer in process state.", "expected": ""},
+        {"action": "Validate PSIM; confirm SimType=PSIM in SimCardValidationDetails.", "expected": ""},
+        {"action": "Configure MDN with a new number; confirm MdnType=NewNumber in MdnConfigDetails.", "expected": ""},
+        {"action": "Complete IDV as Validated; confirm IdvType=Validated in line state snapshot.", "expected": ""},
+        {"action": "Complete payment and full activation.", "expected": "Activation succeeds end-to-end; all enum properties are set correctly; no NullReferenceException or EnumParseException is thrown; Metro API receives correct boundary string constants."}
+      ]
+    },
+    {
+      "name": "TC-2: BYOD Handset with eSIM and port-in MDN — InventoryType=Byod, SimType=ESIM, MdnType=PortIn [Priority: High]",
+      "test_data": "Preconditions: BYOD Handset device available; port-in MDN scenario configured in test env. | Test Data: deviceType = Handset, inventoryType = Byod (BYOD), simType = ESIM, mdnType = PortIn, idvType = Validated",
+      "steps": [
+        {"action": "Initiate activation for a BYOD Handset.", "expected": ""},
+        {"action": "Validate device; confirm InventoryType=Byod replaces removed IsByod boolean in state.", "expected": ""},
+        {"action": "Validate eSIM; confirm SimType=ESIM replaces removed IsESim boolean.", "expected": ""},
+        {"action": "Configure MDN for port-in; confirm MdnType=PortIn replaces removed string \"PortIn\".", "expected": ""},
+        {"action": "Complete activation and verify Metro API request payload uses correct boundary string constants.", "expected": "InventoryType=Byod, SimType=ESIM, MdnType=PortIn are all set correctly; Metro API receives correct string values at API boundary (via constant mapping); no NullReferenceException."}
+      ]
+    },
+    {
+      "name": "TC-3: IDV Invalid path — IdvType=Invalid captured; downstream routing correct [Priority: High]",
+      "test_data": "Preconditions: Metro API IDV check configured to return Invalid outcome. | Test Data: idvType = Invalid, role = Store Rep, storeType = COR",
+      "steps": [
+        {"action": "Initiate a new-account activation.", "expected": ""},
+        {"action": "Trigger IDV flow; configure Metro API stub to return an Invalid result.", "expected": ""},
+        {"action": "Inspect process state for IdvType value.", "expected": ""},
+        {"action": "Confirm activation engine routes per the Invalid IDV business rules (rep acknowledgement / escalation).", "expected": "Process state captures IdvType=Invalid; routing for Invalid IDV proceeds correctly; no runtime error from removed bool IsIdentityValidated."}
+      ]
+    },
+    {
+      "name": "TC-4: Tablet (ASTOCK) — DeviceType=Tablet correct after IsTablet boolean removal [Priority: Medium]",
+      "test_data": "Preconditions: Tablet IMEI available in test env; A-Stock tablet auto-reactivation path exercisable. | Test Data: deviceType = Tablet, inventoryType = D (ASTOCK), role = Store Rep, storeType = COR",
+      "steps": [
+        {"action": "Initiate activation for a Tablet (ASTOCK).", "expected": ""},
+        {"action": "Validate IMEI via Metro API.", "expected": ""},
+        {"action": "Inspect DeviceValidationDetails for DeviceType value.", "expected": ""},
+        {"action": "Confirm A-Stock tablet auto-reactivation routing is not regressed.", "expected": "DeviceType=Tablet is set correctly; removed IsTablet bool causes no NullReferenceException; tablet-specific routing (auto-reactivation check) behaves as before."}
+      ]
+    },
+    {
+      "name": "TC-5: In-flight CosmosDB event with legacy boolean fields deserializes correctly after deploy [Priority: High]",
+      "test_data": "Preconditions: CosmosDB test instance contains a persisted activation event with old boolean fields (IsByod=true, IsESim=true, IsReactivation=false). | Test Data: Legacy event JSON: IsByod=true expected InventoryType=Byod; IsESim=true expected SimType=ESIM; TransactionType=Activation expected from IsReactivation=false",
+      "steps": [
+        {"action": "Deploy story/RTPL-1912 to test environment.", "expected": ""},
+        {"action": "Load an in-flight activation process from CosmosDB that was persisted with legacy boolean fields.", "expected": ""},
+        {"action": "Resume the activation process.", "expected": ""},
+        {"action": "Inspect deserialized DeviceValidationDetails for InventoryType and SimType values.", "expected": ""},
+        {"action": "Confirm process continues without deserialization error.", "expected": "JsonConverter attributes map legacy booleans to correct enum values; activation resumes without data loss or exception."}
+      ]
+    }
+  ]
+}

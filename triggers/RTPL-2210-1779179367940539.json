@@ -1,0 +1,60 @@
+{
+  "ticket_key": "RTPL-2210",
+  "ticket_title": "Adapt platform-apps + metro-api-proxy to Azure Managed Redis Enterprise (single-DB compatibility + Entra MI auth scaffolding)",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1779179367.940539",
+  "test_cases": [
+    {
+      "name": "TC-1: Metro Proxy starts and reads/writes cache without DB-index error (AccessKey mode) [Priority: High]",
+      "test_data": "Preconditions: Metro Proxy deployed with RTPL-2210-remove-default-database; Redis:Endpoint not set; Caching:RedisConnectionString configured for an Azure Managed Redis Enterprise cluster (DB 0 only). | Test Data: Caching:RedisConnectionString = <Enterprise cluster AccessKey string>, Redis:Endpoint = (not set), env = dev",
+      "steps": [
+        {"action": "Deploy Metro Proxy RTPL-2210-remove-default-database branch to dev.", "expected": ""},
+        {"action": "Start the service; observe startup logs for Redis connection events.", "expected": ""},
+        {"action": "Trigger a cache read/write via an activation endpoint using IDistributedCache.", "expected": ""},
+        {"action": "Trigger a distributed lock operation via RedisSimpleLockService.", "expected": ""},
+        {"action": "Confirm no SELECT or \"ERR DB index is out of range\" errors appear in logs.", "expected": "Service starts cleanly; IDistributedCache and lock operations succeed against DB 0; no DefaultDatabase-related connection errors."}
+      ]
+    },
+    {
+      "name": "TC-2: Backend IDistributedCache + FusionCache backplane connect via single multiplexer (AccessKey mode) [Priority: High]",
+      "test_data": "Preconditions: Backend deployed with RTPL-2210-backend-redis-mi-auth; Caching:RedisConnectionString set; Caching:RedisEndpoint not set. | Test Data: Caching:RedisConnectionString = <valid Enterprise string>, Caching:RedisEndpoint = (not set), env = dev",
+      "steps": [
+        {"action": "Deploy Backend RTPL-2210-backend-redis-mi-auth branch to dev.", "expected": ""},
+        {"action": "Start the service; observe startup logs for Redis connection events.", "expected": ""},
+        {"action": "Trigger a plan/promo fetch to exercise IDistributedCache.", "expected": ""},
+        {"action": "Inspect FusionCache backplane subscription state in logs (expect no subscription errors).", "expected": ""},
+        {"action": "Confirm a single IConnectionMultiplexer is registered in DI (not two separate instances).", "expected": "IDistributedCache and FusionCache backplane both connect via a single shared multiplexer; no DB-index error; no duplicate connection log entries."}
+      ]
+    },
+    {
+      "name": "TC-3: AccessKey mode is selected when Redis:Endpoint is absent (Metro Proxy) [Priority: Medium]",
+      "test_data": "Preconditions: Metro Proxy config does not include Redis:Endpoint. | Test Data: Redis:Endpoint = (absent), Caching:RedisConnectionString = <valid string>",
+      "steps": [
+        {"action": "Start Metro Proxy without Redis:Endpoint in configuration.", "expected": ""},
+        {"action": "Observe RedisConnectionFactory startup log or trace for mode selection.", "expected": ""},
+        {"action": "Confirm ConfigurationOptions.Parse (AccessKey path) is taken and not BuildManagedIdentityOptions.", "expected": ""},
+        {"action": "Confirm Redis connection succeeds.", "expected": "AccessKey path is selected; no DefaultAzureCredential or ManagedIdentityCredential invoked; connection to Redis succeeds without auth error."}
+      ]
+    },
+    {
+      "name": "TC-4: RedisSmoke harness validates cache and lock round-trips against Enterprise sandbox clusters [Priority: High]",
+      "test_data": "Preconditions: Access to sandbox Enterprise clusters: redis-rt-platform-core-sbx-eastus and redis-rt-platform-core-sbx-westus3; AccessKey credentials available. | Test Data: Target = sbx-eastus and sbx-westus3, auth mode = AccessKey",
+      "steps": [
+        {"action": "Run RT.Metro.Api.Proxy.RedisSmoke against sbx-eastus with AccessKey credentials.", "expected": ""},
+        {"action": "Confirm cache set/get round-trip succeeds.", "expected": ""},
+        {"action": "Confirm lock acquire/release round-trip succeeds.", "expected": ""},
+        {"action": "Repeat both steps against sbx-westus3.", "expected": "Both smoke harness runs complete without error across both sandbox clusters; cache and lock operations succeed on DB 0."}
+      ]
+    },
+    {
+      "name": "TC-5: Existing dev/qa/stg environments (non-Enterprise Redis) are unaffected after deploy [Priority: High]",
+      "test_data": "Preconditions: Dev environment uses a non-Enterprise Redis cluster with standard AccessKey connection string. | Test Data: Caching:RedisConnectionString = existing dev connection string (non-Enterprise), Redis:Endpoint = (absent), env = dev",
+      "steps": [
+        {"action": "Deploy both RTPL-2210 branches to dev using existing AccessKey connection strings.", "expected": ""},
+        {"action": "Run a standard new-subscriber activation end-to-end.", "expected": ""},
+        {"action": "Confirm Redis cache and lock operations work as before.", "expected": ""},
+        {"action": "Confirm no regression in activation, refill, or session management flows.", "expected": "Dev/qa/stg environments continue to operate unchanged; no errors introduced by the new RedisConnectionFactory or the bumped package versions (Azure.Identity 1.17.1, IdentityModel 8.15.0)."}
+      ]
+    }
+  ]
+}
