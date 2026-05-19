@@ -1,0 +1,73 @@
+{
+  "ticket_key": "RTPL-1925",
+  "ticket_title": "BE - Split ValidateDevice activity into 4 focused activities",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1779179299.050099",
+  "test_cases": [
+    {
+      "name": "TC-1: Standard Handset routes ValidateDevice → ResolveDevicePricing (no collection step) [Priority: High]",
+      "test_data": "Preconditions: RTGO Backend with feature/RTPL-1925 deployed; Handset in Dealer inventory; no EDGE/BYOD/EID/HINT conditions apply. | Test Data: deviceType = Handset, inventoryType = D (ASTOCK), storeType = COR, role = Store Rep",
+      "steps": [
+        {"action": "Initiate a new activation for a standard Handset (ASTOCK Dealer).", "expected": ""},
+        {"action": "Complete ValidateDevice; confirm no routing flags are set (NeedsEdgeCreation=false, NeedsByodCreation=false, NeedsEid=false, IsHintDevice=false).", "expected": ""},
+        {"action": "Observe the next activity returned by the process engine.", "expected": ""},
+        {"action": "Confirm ResolveDevicePricing executes and produces SIM options and pricing data.", "expected": ""},
+        {"action": "Confirm ValidateSimCard is the subsequent activity.", "expected": "Routing bypasses CollectDeviceInfo and ValidateHint; pricing resolves correctly; ValidateSimCard is next. No DeviceStateNotAvailableException thrown."}
+      ]
+    },
+    {
+      "name": "TC-2: BYOD device needing EDGE creation routes through CollectDeviceInfo [Priority: High]",
+      "test_data": "Preconditions: BYOD Handset not in local POS inventory; NeedsEdgeCreation=true expected from ValidateDevice. | Test Data: deviceType = Handset, inventoryType = Byod (BYOD), storeType = COR, role = Store Rep, IMEI = not in local inventory",
+      "steps": [
+        {"action": "Initiate activation for a BYOD Handset not in local inventory.", "expected": ""},
+        {"action": "Complete ValidateDevice; confirm NeedsEdgeCreation=true is set in DeviceState before activity completes.", "expected": ""},
+        {"action": "Confirm next activity is CollectDeviceInfo (not ResolveDevicePricing).", "expected": ""},
+        {"action": "Submit accept-add-to-edge action in CollectDeviceInfo; confirm EDGE creation call succeeds.", "expected": ""},
+        {"action": "Confirm routing proceeds to ResolveDevicePricing then ValidateSimCard.", "expected": "ValidateDevice sets NeedsEdgeCreation=true; CollectDeviceInfo is visited; device is added to EDGE with local inventory update; pricing resolves; ValidateSimCard follows."}
+      ]
+    },
+    {
+      "name": "TC-3: BYOD decline-EDGE → BYOD fallback offered within CollectDeviceInfo [Priority: High]",
+      "test_data": "Preconditions: BYOD Handset; rep declines adding to EDGE. | Test Data: deviceType = Handset, inventoryType = Byod, action = decline-add-to-edge, storeType = COR, role = Store Rep",
+      "steps": [
+        {"action": "Initiate BYOD activation; ValidateDevice sets NeedsEdgeCreation=true.", "expected": ""},
+        {"action": "In CollectDeviceInfo, submit decline-add-to-edge action.", "expected": ""},
+        {"action": "Confirm accept-add-as-byod action is now available (BYOD creation offer).", "expected": ""},
+        {"action": "Submit accept-add-as-byod; confirm BYOD device creation succeeds.", "expected": ""},
+        {"action": "Confirm routing proceeds to ResolveDevicePricing.", "expected": "Declining EDGE immediately surfaces BYOD creation within the same CollectDeviceInfo activity; BYOD device is created; pricing resolves correctly."}
+      ]
+    },
+    {
+      "name": "TC-4: HINT (HomeInternet) device routes ValidateDevice → ValidateHint → ResolveDevicePricing [Priority: High]",
+      "test_data": "Preconditions: HINT (HomeInternet) device available in store inventory; address validation service accessible. | Test Data: deviceType = HomeInternet (HINT), storeType = COR, role = Store Rep, inventoryType = D (ASTOCK)",
+      "steps": [
+        {"action": "Initiate activation for a HINT device.", "expected": ""},
+        {"action": "Complete ValidateDevice; confirm IsHintDevice=true is set in DeviceState.", "expected": ""},
+        {"action": "Confirm next activity is ValidateHint (not CollectDeviceInfo).", "expected": ""},
+        {"action": "Provide address and consent in ValidateHint; confirm address validation and eligibility check execute.", "expected": ""},
+        {"action": "Confirm EligibilityId is stored and routing proceeds to ResolveDevicePricing.", "expected": "IsHintDevice=true routes to ValidateHint; address/eligibility/consent are collected; EligibilityId is stored; pricing resolves; ValidateSimCard follows."}
+      ]
+    },
+    {
+      "name": "TC-5: DeviceState rename — no NullReferenceException across activation paths [Priority: Medium]",
+      "test_data": "Preconditions: Backend deployed with feature/RTPL-1925; Wearable IMEI available. | Test Data: deviceType = Wearable, inventoryType = D (ASTOCK), storeType = ARC, role = Store Rep",
+      "steps": [
+        {"action": "Initiate Wearable activation.", "expected": ""},
+        {"action": "Complete ValidateDevice and ResolveDevicePricing.", "expected": ""},
+        {"action": "Inspect process state for DeviceState presence and property accessibility.", "expected": ""},
+        {"action": "Confirm all DeviceState properties (Stage, routing flags, DeviceType) are readable without error.", "expected": "DeviceState is populated and accessible; no NullReferenceException or DeviceStateNotAvailableException thrown."}
+      ]
+    },
+    {
+      "name": "TC-6: Legacy CosmosDB event (pre-split) deserializes and resumes correctly after deploy [Priority: High]",
+      "test_data": "Preconditions: CosmosDB test instance contains a persisted activation event with pre-RTPL-1925 DeviceValidationDetails schema; process paused at old ValidateDevice activity. | Test Data: Legacy event JSON: DeviceValidationDetails with pre-split field names; process state paused at ValidateDevice",
+      "steps": [
+        {"action": "Deploy feature/RTPL-1925 to test environment.", "expected": ""},
+        {"action": "Load a persisted in-flight activation with the legacy event schema.", "expected": ""},
+        {"action": "Resume the activation process.", "expected": ""},
+        {"action": "Confirm DeviceState is populated from old field names without error.", "expected": ""},
+        {"action": "Confirm process continues without deserialization error.", "expected": "Legacy event deserializes without error; DeviceState populated correctly from old schema; process advances to the next activity."}
+      ]
+    }
+  ]
+}
