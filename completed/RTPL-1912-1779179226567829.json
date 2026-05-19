@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "filename": "RTPL-1912-1779179226567829.json",
+  "ticket_key": "RTPL-1912",
+  "ticket_title": "BE - Replace booleans/strings with typed enums in SubscriberActivation process state",
+  "folder_id": 408,
+  "folder_name": "RTPL-1912 \u2014 BE - Replace booleans/strings with typed enums in SubscriberActivation process state",
+  "cases_created": 5,
+  "case_ids": [
+    3574,
+    3575,
+    3576,
+    3577,
+    3578
+  ]
+}

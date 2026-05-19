@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "filename": "RTPL-2210-1779179367940539.json",
+  "ticket_key": "RTPL-2210",
+  "ticket_title": "Adapt platform-apps + metro-api-proxy to Azure Managed Redis Enterprise (single-DB compatibility + Entra MI auth scaffolding)",
+  "folder_id": 409,
+  "folder_name": "RTPL-2210 \u2014 Adapt platform-apps + metro-api-proxy to Azure Managed Redis Enterprise (single-DB compatibility + Entra MI auth scaffolding)",
+  "cases_created": 5,
+  "case_ids": [
+    3579,
+    3580,
+    3581,
+    3582,
+    3583
+  ]
+}
