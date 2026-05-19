@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "filename": "RTPL-2345-1779191862129509.json",
+  "ticket_key": "RTPL-2345",
+  "ticket_title": "FE - Simplify app config caching to user preferences only",
+  "folder_id": 411,
+  "folder_name": "RTPL-2345 \u2014 FE - Simplify app config caching to user preferences only",
+  "cases_created": 6,
+  "case_ids": [
+    3590,
+    3591,
+    3592,
+    3593,
+    3594,
+    3595
+  ]
+}

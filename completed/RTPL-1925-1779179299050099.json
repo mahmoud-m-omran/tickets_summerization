@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "filename": "RTPL-1925-1779179299050099.json",
+  "ticket_key": "RTPL-1925",
+  "ticket_title": "BE - Split ValidateDevice activity into 4 focused activities",
+  "folder_id": 410,
+  "folder_name": "RTPL-1925 \u2014 BE - Split ValidateDevice activity into 4 focused activities",
+  "cases_created": 6,
+  "case_ids": [
+    3584,
+    3585,
+    3586,
+    3587,
+    3588,
+    3589
+  ]
+}
