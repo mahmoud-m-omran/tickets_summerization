@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "filename": "RTPL-2310-1779207133682159.json",
+  "ticket_key": "RTPL-2310",
+  "ticket_title": "Add Datadog Unified Service Tags to all RTGO Metrics",
+  "folder_id": 412,
+  "folder_name": "RTPL-2310 \u2014 Add Datadog Unified Service Tags to all RTGO Metrics",
+  "cases_created": 4,
+  "case_ids": [
+    3596,
+    3597,
+    3598,
+    3599
+  ]
+}
