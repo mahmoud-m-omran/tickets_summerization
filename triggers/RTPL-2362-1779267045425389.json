@@ -1,0 +1,98 @@
+{
+  "ticket_key": "RTPL-2362",
+  "ticket_title": "Metro API Error Blocking Protection Plan Offers During Activation",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1779267045.425389",
+  "test_cases": [
+    {
+      "name": "TC-1: Representative successfully reaches protection plan selection with a dealer-stocked device [Priority: High]",
+      "test_data": "Preconditions: New-subscriber activation in progress; dealer-stocked device scanned and confirmed; customer has passed identity check | Test Data: New prepaid customer, dealer-stocked handset, COR store, identity check passed, valid state and ZIP code",
+      "steps": [
+        {
+          "action": "Representative completes the device scan and SIM setup steps in the activation flow",
+          "expected": ""
+        },
+        {
+          "action": "Representative proceeds to the protection plan selection step",
+          "expected": ""
+        },
+        {
+          "action": "System sends device information to the carrier to retrieve available protection plan offers",
+          "expected": ""
+        },
+        {
+          "action": "Representative views the list of plans displayed on screen",
+          "expected": "Protection plan offers load successfully. Representative can select a plan or choose to skip. No error message appears."
+        }
+      ]
+    },
+    {
+      "name": "TC-2: Protection plan offers load correctly for a customer bringing their own device [Priority: Medium]",
+      "test_data": "Preconditions: New-subscriber activation with a customer's own device; identity check passed | Test Data: New prepaid customer, bring-your-own handset, COR store, identity check passed",
+      "steps": [
+        {
+          "action": "Representative confirms the customer's own device and completes the SIM step",
+          "expected": ""
+        },
+        {
+          "action": "Representative proceeds to the protection plan selection step",
+          "expected": ""
+        },
+        {
+          "action": "System retrieves available plans for the customer's device",
+          "expected": "Protection plan offers appropriate for the device type load successfully. No error is shown."
+        }
+      ]
+    },
+    {
+      "name": "TC-3: Activation completes end-to-end including protection plan selection with dealer stock [Priority: High]",
+      "test_data": "Preconditions: New-subscriber activation in progress, dealer-stocked device, all prior steps completed | Test Data: New prepaid customer, dealer-stocked handset, protection plan selected, COR store",
+      "steps": [
+        {
+          "action": "Representative completes all activation steps up to protection plan selection",
+          "expected": ""
+        },
+        {
+          "action": "Representative selects a protection plan from the list",
+          "expected": ""
+        },
+        {
+          "action": "Representative proceeds through payment and submits the activation",
+          "expected": "Activation completes successfully. Customer receives confirmation and service is active. No carrier errors appear at any step."
+        }
+      ]
+    },
+    {
+      "name": "TC-4: Regression — existing-account and new-account activations with dealer stock are unaffected [Priority: High]",
+      "test_data": "Preconditions: Standard activations for both new and existing accounts using dealer-stocked devices | Test Data: New prepaid customer with dealer-stocked handset; and separately, existing-account activation with dealer-stocked handset, COR store",
+      "steps": [
+        {
+          "action": "Representative performs a new-subscriber activation with a dealer-stocked device through the protection plan step",
+          "expected": ""
+        },
+        {
+          "action": "Representative performs an existing-account activation with a dealer-stocked device through the protection plan step",
+          "expected": "Both activation types complete without errors. Protection plan offers load correctly in both scenarios."
+        }
+      ]
+    },
+    {
+      "name": "TC-5: Device upgrade — protection plan offers load for a dealer-stocked upgrade device [Priority: Medium]",
+      "test_data": "Preconditions: Existing subscriber upgrading to a new device; dealer-stocked device selected | Test Data: Existing prepaid account, device upgrade, dealer-stocked handset, COR store",
+      "steps": [
+        {
+          "action": "Representative initiates an upgrade activation for the customer",
+          "expected": ""
+        },
+        {
+          "action": "Representative completes device and SIM steps",
+          "expected": ""
+        },
+        {
+          "action": "Representative proceeds to the protection plan selection step",
+          "expected": "Protection plan offers load successfully. Representative can select or skip. No carrier API errors."
+        }
+      ]
+    }
+  ]
+}

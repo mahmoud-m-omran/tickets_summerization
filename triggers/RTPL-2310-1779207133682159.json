@@ -1,0 +1,80 @@
+{
+  "ticket_key": "RTPL-2310",
+  "ticket_title": "Add Datadog Unified Service Tags to all RTGO Metrics",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1779207133.682159",
+  "test_cases": [
+    {
+      "name": "TC-1: Metrics appear with the correct service name in the monitoring dashboard [Priority: High]",
+      "test_data": "Preconditions: RT Platform deployed to a QA or UAT environment with monitoring configured. | Test Data: Any active flow that triggers metrics (e.g. an activation or refill); target service: rt-platform-api",
+      "steps": [
+        {
+          "action": "Trigger any standard flow (activation, payment, or refill) in the target environment.",
+          "expected": ""
+        },
+        {
+          "action": "Open the monitoring dashboard and search for metrics from the current deployment.",
+          "expected": ""
+        },
+        {
+          "action": "Inspect the service label on the emitted metrics.",
+          "expected": "All metrics show service = rt-platform-api on the monitoring dashboard."
+        }
+      ]
+    },
+    {
+      "name": "TC-2: Environment label on metrics matches the deployment environment [Priority: High]",
+      "test_data": "Preconditions: RT Platform deployed to at least two environments (e.g. QA and UAT). | Test Data: Same flow triggered in QA and UAT separately.",
+      "steps": [
+        {
+          "action": "Trigger a standard flow in the QA environment and observe the emitted metrics.",
+          "expected": ""
+        },
+        {
+          "action": "Repeat in the UAT environment.",
+          "expected": ""
+        },
+        {
+          "action": "Compare the environment label on metrics from each deployment.",
+          "expected": "QA metrics show env = qa; UAT metrics show env = uat. Labels do not cross between environments."
+        }
+      ]
+    },
+    {
+      "name": "TC-3: Version label on metrics reflects the deployed version after a new release [Priority: Medium]",
+      "test_data": "Preconditions: A new version of the RT Platform has been deployed to a test environment. | Test Data: Any active flow; known deployed version ID.",
+      "steps": [
+        {
+          "action": "Note the current version deployed to the environment.",
+          "expected": ""
+        },
+        {
+          "action": "Trigger a standard flow and check the version label on the emitted metrics.",
+          "expected": ""
+        },
+        {
+          "action": "Deploy a new version and repeat.",
+          "expected": "The version label updates to reflect the new deployment version. Previous version label no longer appears after the new deployment."
+        }
+      ]
+    },
+    {
+      "name": "TC-4: Monitoring dashboard allows navigation from a metric to its associated activity logs [Priority: High]",
+      "test_data": "Preconditions: RT Platform deployed to a monitored environment; Datadog monitoring configured with UST. | Test Data: Any flow that produces metrics and logs (e.g. activation).",
+      "steps": [
+        {
+          "action": "Open the monitoring dashboard and locate a metric emitted during an activation flow.",
+          "expected": ""
+        },
+        {
+          "action": "Use the drilldown feature on that metric.",
+          "expected": ""
+        },
+        {
+          "action": "Verify that associated log entries and activity traces are reachable from the metric.",
+          "expected": "Clicking through from the metric surface navigates to the related log spans and traces for the same event."
+        }
+      ]
+    }
+  ]
+}
