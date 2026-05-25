@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "filename": "RTPL-2370-1779437766617789.json",
+  "ticket_key": "RTPL-2370",
+  "ticket_title": "Cart displays $0.00 for Device and SIM prices despite backend returning correct pricing",
+  "folder_id": 414,
+  "folder_name": "RTPL-2370 \u2014 Cart displays $0.00 for Device and SIM prices despite backend returning correct pricing",
+  "cases_created": 5,
+  "case_ids": [
+    3605,
+    3606,
+    3607,
+    3608,
+    3609
+  ]
+}
