@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "filename": "RTPL-2394-1780387805508999.json",
+  "ticket_key": "RTPL-2394",
+  "ticket_title": "EdgeCoupon: show device coupons even when no matching discount entry exists (match legacy behavior \u2014 display, don't apply discount)",
+  "folder_id": 415,
+  "folder_name": "RTPL-2394 \u2014 EdgeCoupon: show device coupons even when no matching discount entry exists (match legacy behavior \u2014 display, don't apply discount)",
+  "cases_created": 5,
+  "case_ids": [
+    3612,
+    3613,
+    3614,
+    3615,
+    3616
+  ]
+}
