@@ -1,0 +1,53 @@
+{
+  "ticket_key": "RTPL-2394",
+  "ticket_title": "EdgeCoupon: show device coupons even when no matching discount entry exists (match legacy behavior — display, don't apply discount)",
+  "slack_channel_id": "C0B1V5DH4AY",
+  "slack_thread_ts": "1780387805.508999",
+  "test_cases": [
+    {
+      "name": "TC-1: Store rep selects a device coupon with no matching discount entry — activation completes at full device price [Priority: Critical]",
+      "test_data": "Preconditions: Customer has a valid prepaid account in good standing; store rep is logged in at a corporate location; a device is selected; a carrier-eligible coupon exists but has no current discount pricing on file in the system | Test Data: Existing prepaid customer, standard handset, COR store, coupon eligible per carrier offer but no discount price available, account age meets all eligibility requirements",
+      "steps": [
+        {"action": "Representative opens the activation flow and reaches the promotions and coupons selection screen", "expected": ""},
+        {"action": "Representative confirms the coupon with no discount is visible in the list alongside any other available promotions", "expected": ""},
+        {"action": "Representative selects the coupon and proceeds through the order", "expected": ""},
+        {"action": "Representative submits the activation", "expected": "Activation completes successfully. The device is charged at full retail price. No discount is applied. Customer's line is active."}
+      ]
+    },
+    {
+      "name": "TC-2: Device coupon with a valid discount entry still applies the correct discount (regression check) [Priority: Critical]",
+      "test_data": "Preconditions: Customer has a valid prepaid account; a coupon exists with a current, valid discount pricing entry on file | Test Data: Existing prepaid customer, standard handset, COR store, coupon with a valid and in-date discount amount on record",
+      "steps": [
+        {"action": "Representative opens the activation flow and reaches the promotions and coupons selection screen", "expected": ""},
+        {"action": "Representative confirms the coupon is visible with the correct discounted price shown", "expected": ""},
+        {"action": "Representative selects the coupon and completes the activation", "expected": "Discount is applied correctly. Device is sold at the reduced price. Activation completes without error."}
+      ]
+    },
+    {
+      "name": "TC-3: Promotions list ordering — coupons with discounts appear before coupons with no discount [Priority: High]",
+      "test_data": "Preconditions: Multiple coupons are available for the selected device — some with valid discount pricing, at least one without | Test Data: Two or more coupons in the list: one with a known discount amount, one with no discount on file; COR store; standard handset",
+      "steps": [
+        {"action": "Representative opens the activation flow and navigates to the promotions selection screen", "expected": ""},
+        {"action": "Representative reviews the full list of available coupons", "expected": "Coupons that carry a discount appear at the top of the list. Coupons with no discount appear below them. No coupon is missing from the list."}
+      ]
+    },
+    {
+      "name": "TC-5: Tax calculation is correct when a no-discount coupon is used and device sells at full price [Priority: High]",
+      "test_data": "Preconditions: Tax rate for the store location is configured; activation uses a no-discount coupon | Test Data: Corporate store with a resolved state tax rate; standard taxable handset; no-discount coupon selected",
+      "steps": [
+        {"action": "Representative selects the no-discount coupon and proceeds to the payment step", "expected": ""},
+        {"action": "Representative reviews the tax and total breakdown before confirming", "expected": ""},
+        {"action": "Representative submits the order", "expected": "Tax is calculated correctly against the full device retail price. Total due equals full device price plus applicable tax. No missing or incorrect tax line."}
+      ]
+    },
+    {
+      "name": "TC-7: Identity check failure — coupon selection screen is not reached when the customer does not pass the required identity verification [Priority: High]",
+      "test_data": "Preconditions: Customer is in the activation flow and reaches the identity verification step; identity check returns a failed result | Test Data: New prepaid customer, COR store, identity check outcome: failed / not verified",
+      "steps": [
+        {"action": "Representative progresses the customer through the activation flow to the identity verification step", "expected": ""},
+        {"action": "Customer's identity check returns a failed result", "expected": ""},
+        {"action": "Representative observes the outcome", "expected": "The activation does not proceed past the identity check. The coupon selection screen is never displayed. No partial activation is created."}
+      ]
+    }
+  ]
+}
