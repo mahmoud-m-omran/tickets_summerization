@@ -1,0 +1,107 @@
+{
+  "ticket_key": "BYOD",
+  "ticket_title": "AI (BYOD - AI folder)",
+  "folder_id": 426,
+  "test_cases": [
+    {
+      "name": "BYOD-022 | Real Accessory Added on BYOD Sale — Invoice + Payment Integrity",
+      "priority": "High",
+      "tags": [
+        "BYOD",
+        "Accessory",
+        "Invoice",
+        "ReviewInvoice",
+        "SaleRecord",
+        "Cash",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "AR: AR-4 (needs a tangible accessory in local inventory; browse-filter bug RTPL-2783) | Type: Positive | Technique: EP (add vs skip) + output-completeness oracle.\n\nFeature: At the mandatory Add Accessory (Review invoice) step of a BYOD activation the rep can add a real, non-serialized accessory (case, charger, screen protector, cable) to the same order as the activated line. The accessory is added by scanning/typing its SKU or picking it from browse inventory; it becomes its own line item, is taxed independently on its selling price, raises the balance due, and must persist in the SaleRecord alongside the BYOD device $0 line. Every other BYOD case adds zero accessories — this one proves a real accessory flows through invoice and payment correctly and that removing it restores the original balance.\n\nRelated: RTPL-2739 (activation payment accessory line-item shape), RTPL-2788 (accessory price/tax: tax on discounted price, min/max range), RTPL-2730 (accessory-in-invoice components: AddItemToInvoice, InventoryBrowse, ConfirmInvoice), RTPL-2783 (browse must list tangible accessories only), RTPL-2781 (description pulls from master SKU list), RTPL-2353 (non-serialized accessory definition).\n\nAutomation Notes: Accessory is DISCOVERED at run time (first eligible tangible accessory from browse inventory) — do not pin a SKU (rule 4). Decisive oracle = SaleRecord line count includes the accessory AND its tax; the running-cart / Balance-due delta is the cheap early signal. Assert add-then-remove restores payment.totalAmount before the final add. Real payload shape to assert (RTPL-2739): line {type:'accessory', sku, description (from master SKU list), amount, discount:0.00, tax, total}. In-activation add fires POST prepare-payment (not the standalone Quick Sale prepare-sale). Browse-filter bug RTPL-2783 may surface non-tangible items (fees) — gate/skip until fixed.\n\nPreconditions / Test Data:\nStore rep logged in at a COR store; a new account created and the customer ID verified (BYOD-001 steps 1-3). ConfigCat flag enable_subscriber_activation_byod = ON. At least one tangible, non-serialized accessory in local inventory with stock > 0.\n\nTest Data (FE): IMEI = random Luhn-valid 15-digit customer-owned handset IMEI (not in local inventory), or a pooled singleSims[] entry. SIM (ICCID) = first unused physical SIM matching ^89[a-zA-Z0-9]{17}F$. Accessory = discovered at run time (first eligible tangible accessory) — NOT pinned. MDN, plan, protection also discovered at run time.",
+      "steps": [
+        {
+          "action": "Rep runs the BYOD flow through device + SIM (IMEI -> accept-add-as-byod -> BYOP Android -> Continue -> enter ICCID -> Continue) as in BYOD-001 steps 4-10",
+          "expected": "[BE] POST validate-device -> state.lines[0]; accept-add-as-byod; deviceValidationDetails isByod=true, deviceSource='B', basePrice=0; POST validate-sim-card -> state.lines[0]. [FE] cart \"Device\" row = $0.00, \"SIM card\" row = $10 + tax"
+        },
+        {
+          "action": "Rep selects a new number and completes protection (Skip) -> plan (first eligible) -> promotions (Skip) -> add-ons (Skip) -> Create subscriber, as in BYOD-001 steps 11-18",
+          "expected": "[BE] configure-protection skipped=true, configure-plan set, activate-subscriber accepted (no error 100000004/999999963). [FE] dialog offers Continue to order summary"
+        },
+        {
+          "action": "Rep clicks Continue to order summary (single line)",
+          "expected": "[FE] \"Order summary\" header visible"
+        },
+        {
+          "action": "Order Summary — rep reviews",
+          "expected": "[Both] Order ID=state.orderId; Account number; Lines in order=orderSummary.linesInOrder; Total MRC=orderSummary.totalMrc; Total taxes & fees=orderSummary.totalTaxesAndFees; Edge due immediately=orderSummary.dueImmediatelyAmount; device $0.00, SIM $10 + tax"
+        },
+        {
+          "action": "Add Accessory — rep opens Review invoice and browses inventory",
+          "expected": "[FE] \"Review invoice\" header; item rows = payment.lineItems.length + 3 (discount, tax, pp-tax); Balance due = payment.totalAmount. [FE] browse inventory lists tangible/sellable accessories only — no METRO ACT/REACT fee, ESN CHANGE, QPAY PAYMENT FEE (RTPL-2783)"
+        },
+        {
+          "action": "Rep adds the first eligible tangible accessory (scan/type item number, or browse-select)",
+          "expected": "[Both] POST prepare-payment adds the accessory; [BE] new line {type:'accessory', sku, description from master SKU list (RTPL-2781), amount, discount:0.00, tax on amount, total}; [FE] item row count +1; Balance due increases by the accessory total (amount + tax)"
+        },
+        {
+          "action": "Rep removes the accessory",
+          "expected": "[Both] POST prepare-payment removes the accessory; [FE] accessory row gone; Balance due restored to the original payment.totalAmount (no residual charge)"
+        },
+        {
+          "action": "Rep re-adds the accessory and clicks Continue to payment",
+          "expected": "[Both] accessory re-added; [BE] POST prepare-payment. [FE] payment screen; amount to collect = due immediately including the accessory total"
+        },
+        {
+          "action": "Rep pays cash, exact amount (including the accessory)",
+          "expected": "[Both] collect-cash -> collect-payment succeeds. [BE] POST set-payment-amount/collect -> SaleRecord persists with a real number (no TEMP-), saleRecordFailed=false; SaleRecord contains the BYOD device $0 line, the SIM $10 + tax line, AND the accessory line (type accessory, its own tax); QPAY total matches the Order/Review-invoice balance (assert via SQL executeQueryTask / receipt parsePdf)"
+        }
+      ]
+    },
+    {
+      "name": "BYOD-023 | Port-In Number on BYOD Activation — mdnFlowType=PORTIN",
+      "priority": "High",
+      "tags": [
+        "BYOD",
+        "PortIn",
+        "MDN",
+        "PhoneNumber",
+        "MetroIntegration",
+        "Cash",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "AR: AR-4 (needs a provisioned portable test MDN + donor-carrier port credentials; exact port-in intake fields not documented in tickets) | Type: Positive + Negative | Technique: EP (number-option branch: new vs port) + state transition.\n\nFeature: During a BYOD activation the phone-number step offers two mutually-exclusive options — take a New Metro number or Port an existing number from another carrier. Choosing \"Port phone number\" lets the customer keep their current number: the rep enters the number to port plus the donor-carrier porting details, and the platform submits it to Metro as a port-in (mdnFlowType=PORTIN) rather than a fresh Metro number (mdnFlowType=SUBMARKET). Getting this wrong either drops the customer's number or provisions a wrong new number. This case proves the port path is selectable, submits PORTIN to Metro, and completes the BYOD sale on the ported number.\n\nRelated: RTPL-2728 (Reactivation BE/FE: New Number / Port-in offered as the number step), RTPL-2852 (mdnFlowType=SUBMARKET vs PORTIN; metroapi_v3.prg:2650-2652/2695-2698), RTPL-2667 (port-in Switcher promotion requires donor-carrier confirmation; mismatch blocks completion), RTPL-2686 (Account 360 surfaces PortInInd per line), RTPL-2454 (legacy port-in coupon check parity).\n\nAutomation Notes: The port-in intake sub-fields (number to port, account number/PIN, billing zip, donor carrier) are NOT fully specified in current tickets — provision a real portable test MDN + porting credentials and confirm the live field set before pinning selectors; that data dependency is why this is AR-4, not AR-5. Number/plan otherwise discovered at run time (rule 4). Decisive [BE] oracle: the outbound Metro call carries mdnFlowType=PORTIN (not SUBMARKET) — assert on the proxy request, not just UI. Run the New-number path (BYOD-001) as the SUBMARKET control. Negative branch: a non-portable / carrier-mismatched number must be rejected and must NOT complete the activation (RTPL-2667).\n\nPreconditions / Test Data:\nStore rep logged in at a COR store; a new account created and the customer ID verified (BYOD-001 steps 1-3). ConfigCat flag enable_subscriber_activation_byod = ON. A real portable test MDN with valid donor-carrier porting credentials provisioned.\n\nTest Data (FE): IMEI = random Luhn-valid 15-digit customer-owned handset IMEI (or pooled singleSims[]). SIM (ICCID) = first unused physical SIM matching ^89[a-zA-Z0-9]{17}F$. Port-in MDN + porting details (account #, PIN, billing zip, donor carrier) = provisioned porting fixture. Non-portable MDN = a number known not to be portable (negative run). Plan/protection discovered at run time.",
+      "steps": [
+        {
+          "action": "Rep runs the BYOD flow through device + SIM (IMEI -> accept-add-as-byod -> BYOP Android -> Continue -> enter ICCID -> Continue) as in BYOD-001 steps 4-9",
+          "expected": "[BE] POST validate-device -> state.lines[0]; accept-add-as-byod; POST validate-sim-card -> state.lines[0]; GET available-mdns returns the MDN list. [FE] \"Phone number selection\" header; cart \"Device\" $0.00, \"SIM card\" $10 + tax"
+        },
+        {
+          "action": "Rep reads the two number cards on the Phone number selection screen",
+          "expected": "[FE] 2 cards — New: title \"New phone number\", subtitle \"Get a new Metro phone number\", checked; Port: title \"Port phone number\", subtitle \"Switch carrier and keep existing phone number\", NOT checked; zip prefilled from the account"
+        },
+        {
+          "action": "Rep selects the \"Port phone number\" card",
+          "expected": "[FE] Port card selected (aria-label \"Select\" -> \"Selected\"), New card deselected; port-in intake fields (number to port, account #/PIN, billing zip, donor carrier) revealed — flow does NOT advance yet"
+        },
+        {
+          "action": "Rep enters the number to port plus the porting details (account #, PIN, billing zip, donor carrier) and clicks Continue",
+          "expected": "[Both] configure-mdn dispatched with the port action; [BE] outbound Metro call carries mdnFlowType=PORTIN (NOT SUBMARKET); [FE] \"Protection selection\" header; cart \"Phone number\" row = (npa) nxx-**** (the ported number)"
+        },
+        {
+          "action": "Rep completes protection (Skip) -> plan (first eligible) -> promotions (Skip) -> add-ons (Skip) -> Create subscriber, as in BYOD-001 steps 12-18",
+          "expected": "[BE] configure-protection skipped=true; configure-plan set; activate-subscriber accepted with the ported MDN, no error 100000004/999999963"
+        },
+        {
+          "action": "Rep completes Order Summary -> Add Accessory (adds none) -> cash payment, as in BYOD-001 steps 19-23",
+          "expected": "[Both] Order Summary shows the ported number and device $0 / SIM $10 + tax; [BE] collect-cash -> collect-payment; SaleRecord persists with a real number (no TEMP-), reflects the ported MDN, PortInInd set for the line (RTPL-2686)"
+        },
+        {
+          "action": "(Negative, fresh line) Rep selects Port phone number and enters a non-portable / carrier-mismatched number and Continues",
+          "expected": "[Both] the non-portable number is rejected with a port validation error and the activation does NOT complete (donor-carrier confirmation required — RTPL-2667); [BE] no SUBMARKET fallback silently substituted"
+        }
+      ]
+    }
+  ]
+}
