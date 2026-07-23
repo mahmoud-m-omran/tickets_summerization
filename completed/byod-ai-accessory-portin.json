@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "filename": "byod-ai-accessory-portin.json",
+  "ticket_key": "BYOD",
+  "ticket_title": "AI (BYOD - AI folder)",
+  "folder_id": 426,
+  "folder_name": "BYOD \u2014 AI (BYOD - AI folder)",
+  "cases_created": 2,
+  "case_ids": [
+    3707,
+    3708
+  ]
+}
