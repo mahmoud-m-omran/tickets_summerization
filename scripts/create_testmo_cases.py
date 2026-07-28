@@ -60,7 +60,8 @@ for trigger_path in trigger_files:
     ticket_key = data["ticket_key"]
     ticket_title = data["ticket_title"]
     test_cases = data["test_cases"]
-    folder_name = f"{ticket_key} — {ticket_title}"
+    # Optional explicit folder name (else derived from ticket key/title).
+    folder_name = data.get("folder_name") or f"{ticket_key} — {ticket_title}"
     # Optional: post directly into an existing folder (skip create-under-parent).
     folder_id_override = data.get("folder_id")
 

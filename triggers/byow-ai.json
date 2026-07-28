@@ -1,0 +1,312 @@
+{
+  "ticket_key": "BYOW Wearable Activation",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "WEAR-001 | Activate a customer's own watch as a paired line on their phone",
+      "priority": "Critical",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "Paired",
+        "eSIM",
+        "EID",
+        "MultiLine",
+        "Cash",
+        "Critical",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nBYOW (Bring Your Own Watch) lets a rep add a customer-owned smartwatch to the account as a paired line on an existing phone. The watch has no physical SIM — it is provisioned via its 32-digit EID (eSIM) — and its plan is paired to a voice line the rep explicitly selects. A watch can never be line 1: a primary phone line must exist first.\n\n## Related tickets\nRTPL-2012 (Epic: Wearable Activations), RTPL-2347 (pairing/standalone plan), RTPL-2576 (watch eSIM-only), RTPL-2205 (watch compatibility)\n\n## Preconditions\n- ConfigCat flags enable_subscriber_activation_byod = ON and enable_subscriber_activation_watch = ON.\n- A primary phone line already activated/added on the order (rule 9 — watch cannot be line 1), then add-line for the watch.\n- New account created + ID verified (as in the handset happy path).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** Real customer-owned BYOW watch IMEI (family 36040; Apple then Samsung for pairwise). Single-IMEI, byodType 'W'\n- **EID:** Valid 32-digit numeric ^[0-9]{32}$ (watch is eSIM-only — no physical SIM)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Watch is eSIM-only — assert the EID screen appears and NO pSIM card (RTPL-2576).\n- Pairing MDN is rep-selected, never auto-picked (RTPL-2347).\n- Blocked to AR-2 until a real watch IMEI + valid EID are provisioned (workbook EID column float-corrupted).",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the watch IMEI",
+          "expected": "[BE] POST validate-device -> deviceType='WEARABLE', byodType='W', isByod=true, countOfSims=1, imei2=null. [FE] 'IMEI not found' drawer (customer-owned)"
+        },
+        {
+          "action": "Rep clicks Continue in the drawer, then picks the watch device type",
+          "expected": "[Both] accept-add-as-byod; [BE] availableByodDeviceTypes = watch codes only (no handset codes); [FE] watch type selected, Continue enabled"
+        },
+        {
+          "action": "Rep clicks Continue",
+          "expected": "[BE] selectedByodDeviceType = the watch code; simOptions[0].simType='ESIM'. [FE] EID entry screen (NOT a physical-SIM card) — RTPL-2576"
+        },
+        {
+          "action": "Rep enters the 32-digit EID and Continues",
+          "expected": "[Both] provide-eid accepted; deviceValidationDetails.eid set; flow advances to number/plan"
+        },
+        {
+          "action": "Rep reaches plan selection and picks a paired watch plan",
+          "expected": "[BE] GET selection-options/plans; [FE] paired plan selected; a pairing-MDN selector appears (paired SOC requires a pairing line)"
+        },
+        {
+          "action": "Rep selects the pairing MDN (the phone line) and Continues",
+          "expected": "[Both] configure-plan with selectedPairingMdn set; [BE] primarySubscriberForPairing recorded; no pairing-mdn-required error"
+        },
+        {
+          "action": "Rep completes promotions(skip) -> add-ons(skip) -> Create subscriber",
+          "expected": "[BE] watch line activated (deviceInfoSource = watch code); no error 100000004/999999963"
+        },
+        {
+          "action": "Rep completes Order Summary -> Add Accessory (none) -> cash payment (exact)",
+          "expected": "[Both] Order Summary 'Lines in order: 2'; [BE] collect-cash -> collect-payment; SaleRecord persists (no TEMP-) with BOTH lines and the watch Device row at $0.00"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-002 | Offer only watch device types when registering a customer's watch",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "DevicePicker",
+        "High",
+        "Regression",
+        "UI",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nWhen a rep registers a customer-owned watch, the device-type picker must offer watch types only (never handset/tablet). A regression once resolved Samsung/Apple watch IMEIs as phones and showed phone options — corrupting the whole activation.\n\n## Related tickets\nRTPL-2557 (watch IMEIs misidentified as phones), RTPL-2205\n\n## Preconditions\n- BYOW flow entered via accept-add-as-byod on a watch IMEI (primary phone line already present).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** Real BYOW watch IMEI (Apple + Samsung, family 36040)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Two-layer: intercept availableByodDeviceTypes AND assert rendered DOM. Assert by code, not i18n label.\n- RTPL-2557 regression signal: a watch IMEI that surfaces handset options is a fail.",
+      "steps": [
+        {
+          "action": "Rep reaches the device-type picker after accepting the watch as BYOD",
+          "expected": "[FE] required radio group shown"
+        },
+        {
+          "action": "Rep reads the offered options",
+          "expected": "[Both] rendered options = watch types only (BYOW-APPLEWATCH, BYOW-SAM); [BE] availableByodDeviceTypes contains NO handset/tablet codes (no BYOD-ANDROID/IPHONE/BYOT)"
+        },
+        {
+          "action": "Rep confirms a Samsung and an Apple watch IMEI both resolve to watch (RTPL-2557)",
+          "expected": "[BE] isWatch=true / deviceType='WEARABLE' for both — never phone options"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-003 | Reject a phone device type applied to a customer's watch",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "CrossDevice",
+        "NegativeTest",
+        "Security",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nThe device-type picker must be trustworthy end-to-end: a handset code (e.g. BYOD-ANDROID) must never be accepted for a watch IMEI. The backend must reject the mismatched code rather than silently flipping the line to a phone (a past bug returned 200 OK and overwrote isWatch true->false).\n\n## Related tickets\nRTPL-2556 (cross-device guard — code accepted for wrong class, isWatch overwritten)\n\n## Preconditions\n- BYOW flow: watch IMEI validated and accepted as BYOD (isWatch=true).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** Real BYOW watch IMEI (family 36040)\n- **Invalid device-type code (API bypass):** BYOD-ANDROID (handset-only)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- API layer is the real guard (RTPL-2556 was a 200 OK + isWatch flip). Assert on re-read state, not just the click response.",
+      "steps": [
+        {
+          "action": "Rep validates the watch IMEI and accepts BYOD",
+          "expected": "[BE] isWatch=true"
+        },
+        {
+          "action": "Rep views the picker",
+          "expected": "[FE] BYOD-ANDROID is not offered / not selectable"
+        },
+        {
+          "action": "(API bypass) submit select-byod-device-type with deviceType:'BYOD-ANDROID'",
+          "expected": "[BE] HTTP 400 invalid-byod-device-type — mismatched code rejected"
+        },
+        {
+          "action": "Re-read line state",
+          "expected": "[BE] isWatch still true (NOT overwritten); selectedByodDeviceType unchanged"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-004 | Provision a customer's watch by eSIM/EID, never a physical SIM",
+      "priority": "Critical",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "eSIM",
+        "EID",
+        "BVA",
+        "Cash",
+        "Critical",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nA smartwatch has no physical SIM — it must be provisioned via its 32-digit EID. RTGO must show the EID entry screen (never a physical-SIM card) for a watch, accept a valid 32-digit EID, and reject wrong lengths/charsets. A bug once presented a physical-SIM step for watches.\n\n## Related tickets\nRTPL-2576 (watch presented physical SIM instead of eSIM/EID), RTPL-2414 (missing-eid)\n\n## Preconditions\n- BYOW flow at the SIM/EID step for a watch line (primary phone line present).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** eSIM watch IMEI (family 36040, variant 1 = eSIM)\n- **EID (valid):** 32-digit numeric ^[0-9]{32}$\n- **EID (invalid, BVA):** 31 digits; 33 digits; 32 chars incl. a letter\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Decisive assert: the SIM step for a watch is the EID screen, and no pSIM line ever appears in cart/SaleRecord.\n- BVA as one parameterized spec: [31, 32, 33, 32+alpha].",
+      "steps": [
+        {
+          "action": "Rep reaches the SIM/EID step for the watch",
+          "expected": "[FE] EID entry screen shown — NO physical-SIM card offered (RTPL-2576); [BE] simOptions[0].simType='ESIM'"
+        },
+        {
+          "action": "Rep enters a 31-digit, then 33-digit, then 32+letter EID",
+          "expected": "[FE] each rejected by ^[0-9]{32}$; flow does NOT advance"
+        },
+        {
+          "action": "Rep enters a valid 32-digit EID and Continues",
+          "expected": "[Both] provide-eid accepted; deviceValidationDetails.eid set; flow advances"
+        },
+        {
+          "action": "Rep completes plan -> pairing MDN -> activate -> Order Summary -> Add Accessory -> cash payment",
+          "expected": "[BE] watch provisioned via eSIM; NO physical SIM line in the SaleRecord; SaleRecord persists (real number)"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-005 | Require the rep to choose a pairing line for a paired watch plan",
+      "priority": "Critical",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "Pairing",
+        "Plan",
+        "DecisionTable",
+        "Critical",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nA paired watch plan (Paired SOC) shares a phone line's service, so the rep must explicitly choose which voice line to pair to. RTGO must block finishing the watch line on a paired plan until a pairing MDN is selected — it must never silently auto-pick or proceed without one.\n\n## Related tickets\nRTPL-2347 (smartwatch pairing + standalone plan selection), RTPL-2012\n\n## Preconditions\n- BYOW watch line at plan selection; account has at least one eligible voice line (availableSubscriberForPairing non-empty).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** eSIM BYOW watch IMEI\n- **Plan:** A paired watch SOC (e.g. AWATCHPR / FAMWATCH) — discovered at run time\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Candidate lines come from BE availableSubscriberForPairing; the rep's pick is submitted as selectedPairingMdn — never auto-picked (RTPL-2347).\n- Assert by SOC class (paired vs standalone), not price.",
+      "steps": [
+        {
+          "action": "Rep selects a paired watch plan and tries to continue WITHOUT choosing a pairing MDN",
+          "expected": "[Both] 400 pairing-mdn-required; flow stays at plan/pairing; [FE] pairing-MDN selector flagged required"
+        },
+        {
+          "action": "Rep selects a pairing MDN from the offered voice lines and continues",
+          "expected": "[Both] accepted; selectedPairingMdn / primarySubscriberForPairing set; flow advances to promotions"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-006 | Reject an invalid or unavailable pairing line for a watch",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "Pairing",
+        "NegativeTest",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nWhen pairing a watch, the chosen pairing MDN must be one of the account's eligible voice lines. Submitting a number not in the offered list must be rejected; and if the account has no voice line to pair with at all, the paired plan cannot proceed.\n\n## Related tickets\nRTPL-2347 (pairing-mdn-invalid / pairing-mdn-unavailable)\n\n## Preconditions\n- BYOW watch line at the pairing-MDN step.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** eSIM BYOW watch IMEI\n- **Invalid pairing MDN:** A number NOT in availableSubscriberForPairing\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Two rules from RTPL-2347: invalid (not in list) vs unavailable (none exist). Assert the exact reason code per branch.",
+      "steps": [
+        {
+          "action": "Rep submits a pairing MDN that is not in the offered list",
+          "expected": "[Both] 400 pairing-mdn-invalid; flow does NOT advance"
+        },
+        {
+          "action": "(No-voice-line account) Rep reaches a paired plan with no eligible voice line",
+          "expected": "[Both] pairing-mdn-unavailable — paired plan cannot be completed; rep must pick a standalone plan or add a voice line"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-007 | Suppress pairing for a standalone watch plan",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "Pairing",
+        "Standalone",
+        "DecisionTable",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nA standalone watch plan (Standalone SOC) does not pair to a phone line, so RTGO must auto-suppress the pairing-MDN selector for it — and defensively reject any pairing MDN submitted with a standalone plan.\n\n## Related tickets\nRTPL-2347 (standalone plan selection; standalone-pairing-not-allowed)\n\n## Preconditions\n- BYOW watch line at plan selection with a standalone watch SOC available.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** eSIM BYOW watch IMEI\n- **Plan:** A standalone watch SOC (e.g. AWATCHSA / WATCHSA) — discovered at run time\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Assert the message/copy matches approved i18n (RTPL-2347 AC: 'Unpaired plan selected — voice line pairing unavailable.' — confirm exact copy before pinning).\n- Standalone SOC set = UNPAIRED_WATCH_SOC_CODES; assert by socCode.",
+      "steps": [
+        {
+          "action": "Rep selects a standalone watch plan",
+          "expected": "[FE] no pairing-MDN selector shown (pairing suppressed); flow can proceed without a pairing MDN"
+        },
+        {
+          "action": "(Defensive, API) submit a standalone plan WITH a non-null pairing MDN",
+          "expected": "[BE] 400 standalone-pairing-not-allowed"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-008 | Block an incompatible watch before it enters BYOD",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "Compatibility",
+        "NegativeTest",
+        "High",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nNot every customer-owned watch can join the network. Metro runs a compatibility pre-check; a watch that is not 'Available to Activate' must be blocked before the BYOD flow starts, with a clear reason — never silently advanced.\n\n## Related tickets\nRTPL-2205 (watch compatibility pre-check; watch-not-compatible-for-byod)\n\n## Preconditions\n- Watch IMEI that Metro flags as not compatible for BYOD.\n\n## Test Data (FE — what the rep types)\n- **Incompatible watch IMEI:** A watch IMEI Metro returns as not compatible\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- The FE 'verify watch compatibility' landslide screen was resolved Won't-Do (RTPL-2016); only the BE pre-check remains — assert the reason code, not a dedicated screen.",
+      "steps": [
+        {
+          "action": "Rep enters the incompatible watch IMEI",
+          "expected": "[Both] reason code watch-not-compatible-for-byod; [FE] block message shown"
+        },
+        {
+          "action": "Rep confirms no BYOD entry occurs",
+          "expected": "[BE] no accept-add-as-byod path, no device-type picker, line does not advance"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-009 | Bill and save both lines when a phone and paired watch are on one order",
+      "priority": "Critical",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "MultiLine",
+        "Invoice",
+        "SaleRecord",
+        "Cash",
+        "Critical",
+        "Regression",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nA customer can activate a phone and a paired watch on one order. Both lines must be itemized on the invoice AND persisted in the SaleRecord — an earlier bug silently dropped the watch line from the SaleRecord though full payment was taken, breaking reconciliation. This proves nothing is dropped.\n\n## Related tickets\nRTPL-2641 (watch line dropped from receipt/SaleRecord — Verified), RTPL-2297 (activation failed for multi-line wearable)\n\n## Preconditions\n- enable_subscriber_activation_byod = ON and enable_subscriber_activation_watch = ON.\n- Line 1 = phone (BYOD or A-Stock) activated; watch added as line 2 via add-line (rule 9).\n\n## Test Data (FE — what the rep types)\n- **Line 1 IMEI:** Phone IMEI (BYOD handset or A-Stock)\n- **Line 2 Watch IMEI:** Real BYOW watch IMEI (Apple, then Samsung for pairwise)\n- **Line 2 EID:** Valid 32-digit EID\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Decisive oracle = SaleRecord item COUNT (must be 2), not invoice rendering (RTPL-2641).\n- A watch line resolving to ZERO sale items must fail loudly/alert, never persist silently.",
+      "steps": [
+        {
+          "action": "Rep activates line 1 (phone) through activate-subscriber",
+          "expected": "[BE] phone line activated"
+        },
+        {
+          "action": "Rep Add-a-line, enters the watch IMEI -> accept BYOD -> watch type -> EID -> paired plan + pairing MDN -> activate",
+          "expected": "[BE] watch line activated; [Both] watch line cart HAS a 'Device' row at $0.00 (a missing Device row is the drop precursor)"
+        },
+        {
+          "action": "Rep reviews Order Summary",
+          "expected": "[Both] 'Lines in order: 2'; both LINE ONLY ACTIVATION"
+        },
+        {
+          "action": "Rep completes Add Accessory -> cash payment (exact)",
+          "expected": "[BE] SaleRecord contains EXACTLY 2 LINE ONLY ACTIVATION items + payment; watch LineState.Pricing.Device non-null; QPAY total matches Order Summary"
+        },
+        {
+          "action": "Repeat with a Samsung watch as line 2 (pairwise)",
+          "expected": "[BE] same integrity"
+        }
+      ]
+    },
+    {
+      "name": "WEAR-010 | Prevent a watch from being the first line on an order",
+      "priority": "High",
+      "tags": [
+        "BYOW",
+        "Wearable",
+        "MultiLine",
+        "NegativeTest",
+        "StateTransition",
+        "High",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nA watch is an accessory line — it cannot be activated on its own as line 1; a primary phone line must exist first. Starting an order with a watch as the first line must be prevented so the pairing/plan model stays valid.\n\n## Related tickets\nRTPL-2012, Section-0 rule 9 (tablet/watch cannot be line 1)\n\n## Preconditions\n- Fresh order with no activated primary line.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** BYOW watch IMEI (family 36040)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Guard mirrors the tablet line-1 rule. Assert the watch-first path is blocked and the add-line-second path works.",
+      "steps": [
+        {
+          "action": "On a brand-new order (no primary line), rep enters the watch IMEI as line 1",
+          "expected": "[Both] the flow does NOT allow the watch as line 1 — rep is required to add/activate a primary phone line first"
+        },
+        {
+          "action": "Rep adds a primary phone line, then adds the watch as line 2",
+          "expected": "[Both] watch now accepted on line 2; flow proceeds normally"
+        }
+      ]
+    }
+  ],
+  "folder_name": "BYOW - AI"
+}
