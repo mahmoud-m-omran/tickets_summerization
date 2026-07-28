@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "filename": "byow-ai.json",
+  "ticket_key": "BYOW Wearable Activation",
+  "ticket_title": "AI",
+  "folder_id": 428,
+  "folder_name": "BYOW - AI",
+  "cases_created": 10,
+  "case_ids": [
+    3712,
+    3713,
+    3714,
+    3715,
+    3716,
+    3717,
+    3718,
+    3719,
+    3720,
+    3721
+  ]
+}
