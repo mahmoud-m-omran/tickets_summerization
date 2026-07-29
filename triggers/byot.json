@@ -1,0 +1,399 @@
+{
+  "ticket_key": "BYOT",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "Activate a customer-owned tablet with a physical SIM as a second line, end to end",
+      "priority": "Critical",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "PSIM",
+        "MultiLine",
+        "Cash",
+        "Smoke",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nBYOT (Bring Your Own Tablet) lets a store rep activate a tablet the customer already owns instead of selling dealer stock. It is the tablet branch of the BYOD path: an IMEI not found in dealer inventory is offered as customer-owned, the rep accepts and picks 'Tablet' from the BYOD device-type picker, and the platform registers the device with the carrier under the BYOT code at $0 device price (untaxed). Only the SIM, plan, taxes and accessories are charged. The rep's device-type selection is persisted through the whole activation and sent to the carrier (RTPL-2403 fix).\n\n## Related tickets\nRTPL-2205 (story), RTPL-2574, RTPL-2403 (PR #378), RTPL-2061 (BYOD Epic)\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule: tablet/watch never line 1; note the backend has no hard gate, see Automation Notes).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (provisioned at Metro, not in dealer inventory, single-SIM device profile)\n- **SIM (ICCID):** First unused iccids[] entry matching ^89[a-zA-Z0-9]{17}F$\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Teardown: afterEach cancels the line via apiCalls.cancelLine(processId); capture processId from the first lines/start intercept.\n- Backend has NO hard primary-line gate for tablets — pairing logic is wearable-only and explicitly skipped for tablet lines (Engine.ConfigurePlan.cs:175-180; unit test Should_skip_pairing_when_byot_override_made_line_a_tablet). Primary-line-first is house convention / RTPOS parity, not a code guard — never author a line-1 tablet case, but do not expect a BE rejection either.\n- Picker radio ids are stable automation hooks: #byod-device-type-BYOT etc. (select-byod-device-type.vue:151).\n- BYOT pricing source: device-pricing-registry.ts:337-345 — sku 'BYOT-CUST', description 'Customer-Owned Tablet', basePrice 0, isTaxable false.\n- Known blocker (2026-07-09 live run): tablet plan list returned plans:null at configure-plan (Bug #2). Re-verify on UAT3 before first automated run; the plan step must assert a non-empty list.\n- Do NOT run against backend-mock: the mock still ships the RTPL-2403 device-type bug (collect-device-info-repository.ts:293-300) — real BE / UAT only.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the customer-owned tablet IMEI",
+          "expected": "[Both] POST .../activities/validate-device -> device not in dealer inventory; response offers actions [accept-add-as-byod, decline-add-as-byod]. [FE] Confirm drawer appears: title 'IMEI not found', body 'The IMEI {imei} is invalid or the device is a BYOD Device.' with continue/go-back choices"
+        },
+        {
+          "action": "Rep continues, accepting the device as customer-owned (BYOD)",
+          "expected": "[Both] POST .../activities/collect-device-info {action:'accept-add-as-byod'} -> reasonCodeForAction='select-byod-device-type'; state availableByodDeviceTypes=['BYOD-ANDROID','BYOD-IPHONE','BYOD-DSI','BYOT']. [FE] Picker screen: title 'Add BYOD device', label 'Select device type', description 'Select the device type to register this device as a BYOD (Bring Your Own Device).'; exactly 3 radios rendered — 'BYOP Android', 'BYOP iPhone', 'Tablet' (BYOD-DSI is FE-hidden)"
+        },
+        {
+          "action": "Rep selects the 'Tablet' option (selection only — no advance)",
+          "expected": "[FE] Radio input #byod-device-type-BYOT checked, tablet icon shown; other radios unchecked; Continue enabled; screen does NOT advance"
+        },
+        {
+          "action": "Rep taps Continue",
+          "expected": "[Both] POST .../activities/collect-device-info {action:'select-byod-device-type', inputData:{deviceType:'BYOT'}} -> state deviceValidationDetails: selectedByodDeviceType='BYOT', deviceType='Tablet', isByod=true, deviceSource='B'; single-SIM device (deviceProperty not DF/DS) so NO IMEI2 prompt; flow passes through resolve-device-pricing. [FE] 'SIM validation' header appears. Cart: Device row = 'Customer-Owned Tablet', price $0.00, tax $0.00"
+        },
+        {
+          "action": "Rep enters the physical SIM ICCID",
+          "expected": "[FE] Exactly 1 pSIM card, title 'IMEI 1 - PSIM', content = tablet IMEI; SIM label 'ICCID SIM *'; Continue disabled until a valid ICCID is entered, then enabled"
+        },
+        {
+          "action": "Rep taps Continue on SIM validation",
+          "expected": "[Both] POST .../activities/validate-sim-card -> state.lines[0]; GET available-mdns returns the MDN list. [FE] 'Phone number selection' header. Cart: 'SIM card' row = $10 selling price plus tax (BYOD PSIM: $10, no free-SIM discount, taxed on $10)"
+        },
+        {
+          "action": "Rep keeps 'New phone number' with the first available MDN and taps Continue",
+          "expected": "[FE] 2 cards: 'New phone number' (checked), 'Port phone number' (unchecked); MDN messages formatted '(npa) nxx-* submarketName, stateCode'. [Both] Continue -> GET selection-options/protections returns protectionPlans. [FE] 'Protection selection' header; cart 'Phone number' row = '(npa) nxx-****'"
+        },
+        {
+          "action": "Rep selects the first eligible protection (selection only), then taps Continue",
+          "expected": "[FE] Selected card button aria-label flips 'Select' -> 'Selected'. [Both] Continue -> POST configure-protection; GET selection-options/plans returns plans. [FE] 'Plan selection' header; cart gains 'Protection (SOC)' = '$x / mo.'"
+        },
+        {
+          "action": "Rep keeps the pre-selected plan (index 0) and taps Continue",
+          "expected": "[FE] Plan cards sorted high->low with '$x per month' badges; index 0 pre-selected; plan list MUST be non-empty (plans:null here is the known tablet blocker — fail loudly). [Both] Continue -> POST configure-plan; GET selection-options/promotions. [FE] 'Promotion selection' header; cart gains 'Plan (SOC)' = '$x / mo.'; Estimated monthly and Total due update"
+        },
+        {
+          "action": "Rep continues through Promotion selection without selecting (separate step from add-ons)",
+          "expected": "[FE] 'Promotion selection' header; if none eligible the exact text 'This customer is not eligible for any promotions at this time. You can continue with the current pricing.' [Both] Continue -> POST configure-promotions; GET selection-options/addons"
+        },
+        {
+          "action": "Rep continues through Add on services without selecting (separate step from promotions)",
+          "expected": "[FE] 'Add on services' header with category tabs (International, Services, Data, Storage, Security, Others). [Both] Continue -> create-subscriber confirm dialog appears"
+        },
+        {
+          "action": "Rep confirms 'Create subscriber' then 'Continue to order summary'",
+          "expected": "[Both] activate-subscriber completes; order-summary response received. [FE] Order Summary rows: Order ID = state.orderId, Account number = state.accountContext.accountNumber, Lines in order = 2, Total MRC = orderSummary.totalMrc, Total taxes & fees = orderSummary.totalTaxesAndFees, Edge due immediately = orderSummary.dueImmediatelyAmount"
+        },
+        {
+          "action": "Rep reviews the Order Summary and continues to Add Accessory (adds zero accessories)",
+          "expected": "[FE] 'Review invoice' header; row count = payment.lineItems.length + 3 (discount, tax, pp-tax); device line shows $0.00 for the tablet; Balance due = payment.totalAmount. [BE] Continue to payment -> POST prepare-payment"
+        },
+        {
+          "action": "Rep collects CASH for the exact balance due and completes payment",
+          "expected": "[FE] Payment summary shows 'Order summary' + 'Account summary'; Total to collect = balance due (exact, no change). [BE] collect-cash -> collect-payment succeeds; SaleRecord persists with a real record number (no 'TEMP-' prefix) — assert via SQL executeQueryTask"
+        }
+      ]
+    },
+    {
+      "name": "Phone-or-tablet BYOD picker offers exactly Android, iPhone and Tablet",
+      "priority": "High",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "Picker",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nWhen a rep accepts an unknown (non-watch) IMEI as customer-owned, the BYOD device-type picker must present the three selectable non-watch choices — BYOP Android, BYOP iPhone and Tablet. The backend also returns the disallowed BYOD-DSI code, which the frontend hides (product decision: no DSI). A missing Tablet option blocks every BYOT activation at the counter (RTPL-2574).\n\n## Related tickets\nRTPL-2574, RTPL-2205, RTPL-2403\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet candidate is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (non-watch classification, not in dealer inventory)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Partial case — stops at the picker assertion; no Order Summary / payment needed. Teardown: cancel the line via API.\n- FE hides BYOD-DSI via HIDDEN_DEVICE_TYPES set (select-byod-device-type.vue:55) while the BE still returns it — assert the [BE] 4-code set AND the [FE] 3-radio render separately; both are regression signals.\n- Labels come from ui.base.json byod-device-type.* keys — assert exact strings 'BYOP Android' / 'BYOP iPhone' / 'Tablet'.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the customer-owned tablet IMEI",
+          "expected": "[Both] POST validate-device -> device not in dealer inventory; actions [accept-add-as-byod, decline-add-as-byod] offered. [FE] Drawer title 'IMEI not found'"
+        },
+        {
+          "action": "Rep continues, accepting the device as customer-owned (BYOD)",
+          "expected": "[BE] POST collect-device-info {action:'accept-add-as-byod'} -> reasonCodeForAction='select-byod-device-type'; availableByodDeviceTypes=['BYOD-ANDROID','BYOD-IPHONE','BYOD-DSI','BYOT'] (exact set, order-insensitive)"
+        },
+        {
+          "action": "Rep inspects the device type picker screen",
+          "expected": "[FE] Title 'Add BYOD device'; label 'Select device type'; description 'Select the device type to register this device as a BYOD (Bring Your Own Device).'; EXACTLY 3 radio options rendered: 'BYOP Android' (#byod-device-type-BYOD-ANDROID), 'BYOP iPhone' (#byod-device-type-BYOD-IPHONE), 'Tablet' (#byod-device-type-BYOT); NO 'BYOD-DSI' option visible; all 3 selectable; Continue label = 'Continue'"
+        }
+      ]
+    },
+    {
+      "name": "Tablet option appears in the watch-compatible BYOD picker",
+      "priority": "High",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Watch",
+        "Picker",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nLegacy RTPOS offers Tablet in the watch-compatible BYOD picker, and RTGO must match: when the carrier classifies the customer-owned IMEI as a watch, the device-type picker shows the watch options AND Tablet — because watch-classified tablets exist in the wild and the rep must be able to correct the classification. Before the RTPL-2574 fix only the two smartwatch choices appeared, dead-ending tablet activations that arrived through this branch.\n\n## Related tickets\nRTPL-2574 (fix), RTPL-2205, RTPL-2557\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the device is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** Real watch IMEI from the RTGO Data workbook that Metro resolves with watch classification (byodType 'W'); probe live — do not synthesize\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Partial case — stops at the picker assertion. Teardown: cancel the line via API.\n- MUST run against the real backend: backend-mock's watch branch returns only ['BYOW-SAM','BYOW-APPLEWATCH'] — the RTPL-2574 fix is NOT in the mock (collect-device-info-repository.ts:169-173), and mock tests lock in the wrong behavior. A mock run fails this case falsely.\n- Real-BE source of truth: GetAvailableWatchOptions includes BYOT in both DSI and non-DSI variants (SubscriberActivationConstants.cs:126-132, comment cites RTPL-2574).",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the watch-classified customer-owned IMEI",
+          "expected": "[Both] POST validate-device -> device not in dealer inventory, watch classification (isWatch=true); actions [accept-add-as-byod, decline-add-as-byod] offered. [FE] Drawer title 'IMEI not found'"
+        },
+        {
+          "action": "Rep continues, accepting the device as customer-owned (BYOD)",
+          "expected": "[BE] reasonCodeForAction='select-byod-device-type'; availableByodDeviceTypes = ['BYOW-SAM','BYOW-APPLEWATCH','BYOT'] (non-DSI watch set — Tablet MUST be present)"
+        },
+        {
+          "action": "Rep inspects the device type picker screen",
+          "expected": "[FE] Exactly 3 radios rendered: 'BYOW Sam', 'BYOW Apple Watch', 'Tablet' (#byod-device-type-BYOT); all selectable"
+        }
+      ]
+    },
+    {
+      "name": "Choosing Tablet for a watch-classified device reclassifies the line and skips watch pairing",
+      "priority": "High",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Watch",
+        "Reclassification",
+        "Edge"
+      ],
+      "custom_requirements": "## Feature description\nWhen the carrier classifies a customer-owned device as a watch but the rep picks Tablet from the picker, the platform must override the classification: the line becomes a Tablet (selectedByodDeviceType 'BYOT', deviceType 'Tablet'), watch plan filtering and wearable pairing no longer apply, and the carrier receives the tablet code as-is (no Samsung watch item-id substitution). This is the correction path for tablets that Metro's device database mis-tags as wearables.\n\n## Related tickets\nRTPL-2574, RTPL-2403, RTPL-2347 (pairing), RTPL-2576 (watch eSIM)\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the device is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** Real watch IMEI from the RTGO Data workbook that Metro resolves with watch classification (byodType 'W')\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Known asymmetry (potential product bug — raise before automating the SIM assertion hard): the BYOT override flips DeviceType to Tablet but leaves IsWatch=true, and BuildAllowedSimOptions passes IsWatch (Engine.ValidateDevice.cs:898-913) — so this line still gets the watch eSIM-only SIM matrix. Backend unit test Should_skip_pairing_when_byot_override_made_line_a_tablet (WhenValidatingPairingSelection.cs:130-144) proves the pairing skip; nothing pins the SIM matrix. Confirm intended behavior with product, then harden step 4.\n- Override source: Engine.CollectDeviceInfo.cs:302-312 (IsWatch branch: BYOT -> DeviceType.Tablet); no-substitution rule: DeviceState.cs:186-205 ('BYOT is sent to AddByodDevice as-is').\n- Real BE only — mock lacks the 2574/2403 behavior.\n- Partial case — stops at the plan-list assertion; no payment.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the watch-classified IMEI, accepts as BYOD, and reaches the picker",
+          "expected": "[BE] availableByodDeviceTypes includes 'BYOT'. [FE] Picker shows 'BYOW Sam', 'BYOW Apple Watch', 'Tablet'"
+        },
+        {
+          "action": "Rep selects 'Tablet' (selection only)",
+          "expected": "[FE] #byod-device-type-BYOT checked; Continue enabled; no advance"
+        },
+        {
+          "action": "Rep taps Continue",
+          "expected": "[Both] POST collect-device-info {action:'select-byod-device-type', inputData:{deviceType:'BYOT'}} -> deviceValidationDetails: selectedByodDeviceType='BYOT', deviceType='Tablet' (overridden from Wearable), isByod=true. Carrier device-create receives 'BYOT' as-is — NO Samsung QuantomItemId substitution. [FE] Flow advances toward SIM validation"
+        },
+        {
+          "action": "Rep observes the SIM validation step presented for the reclassified line",
+          "expected": "[FE] SIM validation renders. RECORD which SIM matrix appears: code keys SIM options on isWatch, which REMAINS true after the tablet override — so the watch (eSIM/EID) matrix is expected today. Flag the observed behavior; do not fail the case on it (open product question)"
+        },
+        {
+          "action": "Rep proceeds to Plan selection (via SIM + MDN per the observed matrix)",
+          "expected": "[BE] Wearable pairing does NOT run — no pairing-mdn-* reason codes, no 'availableSubscriberForPairing' requirement; plan list is the tablet/standard list, not watch plans (no AWATCH*/FAMWATCH SOC codes)"
+        }
+      ]
+    },
+    {
+      "name": "Dual-IMEI tablet prompts for the second IMEI before the device is created",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "IMEI2",
+        "DualSIM"
+      ],
+      "custom_requirements": "## Feature description\nThe second-IMEI prompt in the BYOD tablet path is conditional: it appears only when the device profile marks a dual-IMEI device (carrier deviceProperty starting 'DF' or 'DS'). For those devices the rep must supply IMEI2 after picking Tablet, and the platform pre-fills it when the carrier already knows it. Devices without the dual-IMEI property skip the prompt entirely (covered by the companion case).\n\n## Related tickets\nRTPL-2205 (AC-5/AC-6 IMEI2 conditioning), RTPL-2403\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI (IMEI1):** dualSims[].imei1 from simData<ENV>.json fixture pool (dual-IMEI device profile, deviceProperty DF/DS)\n- **IMEI2:** dualSims[].imei2 from the same fixture-pool entry\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Prompt gate: IsDualImeiDeviceProperty = deviceProperty startsWith DF|DS (Engine.CollectDeviceInfo.cs:320-352); FE renders on reasonCodeForAction only (collect-device-info.vue:41-42).\n- Known parity gap (doc RTPL-2403 plan :58): legacy sends [imei1, imei2] to the carrier device-create; RTGO sends [imei2] only. If carrier-side assertions are added later, expect the single-element list.\n- Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters IMEI1, accepts as BYOD, selects 'Tablet' and taps Continue",
+          "expected": "[Both] select-byod-device-type accepted (selectedByodDeviceType='BYOT'); because deviceProperty starts DF/DS the flow does NOT create the device yet — reasonCodeForAction='provide-imei2-for-byod' with action [provide-imei2]. [FE] IMEI2 screen: title 'Add BYOD device', description starts 'The device entered was not found by the compatibility checker, or the checker is currently unavailable.'; IMEI2 field pre-filled when the carrier returned one"
+        },
+        {
+          "action": "Rep confirms/enters the second IMEI and continues",
+          "expected": "[Both] POST collect-device-info {action:'provide-imei2'} -> device created (isByod=true, deviceSource='B'); collect-device-info completes and the flow advances through resolve-device-pricing to 'SIM validation'"
+        }
+      ]
+    },
+    {
+      "name": "Single-SIM tablet skips the second-IMEI prompt",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "IMEI2",
+        "SingleSIM"
+      ],
+      "custom_requirements": "## Feature description\nComplement of the dual-IMEI case: when the device profile carries no dual-IMEI marker (deviceProperty not starting 'DF'/'DS'), picking Tablet creates the customer-owned device immediately — the rep is never asked for a second IMEI. Prompting for data the device does not have slows the counter and confuses reps, so the absence of the prompt is itself the assertion.\n\n## Related tickets\nRTPL-2205 (AC-7 IMEI2 skipped), RTPL-2403\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (single-SIM device profile)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Assert the NEGATIVE: intercept collect-device-info responses and require reasonCodeForAction never equals 'provide-imei2-for-byod' before SIM validation.\n- Gate source: Engine.CollectDeviceInfo.cs:320-333 (non-dual property -> EnsureByodEnabled -> CreateByodDeviceAndComplete).\n- Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the IMEI, accepts as BYOD, selects 'Tablet' and taps Continue",
+          "expected": "[Both] select-byod-device-type -> device created in the SAME activity completion (no intermediate action): NO provide-imei2-for-byod reason code ever appears in the response stream; deviceValidationDetails: selectedByodDeviceType='BYOT', isByod=true. [FE] No IMEI2 screen renders; flow lands directly on 'SIM validation'"
+        }
+      ]
+    },
+    {
+      "name": "Second-IMEI entry rejects empty and wrong-length values",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "IMEI2",
+        "Validation",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nThe IMEI2 field on the BYOD tablet path validates server-side: the value is required and must be exactly 15 digits. Boundary values around the 15-digit rule (14, 16, empty, non-numeric) must be rejected with the exact validator messages, and the rep must be able to correct the value and proceed without restarting the line.\n\n## Related tickets\nRTPL-2205, RTPL-2403\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n- Rep has reached the IMEI2 prompt (dual-IMEI tablet, 'Tablet' selected).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI (IMEI1):** dualSims[].imei1 from simData<ENV>.json fixture pool\n- **Valid IMEI2:** dualSims[].imei2 from the same entry\n- **Invalid IMEI2 values:** Empty string; 14 digits (valid IMEI2 minus last digit); 16 digits (valid IMEI2 plus one digit); 15 chars with a letter\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Validator source: SubscriberActivationEngine.CollectDeviceInfo.cs:27-39 (NotEmpty + ^\\d{15}$ with the two exact messages).\n- RTGO error toasts auto-dismiss — assert on the intercepted 4xx response body, not by polling the DOM later.\n- Partial case — stops after recovery; no payment. Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "Rep clears the IMEI2 field and submits empty",
+          "expected": "[Both] provide-imei2 rejected 400 with validator message 'IMEI2 is required.'; line state unchanged (reasonCodeForAction still 'provide-imei2-for-byod'). [FE] Error surfaces as an auto-dismissing top-right toast — capture synchronously on the 4xx"
+        },
+        {
+          "action": "Rep submits a 14-digit value",
+          "expected": "[Both] Rejected 400 with 'IMEI2 must be exactly 15 digits.'; state unchanged"
+        },
+        {
+          "action": "Rep submits a 16-digit value",
+          "expected": "[Both] Rejected 400 with 'IMEI2 must be exactly 15 digits.'; state unchanged"
+        },
+        {
+          "action": "Rep submits 15 characters containing a letter",
+          "expected": "[Both] Rejected 400 with 'IMEI2 must be exactly 15 digits.' (regex ^\\d{15}$); state unchanged"
+        },
+        {
+          "action": "Rep enters the valid IMEI2 and continues",
+          "expected": "[Both] provide-imei2 accepted; device created; flow advances to 'SIM validation' — recovery works without restarting the line"
+        }
+      ]
+    },
+    {
+      "name": "A device type that was not offered to the line is rejected and the rep can recover",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "Guard",
+        "Negative",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nThe backend validates the rep's device-type choice twice: the code must be one of the seven known BYOD codes, and it must be in the set offered to THIS line (a watch code cannot be forced onto a phone/tablet line and vice versa). An invalid submission returns a 400 without mutating the line, so the rep's next valid pick — Tablet — still succeeds. The UI never renders un-offered options, so this guard is exercised at the API level.\n\n## Related tickets\nRTPL-2205, RTPL-2556 (guard), RTPL-2403\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n- Rep has reached the device-type picker on a non-watch line (offered set = BYOD-ANDROID, BYOD-IPHONE, BYOD-DSI, BYOT).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (non-watch classification)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Guard sources: NormalizeDeviceType null -> throw (Engine.CollectDeviceInfo.cs:277-282); not-in-offered-set -> throw (:284-293). Both raise InvalidByodDeviceTypeException (400).\n- Mock parity: mock returns 400 code 'invalid-activity-action' with message listing the 7 valid values (collect-device-info-service.ts:132-141) — message text differs from real BE; assert status + state, not message, if mock is ever used.\n- State-integrity recovery mirrors RTPL-2556 TC-5. Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "Via API, submit a watch code not offered to this line",
+          "expected": "[BE] 400 invalid BYOD device type (InvalidByodDeviceTypeException — code not in the offered set); deviceValidationDetails unchanged: selectedByodDeviceType null, deviceType NOT reclassified"
+        },
+        {
+          "action": "Via API, submit an unknown code",
+          "expected": "[BE] 400 invalid BYOD device type (normalization returns null for unknown codes); state unchanged; reasonCodeForAction still 'select-byod-device-type'"
+        },
+        {
+          "action": "Rep selects 'Tablet' in the UI and taps Continue",
+          "expected": "[Both] select-byod-device-type {deviceType:'BYOT'} accepted; selectedByodDeviceType='BYOT'; no residual state from the rejected attempts; flow advances normally"
+        }
+      ]
+    },
+    {
+      "name": "Declining the customer-owned offer aborts the tablet line cleanly",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "Decline",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nWhen the platform offers to register an unknown IMEI as customer-owned and the rep declines (customer changed their mind, wrong IMEI typed), the line must abort cleanly: the decline action returns a validation-aborted failure, no BYOD device is created, and the rep can restart with a different IMEI. A dirty abort would strand half-created lines on the account.\n\n## Related tickets\nRTPL-2205, RTPL-2061\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet candidate is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (not in dealer inventory)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Decline source: Engine.CollectDeviceInfo.cs:262-265 (decline-add-as-byod -> ValidationAbortedException, HTTP 400).\n- The decline path is also reachable via decline-add-to-edge -> edge-declined-offer-byod -> same accept/decline pair (Engine :209-233) — one case covers the guard; note the second entry point for exploratory runs.\n- Teardown: cancel the line via API if any line state persists.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the IMEI and reaches the customer-owned offer",
+          "expected": "[Both] validate-device -> actions [accept-add-as-byod, decline-add-as-byod]. [FE] 'IMEI not found' drawer visible"
+        },
+        {
+          "action": "Rep declines the customer-owned offer (goes back)",
+          "expected": "[Both] POST collect-device-info {action:'decline-add-as-byod'} -> 400 validation-aborted (ValidationAbortedException); NO device created (deviceValidationDetails has no selectedByodDeviceType, no isByod=true device row in the cart). [FE] Error toast on the 4xx; rep is returned to IMEI entry — capture the toast synchronously"
+        },
+        {
+          "action": "Rep enters a different valid IMEI on the same line",
+          "expected": "[Both] validate-device runs fresh — no residual BYOD state from the declined attempt; the flow proceeds normally"
+        }
+      ]
+    },
+    {
+      "name": "With the BYOD feature off, a customer-owned tablet cannot enter the flow",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "FeatureFlag",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nThe whole customer-owned path is gated by the BYOD feature flag. With the flag off, an IMEI not found in dealer inventory must NOT be offered as customer-owned — the device is unsupported and the rep is directed to RTPOS. This protects stores from starting activations the backend will refuse to complete. There is no separate backend tablet flag: tablets ride the single BYOD gate.\n\n## Related tickets\nRTPL-2205 (AC-1 gate), RTPL-2061\n\n## Preconditions\n- ConfigCat enable_subscriber_activation_byod OFF for the test store/environment.\n- Primary phone line activated on the order, then add-line performed — the tablet candidate is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool (not in dealer inventory)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Flag reality check: backend defines ONLY enable_subscriber_activation_byod (+hint) — there is NO backend tablet or watch flag (SubscriberActivationConstants.cs:447-459). The mock's subscriber_activation_tablet_enabled exists in backend-mock config.ts only; do not build the fixture around it.\n- EnsureByodEnabled also guards the later device-creation step (Engine.CollectDeviceInfo.cs:320-333) — the flag-off assertion at IMEI entry is the user-visible one.\n- Restore the flag in afterEach — a leaked OFF flag poisons every other BYOD case in the suite.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the customer-owned tablet IMEI",
+          "expected": "[Both] validate-device / collect-device-info path does NOT offer accept-add-as-byod; the line surfaces the unsupported-device outcome — reason 'unsupported-device-type' with the dialog 'The IMEI # {imei} you entered can't be activated in RTGO at this time.' directing the rep to RTPOS. [FE] No 'IMEI not found' BYOD drawer, no device-type picker at any point"
+        },
+        {
+          "action": "Rep dismisses the dialog",
+          "expected": "[FE] Line returns to IMEI entry; no device row in the cart; no BYOD device created [BE]"
+        }
+      ]
+    },
+    {
+      "name": "Customer-owned tablet is priced at zero with an untaxed device and a standard charged SIM",
+      "priority": "High",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "Pricing",
+        "Cart"
+      ],
+      "custom_requirements": "## Feature description\nA customer-owned tablet carries no device charge: the platform prices it as 'Customer-Owned Tablet' at $0.00 with no device tax. The physical SIM is NOT free on the BYOD path — it sells at $10 with no auto-discount and is taxed on the $10 selling price (unlike A-Stock where the SIM is discounted to free). The cart and device drilldown must show these numbers exactly; wrong SIM pricing on BYOD lines is a recurring regression.\n\n## Related tickets\nRTPL-2205 (AC $0 device), RTPL-2578 (pricing canon), RTPL-2572 (receipt $0 plan bug — adjacent)\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool\n- **SIM (ICCID):** First unused iccids[] entry matching ^89[a-zA-Z0-9]{17}F$\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Pricing source: device-pricing-registry.ts:337-345 (BYOT_DEVICE sku 'BYOT-CUST', basePrice 0) and :520-533 (family 37040 -> isTaxable false). BYOD SIM canon: $10 / no discount / taxed (RTPL-2578 table).\n- SIM tax follows selling price even in Tax-Before-Discount stores — assert tax > $0 on the SIM row.\n- Partial case — stops after the SIM cart assertion; BYOT-001 covers totals through payment. Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep completes IMEI entry, accepts as BYOD, selects 'Tablet', and continues past device creation",
+          "expected": "[Both] Device created: isByod=true, deviceSource='B', deviceType='Tablet'. [FE] Cart Device row appears"
+        },
+        {
+          "action": "Rep opens the cart device drilldown",
+          "expected": "[FE] Device type = 'Tablet'; Description = 'Customer-Owned Tablet'; IMEI = entered IMEI; Price = $0.00; Tax = $0.00; Final price = $0.00"
+        },
+        {
+          "action": "Rep validates the physical SIM and continues",
+          "expected": "[Both] validate-sim-card succeeds. [FE] Cart 'SIM card' row = $10 plus tax on $10 (NO free-SIM discount on the BYOD path); 'Total due' = SIM total (device contributes $0)"
+        }
+      ]
+    },
+    {
+      "name": "A customer-owned tablet line is offered the BYOD-only plans",
+      "priority": "Medium",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "Plans",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nBecause a customer-owned tablet sets the BYOD marker on the line, plan selection must include the BYOD-only plan catalog (e.g. the no-coupon BYOD data plan) alongside standard plans — and those BYOD-only plans must never appear on non-BYOD lines. This is the pricing incentive that makes bringing your own device worthwhile, so a missing BYOD plan on a BYOT line is a revenue-affecting defect.\n\n## Related tickets\nRTPL-2205, RTPL-2578, RTPL-2061\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod).\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n- Tablet line created as customer-owned (BYOT) and advanced through SIM + MDN + protection to plan selection.\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** First unused singleSims[] IMEI from simData<ENV>.json fixture pool\n- **SIM (ICCID):** First unused iccids[] entry\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Assert at the API (intercept) level: FE plan blacklist still hides 40L1WEB/BYOD10GB3 in the UI (known Bug #4, 2026-07-09) even though the backend serves them — a UI assertion would false-fail until that FE bug lands.\n- 40L1WEB requires coupon COUP_NEU3F3 (not seeded in UAT3) — keep it OUT of the positive assertion; only assert its absence on the control line.\n- Backend knob: byod_only_plan_soc_codes ConfigCat setting (SubscriberActivationConstants.cs:447-459 block) — the BYOD-only list is config, refresh the expected socCodes from config before hard-pinning.\n- Depends on the tablet plans:null blocker (Bug #2) being resolved. Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "Rep reaches Plan selection on the BYOT line and the plan list loads",
+          "expected": "[BE] GET selection-options/plans -> plan list non-empty AND contains socCode 'BYOD10GB3' (BYOD-only, no coupon required). Assert by socCode, never by price"
+        },
+        {
+          "action": "Compare against a non-BYOD control line (the primary A-Stock phone line's plan list)",
+          "expected": "[BE] The control line's selection-options/plans contains NO BYOD-only socCodes (no 'BYOD10GB3', no '40L1WEB')"
+        }
+      ]
+    },
+    {
+      "name": "A dealer-stock tablet bypasses the customer-owned flow entirely",
+      "priority": "High",
+      "tags": [
+        "BYOT",
+        "Tablet",
+        "ASTOCK",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nContrast/regression guard for the BYOT feature: a tablet that IS in dealer inventory (A-Stock) must never be routed into the customer-owned path. Entering a catalog tablet IMEI goes straight to SIM validation — no 'IMEI not found' drawer, no accept-as-BYOD offer, no device-type picker — and the device keeps its catalog price. A catalog tablet appearing in the BYOD flow means inventory resolution broke.\n\n## Related tickets\nRTPL-2141 (A-Stock tablet), RTPL-2205, RTPL-2061\n\n## Preconditions\n- BYOD feature flag ON (ConfigCat enable_subscriber_activation_byod) — the bypass must hold even with BYOD enabled.\n- Primary phone line activated on the order, then add-line performed — the tablet is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **A-Stock tablet IMEI:** Unused catalog tablet IMEI from the RTGO Data workbook (probe live — 'Used' column lies)\n- **SIM (ICCID):** First unused iccids[] entry\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Assert the ABSENCE of the BYOD drawer/picker — a tablet routed into collect-device-info here is the regression signal.\n- Routing source: NextActivityMap — validate-device goes to collect-device-info only on NeedsEdgeCreation|NeedsByodCreation|NeedsEid, else resolve-device-pricing (SubscriberActivationProcessConfiguration.cs:55-61).\n- Adjacent edge (not this case): a previously-activated A-Stock tablet in local inventory auto-accepts reactivation without a prompt (Engine.ValidateDevice.cs:586-599) — candidate for the Tablet/A-Stock suite, out of BYOT scope.\n- Teardown: cancel the line via API.",
+      "steps": [
+        {
+          "action": "On the added line (line 2), rep enters the A-Stock tablet IMEI",
+          "expected": "[Both] POST validate-device -> deviceType='Tablet', inLocalInventory=true, isByod=false, deviceSource='D'; flow advances DIRECTLY to 'SIM validation'. [FE] NO 'IMEI not found' drawer, NO accept-as-BYOD offer, NO device-type picker at any point; cart Device row shows the catalog description and catalog price (not $0, not 'Customer-Owned Tablet')"
+        }
+      ]
+    },
+    {
+      "name": "Activate a customer-owned tablet on an eSIM",
+      "priority": "Low",
+      "tags": [
+        "BYOT",
+        "BYOD",
+        "Tablet",
+        "eSIM",
+        "Blocked"
+      ],
+      "custom_requirements": "## Feature description\nPlaceholder/traceability case for the deferred slice of the BYOT feature: a customer-owned tablet activated on an eSIM would need a separate carrier provisioning call after device registration. That call is explicitly not implemented in the backend today (deferred by design per the RTPL-2403 implementation record), so no runnable steps exist. The case documents the coverage gap so the suite inherits it the day the backend lands.\n\n## Related tickets\nRTPL-2205 (AC-7, unimplemented), RTPL-2403 (plan doc :59), RTPL-2061\n\n## Preconditions\n- BLOCKED — do not attempt: backend has no BYOD eSIM provisioning path.\n- When unblocked: BYOD flag ON; primary phone line activated, then add-line — tablet is line 2 (house rule).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI + EID:** dualSims[] fixture-pool entry (imei1 + eid) — EID format ^[0-9]{32}$ — once the backend path exists\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Blocked by design: RTPL-2205 AC-7 (AddBYODESIm after registration) listed as unimplemented in docs/plans/RTPL-2403-byod-device-type.md:59. Product to confirm deferred vs descoped.\n- Secondary data blocker: watch/eSIM EIDs in the data workbook are float-corrupted — re-pull clean EIDs when unblocking.\n- Re-score to AR-4/5 and author real steps when the backend lands; keep the Testmo case as the tracking hook.",
+      "steps": [
+        {
+          "action": "PLACEHOLDER — when the backend implements BYOD eSIM provisioning: enter the tablet IMEI, accept as BYOD, select 'Tablet', and proceed to SIM with the eSIM/EID option",
+          "expected": "[Both] To be authored against the delivered behavior: expected shape is device creation followed by the carrier eSIM provisioning call, then eSIM (no physical SIM line item, per pricing canon: eSIM = no SIM charge). Do not automate from this placeholder"
+        }
+      ]
+    }
+  ],
+  "folder_name": "BYOT - AI"
+}
