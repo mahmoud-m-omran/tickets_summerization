@@ -1,8 +1,9 @@
-"""Probe how Testmo stores case->Jira issue links.
+"""Probe how Testmo stores case->Jira issue links. Round 2.
 
-Fetches a case that already has a Jira link via the UI (BYOW 3712) and one
-that does not (BYOD 3686), dumps both payloads so the issues field schema
-can be compared, plus candidate issue endpoints. Read-only GETs.
+Round 1: no GET route for single cases (/projects/3/cases/{id},
+/cases/{id} all 404). Folders list GET works, so try the cases LIST
+endpoint and look for an issues field on BYOW cases 3712-3721 (these have
+Jira links added via the UI). Read-only GETs.
 Output -> probe-results/issues-schema.txt (committed by the workflow).
 """
 import json
@@ -24,25 +25,39 @@ def get(url):
     return code, body
 
 
-def show(label, url):
+def show(label, url, limit=8000):
     code, body = get(url)
     OUT.append(f"\n===== {label} -> HTTP {code} =====")
     try:
-        OUT.append(json.dumps(json.loads(body), indent=2)[:8000])
+        OUT.append(json.dumps(json.loads(body), indent=2)[:limit])
     except Exception:
         OUT.append(body[:2000])
 
 
-# Single-case reads: try both URL shapes Testmo might use.
-show("case 3712 (HAS Jira link) via /projects/3/cases/3712",
-     f"{BASE}/projects/3/cases/3712")
-show("case 3712 via /cases/3712", f"{BASE}/cases/3712")
-show("case 3686 (NO link) via /projects/3/cases/3686",
-     f"{BASE}/projects/3/cases/3686")
+# Cases list endpoint, various shapes.
+show("cases list folder 428 (BYOW, linked)",
+     f"{BASE}/projects/3/cases?folder_id=428&per_page=2")
+show("cases list plain", f"{BASE}/projects/3/cases?per_page=1")
 
-# Candidate issue endpoints.
-show("case 3712 issues subresource", f"{BASE}/projects/3/cases/3712/issues")
-show("project issues", f"{BASE}/projects/3/issues")
+# If the list works, fetch full first BYOW case separately with a bigger cap
+# so nested fields (issues?) aren't truncated away.
+code, body = get(f"{BASE}/projects/3/cases?folder_id=428&per_page=100")
+OUT.append(f"\n===== full BYOW list -> HTTP {code} =====")
+try:
+    data = json.loads(body)
+    cases = data.get("result", [])
+    OUT.append(f"count={len(cases)}")
+    if cases:
+        c = cases[0]
+        OUT.append("keys of first case: " + ", ".join(sorted(c.keys())))
+        # Print any key that smells issue/link related, fully.
+        for k in sorted(c.keys()):
+            lk = k.lower()
+            if "issue" in lk or "link" in lk or "jira" in lk or "integration" in lk:
+                OUT.append(f"field {k}: " + json.dumps(c[k], indent=2)[:3000])
+        OUT.append("first case full: " + json.dumps(c, indent=2)[:6000])
+except Exception as e:
+    OUT.append(f"parse error: {e}; raw: {body[:1500]}")
 
 os.makedirs("probe-results", exist_ok=True)
 with open("probe-results/issues-schema.txt", "w") as f:
