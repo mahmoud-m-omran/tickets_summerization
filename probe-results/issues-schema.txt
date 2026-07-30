@@ -1,0 +1,25 @@
+
+===== case 3712 (HAS Jira link) via /projects/3/cases/3712 -> HTTP 404 =====
+{
+  "message": "The route api/v1/projects/3/cases/3712 could not be found."
+}
+
+===== case 3712 via /cases/3712 -> HTTP 404 =====
+{
+  "message": "The route api/v1/cases/3712 could not be found."
+}
+
+===== case 3686 (NO link) via /projects/3/cases/3686 -> HTTP 404 =====
+{
+  "message": "The route api/v1/projects/3/cases/3686 could not be found."
+}
+
+===== case 3712 issues subresource -> HTTP 404 =====
+{
+  "message": "The route api/v1/projects/3/cases/3712/issues could not be found."
+}
+
+===== project issues -> HTTP 404 =====
+{
+  "message": "The route api/v1/projects/3/issues could not be found."
+}
