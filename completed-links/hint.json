@@ -1,0 +1,92 @@
+{
+  "status": "success",
+  "filename": "hint.json",
+  "links": [
+    {
+      "case_id": 3737,
+      "display_id": "QA-2725",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3738,
+      "display_id": "QA-2726",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3739,
+      "display_id": "QA-2727",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3740,
+      "display_id": "QA-2728",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3741,
+      "display_id": "QA-2729",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3742,
+      "display_id": "QA-2730",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3743,
+      "display_id": "QA-2731",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3744,
+      "display_id": "QA-2732",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3745,
+      "display_id": "QA-2733",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3746,
+      "display_id": "QA-2734",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3747,
+      "display_id": "QA-2735",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3748,
+      "display_id": "QA-2736",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3749,
+      "display_id": "QA-2737",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3750,
+      "display_id": "QA-2738",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 14,
+  "total": 14
+}
