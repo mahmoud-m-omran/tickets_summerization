@@ -1,69 +1,420 @@
 
-===== cases list folder 428 (BYOW, linked) -> HTTP 422 =====
+===== GET /issues/connections -> HTTP 200 =====
 {
-  "message": "The selected page rows is invalid.",
-  "errors": {
-    "per_page": [
-      "The selected page rows is invalid."
-    ]
-  }
-}
-
-===== cases list plain -> HTTP 422 =====
-{
-  "message": "The selected page rows is invalid.",
-  "errors": {
-    "per_page": [
-      "The selected page rows is invalid."
-    ]
-  }
-}
-
-===== full BYOW list -> HTTP 200 =====
-count=10
-keys of first case: created_at, created_by, custom_automated, custom_description, custom_priority, custom_steps, estimate, folder_id, forecast, has_automation, has_automation_status, id, key, name, project_id, repo_id, state_id, status_at, status_id, template_id, updated_at, updated_by
-first case full: {
-  "id": 3721,
-  "estimate": null,
-  "folder_id": 428,
-  "forecast": null,
-  "has_automation": false,
-  "has_automation_status": false,
-  "key": 3721,
-  "name": "Prevent a watch from being the first line on an order",
-  "project_id": 3,
-  "repo_id": 3,
-  "state_id": 4,
-  "status_id": null,
-  "status_at": null,
-  "template_id": 2,
-  "created_at": "2026-07-28 14:29:55.954022",
-  "created_by": 13,
-  "updated_at": "2026-07-29 12:48:28.450217",
-  "updated_by": 13,
-  "custom_priority": 2,
-  "custom_description": null,
-  "custom_automated": 14,
-  "custom_steps": [
+  "page": 1,
+  "prev_page": null,
+  "next_page": null,
+  "last_page": 1,
+  "per_page": 100,
+  "total": 36,
+  "result": [
     {
-      "column_name": "custom_steps",
-      "id": 18436,
-      "case_id": 3721,
-      "text1": "<p>On a brand-new order (no primary line), rep enters the watch IMEI as line 1</p>",
-      "text2": null,
-      "text3": "<p>[Both] the flow does NOT allow the watch as line 1 \u2014 rep is required to add/activate a primary phone line first</p>",
-      "text4": null,
-      "display_order": 1
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10006,
+      "connection_project_name": "Infrastructure",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
     },
     {
-      "column_name": "custom_steps",
-      "id": 18437,
-      "case_id": 3721,
-      "text1": "<p>Rep adds a primary phone line, then adds the watch as line 2</p>",
-      "text2": null,
-      "text3": "<p>[Both] watch now accepted on line 2; flow proceeds normally</p>",
-      "text4": null,
-      "display_order": 2
-    }
-  ]
-}
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10019,
+      "connection_project_name": "Defect Tracking",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10035,
+      "connection_project_name": "RT to the Cloud",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10041,
+      "connection_project_name": "RT Backoffice",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10033,
+      "connection_project_name": "RTArchitecture",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10014,
+      "connection_project_name": "Revv EndPoint",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10032,
+      "connection_project_name": "RTWeb UI/UX Design",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10020,
+      "connection_project_name": "QA Test",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10037,
+      "connection_project_name": "Internal Support",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10016,
+      "connection_project_name": "Real Time Feed",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10010,
+      "connection_project_name": "IDV / PET",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10017,
+      "connection_project_name": "Identity Check API",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10015,
+      "connection_project_name": "Human Resources",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10008,
+      "connection_project_name": "ERP",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10000,
+      "connection_project_name": "Client Support Website",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10011,
+      "connection_project_name": "Customization Requests",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10023,
+      "connection_project_name": "BIDO",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10004,
+      "connection_project_name": "BDI",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10030,
+      "connection_project_name": "Total By Verizon - RTWEB",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10013,
+      "connection_project_name": "Video Training",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10024,
+      "connection_project_name": "The Sprint Breakers",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+      "integration_name": "RT Jira",
+      "connection_id": 1,
+      "connection_name": "RT Jira",
+      "connection_project_id": 10025,
+      "connection_project_name": "Total by Verizon",
+      "is_active": true,
+      "created_at": "2024-09-06T16:11:03.736Z",
+      "updated_at": null
+    },
+    {
+      "integration_id": 1,
+      "integration_type": 4,
+     
+
+Jira integration_id=1 connection_id=1 project='Infrastructure' connection_project_id=10006
+
+===== PATCH /projects/3/cases (3736 <- QA-2724) -> HTTP 200 =====
+{
+  "result": [
+    {
+      "id": 3736,
+      "estimate": null,
+      "folder_id": 430,
+      "forecast": null,
+      "has_automation": false,
+      "has_automation_status": false,
+      "key": 3736,
+      "name": "Activate a home internet gateway on a new account end to end with an eligible address",
+      "project_id": 3,
+      "repo_id": 3,
+      "state_id": 4,
+      "status_id": null,
+      "status_at": null,
+      "template_id": 2,
+      "created_at": "2026-07-29 15:52:59.210008",
+      "created_by": 13,
+      "updated_at": "2026-07-29 15:52:59.210008",
+      "updated_by": 13,
+      "automation_links": [],
+      "tags": [
+        {
+          "tag_id": 79,
+          "name": "cash"
+        },
+        {
+          "tag_id": 128,
+          "name": "esim"
+        },
+        {
+          "tag_id": 579,
+          "name": "happypath"
+        },
+        {
+          "tag_id": 580,
+          "name": "hint"
+        },
+        {
+          "tag_id": 581,
+          "name": "homeinternet"
+        },
+        {
+          "tag_id": 82,
+          "name": "newaccount"
+        }
+      ],
+      "issues": [
+        {
+          "issue_id": 946,
+          "display_id": "QA-2724",
+          "integration_id": 1,
+          "connection_project_id": null
+        }
+      ],
+      "custom_priority": 2,
+      "custom_description": null,
+      "custom_requirements": "## Feature description\nHINT (T-Mobile Home Internet) lets a Metro rep activate a fixed-wireless home internet gateway. When the rep enters a gateway IMEI, the platform classifies the device as Home Internet (dbo.HintDevices ItemId lookup / Metro type 'INT'), confirms the device with the rep, collects the customer's service address, checks it against the HomeInternetEligibilityCheck service, and \u2014 if covered \u2014 requires a dual customer + retailer acknowledgement before the flow continues to SIM, plan, and payment. The activity order is ValidateDevice \u2192 ValidateHint \u2192 ResolveDevicePricing \u2192 ValidateSimCard. A false-positive eligibility means a gateway that will not provision (chargeback + churn); a false-negative loses a $50/mo home internet sale.\n\n## Related tickets\nRTPL-2008 (HINT Epic), RTPL-2289 (FE device validation + address eligibility), RTPL-2416 (blank screen after IMEI \u2014 regression guard), RTPL-1889 (BE eligibility)\n\n## Preconditions\n- ConfigCat flag enable_subscriber_activation_hint is ON for the store (backend-mock equivalent: subscriber_activation_hint_enabled=true).\n- Rep signed in at a COR store; no activation in progress.\n\n## Test Data (FE \u2014 what the rep types)\n- **HINT gateway IMEI:** 999977129737997 (known HINT gateway on QA/UAT; backend-mock equivalent 390100000000101)\n- **EID:** First unused EID from the env fixture pool (dualSims.eid) \u2014 gateways are eSIM\n- **Eligible service address:** 31455 NORTHWESTERN HWY, FARMINGTON, MI 48334 (known covered/unlimited address; backend-mock ZIP switch 33101)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time \u2014 not pinned._\n\n## Automation Notes\n- Backend-mock equivalents: HINT IMEIs are the 39-prefix seed series (hotspot 390100000000101, router 390200000000202); eligibility outcome is driven by ZIP switches \u2014 33101 eligible, 33102 ineligible, 33103 limited, 33104 service error, 00000 invalid address.\n- The accept-hint-consent action chains resolve-device-pricing server-side \u2014 the client lands directly on validate-sim-card; assert the SIM header, not an intermediate pricing screen.\n- Step order oracle: ValidateDevice \u2192 ValidateHint \u2192 ResolveDevicePricing \u2192 ValidateSimCard (SubscriberActivationProcessConfiguration).\n- Cite-worthy regression: RTPL-2416 shipped a missing routing entry that produced a blank screen after IMEI \u2014 the SIM-validation-header assertion after consent is the guard.",
+      "custom_automated": 14,
+      "custom_steps": [
+        {
+          "column_name": "custom_steps",
+          "id": 18486,
+          "case_id": 3736,
+          "text1": "From the dashboard, rep starts a new activation",
+          "text2": null,
+          "text3": "[FE] Account information screen opens.",
+          "text4": null,
+          "display_order": 1
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18487,
+          "case_id": 3736,
+          "text1": "Rep enters the customer's name, email, address and ZIP, then Continue",
+          "text2": null,
+          "text3": "[FE] City auto-fills UPPERCASE and state shows the code after ZIP entry. [Both] POST account-new/start returns state.businessData.account.accountNumber; ID verification header appears with fields prefilled from the account, uppercased.",
+          "text4": null,
+          "display_order": 2
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18488,
+          "case_id": 3736,
+          "text1": "Rep enters the customer's phone number and completes ID verification, then Continue",
+          "text2": null,
+          "text3": "[Both] POST validate-identity returns state.businessData.completion.eKey. [FE] Success text \"Congratulations, your customer's ID has been verified.\" Cart account panel shows Account type \"New account\", ID verified ref# = eKey.",
+          "text4": null,
+          "display_order": 3
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18489,
+          "case_id": 3736,
+          "text1": "On IMEI validation, rep enters the HINT gateway IMEI and continues",
+          "text2": null,
+          "text3": "[BE] POST validate-device classifies the device as Home Internet (deviceType HomeInternet / Metro type 'INT' / dbo.HintDevices ItemId hit); state.processId captured. [FE] Non-dismissable drawer \"Confirm home internet device\" opens with message \"The IMEI entered is a home internet device and requires extra details to activate. Click continue to proceed with activating this home internet device.\"",
+          "text4": null,
+          "display_order": 4
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18490,
+          "case_id": 3736,
+          "text1": "Rep clicks Continue on the confirm-device drawer",
+          "text2": null,
+          "text3": "[FE] Drawer closes; panel \"Home internet address eligibility\" is shown with note \"Confirm the customer's address where the device will be located to check for service eligibility then click continue to proceed with activating this home internet device.\" Breadcrumb reads \"HINT Eligibility\"; cart step chip reads \"Home internet eligibility\".",
+          "text4": null,
+          "display_order": 5
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18491,
+          "case_id": 3736,
+          "text1": "Rep types the 5-digit service ZIP code",
+          "text2": null,
+          "text3": "[FE] ZIP field is masked to 5 numeric digits (99999). City and state auto-populate from the ZIP lookup (city UPPERCASE, state code selected); fields are disabled during the lookup and editable after.",
+          "text4": null,
+          "display_order": 6
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18492,
+          "case_id": 3736,
+          "text1": "Rep enters address line 1 (and optional line 2) of the service address",
+          "text2": null,
+          "text3": "[FE] Address line 1 accepts 2-30 characters, line 2 up to 15, city up to 40 \u2014 all forced UPPERCASE; state is a US-state select. Continue enabled once required fields are valid. No screen change.",
+          "text4": null,
+          "display_order": 7
+        },
+        {
+          "column_name": "custom_steps",
+          "id": 18493,
+          "case_id": 3736,
+          "text1": "Rep clicks Continue to submit the address for the eligibility check",
+          "text2": null,
+          "text3": "[Both] POST .../activities/validate-hint with action 'provide-hint-address' and the uppercased ad
