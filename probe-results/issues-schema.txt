@@ -1,25 +1,69 @@
 
-===== case 3712 (HAS Jira link) via /projects/3/cases/3712 -> HTTP 404 =====
+===== cases list folder 428 (BYOW, linked) -> HTTP 422 =====
 {
-  "message": "The route api/v1/projects/3/cases/3712 could not be found."
+  "message": "The selected page rows is invalid.",
+  "errors": {
+    "per_page": [
+      "The selected page rows is invalid."
+    ]
+  }
 }
 
-===== case 3712 via /cases/3712 -> HTTP 404 =====
+===== cases list plain -> HTTP 422 =====
 {
-  "message": "The route api/v1/cases/3712 could not be found."
+  "message": "The selected page rows is invalid.",
+  "errors": {
+    "per_page": [
+      "The selected page rows is invalid."
+    ]
+  }
 }
 
-===== case 3686 (NO link) via /projects/3/cases/3686 -> HTTP 404 =====
-{
-  "message": "The route api/v1/projects/3/cases/3686 could not be found."
-}
-
-===== case 3712 issues subresource -> HTTP 404 =====
-{
-  "message": "The route api/v1/projects/3/cases/3712/issues could not be found."
-}
-
-===== project issues -> HTTP 404 =====
-{
-  "message": "The route api/v1/projects/3/issues could not be found."
+===== full BYOW list -> HTTP 200 =====
+count=10
+keys of first case: created_at, created_by, custom_automated, custom_description, custom_priority, custom_steps, estimate, folder_id, forecast, has_automation, has_automation_status, id, key, name, project_id, repo_id, state_id, status_at, status_id, template_id, updated_at, updated_by
+first case full: {
+  "id": 3721,
+  "estimate": null,
+  "folder_id": 428,
+  "forecast": null,
+  "has_automation": false,
+  "has_automation_status": false,
+  "key": 3721,
+  "name": "Prevent a watch from being the first line on an order",
+  "project_id": 3,
+  "repo_id": 3,
+  "state_id": 4,
+  "status_id": null,
+  "status_at": null,
+  "template_id": 2,
+  "created_at": "2026-07-28 14:29:55.954022",
+  "created_by": 13,
+  "updated_at": "2026-07-29 12:48:28.450217",
+  "updated_by": 13,
+  "custom_priority": 2,
+  "custom_description": null,
+  "custom_automated": 14,
+  "custom_steps": [
+    {
+      "column_name": "custom_steps",
+      "id": 18436,
+      "case_id": 3721,
+      "text1": "<p>On a brand-new order (no primary line), rep enters the watch IMEI as line 1</p>",
+      "text2": null,
+      "text3": "<p>[Both] the flow does NOT allow the watch as line 1 \u2014 rep is required to add/activate a primary phone line first</p>",
+      "text4": null,
+      "display_order": 1
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18437,
+      "case_id": 3721,
+      "text1": "<p>Rep adds a primary phone line, then adds the watch as line 2</p>",
+      "text2": null,
+      "text3": "<p>[Both] watch now accepted on line 2; flow proceeds normally</p>",
+      "text4": null,
+      "display_order": 2
+    }
+  ]
 }
