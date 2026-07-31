@@ -1,272 +1,218 @@
 
-===== GET /projects/3/priorities -> HTTP 404 =====
+===== GET cases?folder_id=431 (show 422 body) [case 3751 found] -> HTTP 200 =====
 {
-  "message": "The route api/v1/projects/3/priorities could not be found."
-}
+  "id": 3751,
+  "estimate": null,
+  "folder_id": 431,
+  "forecast": null,
+  "has_automation": false,
+  "has_automation_status": false,
+  "key": 3751,
+  "name": "Activate a dealer-stock tablet with a physical SIM as an added line",
+  "project_id": 3,
+  "repo_id": 3,
+  "state_id": 4,
+  "status_id": null,
+  "status_at": null,
+  "template_id": 2,
+  "created_at": "2026-07-31 09:32:21.067359",
+  "created_by": 13,
+  "updated_at": "2026-07-31 09:32:21.067359",
+  "updated_by": 13,
+  "custom_priority": 2,
+  "custom_description": null,
+  "custom_automated": 14,
+  "custom_steps": [
+    {
+      "column_name": "custom_steps",
+      "id": 18545,
+      "case_id": 3751,
+      "text1": "Complete the primary phone line through activate-subscriber, then on the 'Subscriber created' dialog choose Add another line",
+      "text2": null,
+      "text3": "[Both] POST lines/start with type='add-new-line' creates the second line; [FE] IMEI validation header visible for line 2; cart shows line 1 rows unchanged",
+      "text4": null,
+      "display_order": 1
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18546,
+      "case_id": 3751,
+      "text1": "Enter the A-Stock tablet IMEI on line 2 (auto-submits at 15 digits)",
+      "text2": null,
+      "text3": "[BE] POST validate-device returns deviceValidationDetails.deviceType='Tablet', deviceSource='D', isByod=false, requiresAction=false (validate-device-repository.ts:174-184, :806-840). [FE] flow advances DIRECTLY to SIM validation \u2014 NO 'Add BYOD device' picker, NO confirm-byod drawer. Cart Device row = tablet catalog price",
+      "text4": null,
+      "display_order": 2
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18547,
+      "case_id": 3751,
+      "text1": "On SIM validation, verify the physical-SIM card state",
+      "text2": null,
+      "text3": "[FE] 'SIM validation' header visible; pSIM card title 'IMEI 1 - PSIM' with content = the tablet IMEI; exactly 1 card, pSIM checked, SIM label 'ICCID SIM *', input empty, Continue DISABLED",
+      "text4": null,
+      "display_order": 3
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18548,
+      "case_id": 3751,
+      "text1": "Enter the ICCID and Continue",
+      "text2": null,
+      "text3": "[Both] POST validate-sim-card returns state.lines[1]; GET available-mdns returns the MDN list; Phone number selection header appears. [FE] cart 'SIM card' row = $10 with A-Stock free-SIM discount -$10, $0 tax (RTPL-2578 pricing table)",
+      "text4": null,
+      "display_order": 4
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18549,
+      "case_id": 3751,
+      "text1": "Keep 'New phone number' selected and Continue",
+      "text2": null,
+      "text3": "[FE] 2 cards: 'New phone number' (subtitle 'Get a new Metro phone number') checked; 'Port phone number' not checked; each MDN message = '(npa) nxx-* submarketName, stateCode'. [Both] Continue \u2192 GET selection-options/protections. Cart 'Phone number' row = '(npa) nxx-****'",
+      "text4": null,
+      "display_order": 5
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18550,
+      "case_id": 3751,
+      "text1": "Select the first eligible protection and Continue",
+      "text2": null,
+      "text3": "[FE] 'Protection selection' header; selected card button aria-label flips 'Select' \u2192 'Selected'. [Both] POST configure-protection + GET selection-options/plans. Cart gains 'Protection (SOC)' = $x / mo.",
+      "text4": null,
+      "display_order": 6
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18551,
+      "case_id": 3751,
+      "text1": "On Plan selection, accept the first (pre-selected) tablet plan and Continue",
+      "text2": null,
+      "text3": "[FE] 'Plan selection' header; index 0 pre-selected; NO 'Pair with voice line' selector (availableSubscriberForPairing=null for tablets, configure-protection-repository.ts:91-109); rate badge '$x per month'. [Both] POST configure-plan + GET selection-options/promotions. Cart gains 'Plan (SOC)' = $x / mo.",
+      "text4": null,
+      "display_order": 7
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18552,
+      "case_id": 3751,
+      "text1": "On Promotion selection, continue without selecting (or note the no-eligible text)",
+      "text2": null,
+      "text3": "[FE] 'Promotion selection' header; if none eligible, exact text 'This customer is not eligible for any promotions at this time. You can continue with the current pricing.' [Both] Continue \u2192 POST configure-promotions + GET selection-options/addons",
+      "text4": null,
+      "display_order": 8
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18553,
+      "case_id": 3751,
+      "text1": "On Add on services, continue without add-ons",
+      "text2": null,
+      "text3": "[FE] 'Add on services' header with category tabs (International, Services, Data, Storage, Security, Others). [Both] Continue \u2192 create-subscriber confirm dialog",
+      "text4": null,
+      "display_order": 9
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18554,
+      "case_id": 3751,
+      "text1": "Confirm 'Create subscriber' for the tablet line, then choose 'Continue to order summary'",
+      "text2": null,
+      "text3": "[Both] activate-subscriber completes; 'Subscriber created' dialog subtitle 'Would you like to add another line to the order, or view Charge Summary and checkout?'; order-summary response returned",
+      "text4": null,
+      "display_order": 10
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18555,
+      "case_id": 3751,
+      "text1": "Review the Order Summary",
+      "text2": null,
+      "text3": "[FE] 'Order summary' rows: Order ID = state.orderId, Account number, 'Lines in order' = 2, Total MRC, Total taxes &amp; fees, 'Edge due immediately' = orderSummary.dueImmediatelyAmount",
+      "text4": null,
+      "display_order": 11
+    },
+    {
+      "column_name": "custom_steps",
+      "id": 18556,
+      "case_id": 3751,
+      "
 
-===== GET /priorities -> HTTP 404 =====
-{
-  "message": "The route api/v1/priorities could not be found."
-}
+priority-ish keys BEFORE: {'custom_priority': 2}
+case top-level keys: ['created_at', 'created_by', 'custom_automated', 'custom_description', 'custom_priority', 'custom_steps', 'estimate', 'folder_id', 'forecast', 'has_automation', 'has_automation_status', 'id', 'key', 'name', 'project_id', 'repo_id', 'state_id', 'status_at', 'status_id', 'template_id', 'updated_at', 'updated_by']
 
-===== GET /projects/3/case-fields -> HTTP 404 =====
+===== PATCH cases priority_id=1 -> HTTP 400 =====
 {
-  "message": "The route api/v1/projects/3/case-fields could not be found."
-}
-
-===== GET /case-fields -> HTTP 404 =====
-{
-  "message": "The route api/v1/case-fields could not be found."
-}
-
-===== GET /projects/3/templates -> HTTP 200 =====
-{
-  "result": [
-    {
-      "id": 4,
-      "name": "Case (BDD)",
-      "is_default": false,
-      "fields": [
-        {
-          "id": 2,
-          "name": "Priority",
-          "type": 8,
-          "options": [
-            {
-              "id": 1,
-              "value": "High"
-            },
-            {
-              "id": 2,
-              "value": "Normal"
-            },
-            {
-              "id": 3,
-              "value": "Low"
-            }
-          ]
-        },
-        {
-          "id": 19,
-          "name": "Description",
-          "type": 2
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Case (steps)",
-      "is_default": true,
-      "fields": [
-        {
-          "id": 2,
-          "name": "Priority",
-          "type": 8,
-          "options": [
-            {
-              "id": 1,
-              "value": "High"
-            },
-            {
-              "id": 2,
-              "value": "Normal"
-            },
-            {
-              "id": 3,
-              "value": "Low"
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "name": "Description",
-          "type": 2
-        },
-        {
-          "id": 7,
-          "name": "Expected result",
-          "type": 2
-        },
-        {
-          "id": 9,
-          "name": "Prerequisite",
-          "type": 2
-        },
-        {
-          "id": 12,
-          "name": "Test Data",
-          "type": 2
-        },
-        {
-          "id": 17,
-          "name": "Assignee",
-          "type": 8,
-          "options": []
-        },
-        {
-          "id": 18,
-          "name": "Automated",
-          "type": 8,
-          "options": [
-            {
-              "id": 14,
-              "value": "No"
-            },
-            {
-              "id": 15,
-              "value": "Yes"
-            },
-            {
-              "id": 16,
-              "value": "Yes, requires update"
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "name": "Steps",
-          "type": 10
-        },
-        {
-          "id": 16,
-          "name": "Expected test Result",
-          "type": 2
-        }
-      ]
-    }
-  ]
-}
-
---- priority-ish entry in GET /projects/3/templates: ---
-{
-  "id": 4,
-  "name": "Case (BDD)",
-  "is_default": false,
-  "fields": [
-    {
-      "id": 2,
-      "name": "Priority",
-      "type": 8,
-      "options": [
-        {
-          "id": 1,
-          "value": "High"
-        },
-        {
-          "id": 2,
-          "value": "Normal"
-        },
-        {
-          "id": 3,
-          "value": "Low"
-        }
-      ]
-    },
-    {
-      "id": 19,
-      "name": "Description",
-      "type": 2
-    }
-  ]
-}
-
---- priority-ish entry in GET /projects/3/templates: ---
-{
-  "id": 2,
-  "name": "Case (steps)",
-  "is_default": true,
-  "fields": [
-    {
-      "id": 2,
-      "name": "Priority",
-      "type": 8,
-      "options": [
-        {
-          "id": 1,
-          "value": "High"
-        },
-        {
-          "id": 2,
-          "value": "Normal"
-        },
-        {
-          "id": 3,
-          "value": "Low"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Description",
-      "type": 2
-    },
-    {
-      "id": 7,
-      "name": "Expected result",
-      "type": 2
-    },
-    {
-      "id": 9,
-      "name": "Prerequisite",
-      "type": 2
-    },
-    {
-      "id": 12,
-      "name": "Test Data",
-      "type": 2
-    },
-    {
-      "id": 17,
-      "name": "Assignee",
-      "type": 8,
-      "options": []
-    },
-    {
-      "id": 18,
-      "name": "Automated",
-      "type": 8,
-      "options": [
-        {
-          "id": 14,
-          "value": "No"
-        },
-        {
-          "id": 15,
-          "value": "Yes"
-        },
-        {
-          "id": 16,
-          "value": "Yes, requires update"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "Steps",
-      "type": 10
-    },
-    {
-      "id": 16,
-      "name": "Expected test Result",
-      "type": 2
-    }
-  ]
-}
-
-===== GET cases?folder_id=431 -> HTTP 422 =====
-{
-  "message": "The selected page rows is invalid.",
+  "message": "No fields provided or the fields provided are not valid for update.",
   "errors": {
-    "per_page": [
-      "The selected page rows is invalid."
+    "fields": [
+      "No fields provided or the fields provided are not valid for update."
     ]
   }
 }
 
-folder 426 'BYOD - AI' parent_id=None
+===== PATCH cases custom_priority=1 -> HTTP 200 =====
+{
+  "result": [
+    {
+      "id": 3751,
+      "estimate": null,
+      "folder_id": 431,
+      "forecast": null,
+      "has_automation": false,
+      "has_automation_status": false,
+      "key": 3751,
+      "name": "Activate a dealer-stock tablet with a physical SIM as an added line",
+      "project_id": 3,
+      "repo_id": 3,
+      "state_id": 4,
+      "status_id": null,
+      "status_at": null,
+      "template_id": 2,
+      "created_at": "2026-07-31 09:32:21.067359",
+      "created_by": 13,
+      "updated_at": "2026-07-31 14:53:35.969690",
+      "updated_by": 13,
+      "automation_links": [],
+      "tags": [
+        {
+          "tag_id": 570,
+          "name": "astock"
+        },
+        {
+          "tag_id": 79,
+          "name": "cash"
+        },
+        {
+          "tag_id": 202,
+          "name": "multiline"
+        },
+        {
+          "tag_id": 83,
+          "name": "psim"
+        },
+        {
+          "tag_id": 84,
+          "name": "regression"
+        },
+        {
+          "tag_id": 506,
+          "name": "tablet"
+        }
+      ],
+      "issues": [
+        {
+          "issue_id": 961,
+          "display_id": "QA-2744",
+          "integration_id": 1,
+          "connection_project_id": null
+        }
+      ],
+      "custom_priority": 1,
+      "custom_description": null,
+      "custom_requirements": "## Feature description\nDealer A-stock tablets (inventory type D) can now be activated in RTGO alongside handsets. When the rep enters a tablet IMEI that exists in d
 
-folder 431 'Astock - AI' parent_id=382
+patched_shape = 'custom_priority'
 
-folder 430 'HINT - AI' parent_id=382
-
-No priority id discovered anywhere — PATCH skipped.
+priority-ish keys AFTER: {'custom_priority': 1}
