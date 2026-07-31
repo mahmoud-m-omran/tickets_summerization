@@ -1,0 +1,465 @@
+{
+  "ticket_key": "Astock",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "Activate a dealer-stock tablet with a physical SIM as an added line",
+      "priority": "Critical",
+      "tags": [
+        "Astock",
+        "Tablet",
+        "PSIM",
+        "MultiLine",
+        "Cash",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nDealer A-stock tablets (inventory type D) can now be activated in RTGO alongside handsets. When the rep enters a tablet IMEI that exists in dealer stock, the system validates it against Amdocs and local inventory, recognizes it as a Tablet automatically — with no BYOD picker or confirmation drawer — and advances straight to SIM validation, then through the standard plan/promotion/add-on chain to checkout. This lets stores sell tablets end-to-end in RTGO instead of falling back to RTPOS.\n\n## Related tickets\nRTPL-1819 (BE Tablet ASTOCK), RTPL-2010 (FE Enable Tablet for ASTOCK), RTPL-2141 (inventory-type gating), RTPL-1925 (ValidateDevice split)\n\n## Preconditions\n- Tablet activation feature flag ON (backend-mock: subscriber_activation_tablet_enabled=true, config.ts:37).\n- Rep logged into RTGO, store selected; new-account activation started.\n- Primary phone line activated on the order first — a tablet cannot be line 1 (Section-0 rule 9).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** A-Stock tablet catalog IMEI from the data sheet, physical-SIM variant (probe live for unused; mock seed: 370100000000202)\n- **SIM (ICCID):** First unused physical SIM matching ^89[a-zA-Z0-9]{17}F$ from the data sheet\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Assert the ABSENCE of the BYOD drawer/picker after IMEI entry — a tablet routed into collect-device-info is a regression signal (route split at validate-device-repository.ts:806-840).\n- resolve-device-pricing auto-chains (no user action, no FE step — constants/index.ts:115-116); do not wait on it as a screen.\n- Live blocker check before automating: tablet plan list returned plans:null at configure-plan on 2026-07-09 (Bug #2). Mock catalog: IPADAIR-64 $599.99, SAMTABS9-128 $799.99, IPAD10-64 $329.99, SAMTABA9-64 $349.99 (device-pricing-registry.ts:298-336).\n- Known FE defect (informational): tablet lines DO have a correct cart icon, but HomeInternet/IOT lines fall back to i-far-mobile (constants.ts:230-236 key mismatch) — do not copy tablet icon assertions to HINT cases.",
+      "steps": [
+        {
+          "action": "Complete the primary phone line through activate-subscriber, then on the 'Subscriber created' dialog choose Add another line",
+          "expected": "[Both] POST lines/start with type='add-new-line' creates the second line; [FE] IMEI validation header visible for line 2; cart shows line 1 rows unchanged"
+        },
+        {
+          "action": "Enter the A-Stock tablet IMEI on line 2 (auto-submits at 15 digits)",
+          "expected": "[BE] POST validate-device returns deviceValidationDetails.deviceType='Tablet', deviceSource='D', isByod=false, requiresAction=false (validate-device-repository.ts:174-184, :806-840). [FE] flow advances DIRECTLY to SIM validation — NO 'Add BYOD device' picker, NO confirm-byod drawer. Cart Device row = tablet catalog price"
+        },
+        {
+          "action": "On SIM validation, verify the physical-SIM card state",
+          "expected": "[FE] 'SIM validation' header visible; pSIM card title 'IMEI 1 - PSIM' with content = the tablet IMEI; exactly 1 card, pSIM checked, SIM label 'ICCID SIM *', input empty, Continue DISABLED"
+        },
+        {
+          "action": "Enter the ICCID and Continue",
+          "expected": "[Both] POST validate-sim-card returns state.lines[1]; GET available-mdns returns the MDN list; Phone number selection header appears. [FE] cart 'SIM card' row = $10 with A-Stock free-SIM discount -$10, $0 tax (RTPL-2578 pricing table)"
+        },
+        {
+          "action": "Keep 'New phone number' selected and Continue",
+          "expected": "[FE] 2 cards: 'New phone number' (subtitle 'Get a new Metro phone number') checked; 'Port phone number' not checked; each MDN message = '(npa) nxx-* submarketName, stateCode'. [Both] Continue → GET selection-options/protections. Cart 'Phone number' row = '(npa) nxx-****'"
+        },
+        {
+          "action": "Select the first eligible protection and Continue",
+          "expected": "[FE] 'Protection selection' header; selected card button aria-label flips 'Select' → 'Selected'. [Both] POST configure-protection + GET selection-options/plans. Cart gains 'Protection (SOC)' = $x / mo."
+        },
+        {
+          "action": "On Plan selection, accept the first (pre-selected) tablet plan and Continue",
+          "expected": "[FE] 'Plan selection' header; index 0 pre-selected; NO 'Pair with voice line' selector (availableSubscriberForPairing=null for tablets, configure-protection-repository.ts:91-109); rate badge '$x per month'. [Both] POST configure-plan + GET selection-options/promotions. Cart gains 'Plan (SOC)' = $x / mo."
+        },
+        {
+          "action": "On Promotion selection, continue without selecting (or note the no-eligible text)",
+          "expected": "[FE] 'Promotion selection' header; if none eligible, exact text 'This customer is not eligible for any promotions at this time. You can continue with the current pricing.' [Both] Continue → POST configure-promotions + GET selection-options/addons"
+        },
+        {
+          "action": "On Add on services, continue without add-ons",
+          "expected": "[FE] 'Add on services' header with category tabs (International, Services, Data, Storage, Security, Others). [Both] Continue → create-subscriber confirm dialog"
+        },
+        {
+          "action": "Confirm 'Create subscriber' for the tablet line, then choose 'Continue to order summary'",
+          "expected": "[Both] activate-subscriber completes; 'Subscriber created' dialog subtitle 'Would you like to add another line to the order, or view Charge Summary and checkout?'; order-summary response returned"
+        },
+        {
+          "action": "Review the Order Summary",
+          "expected": "[FE] 'Order summary' rows: Order ID = state.orderId, Account number, 'Lines in order' = 2, Total MRC, Total taxes & fees, 'Edge due immediately' = orderSummary.dueImmediatelyAmount"
+        },
+        {
+          "action": "Proceed through Add Accessory (Review invoice) adding zero accessories",
+          "expected": "[FE] 'Review invoice' header; row count = payment.lineItems.length + 3 (discount, tax, pp-tax); Balance due = payment.totalAmount. [BE] Continue to payment → POST prepare-payment"
+        },
+        {
+          "action": "Collect payment in CASH for the exact balance due",
+          "expected": "[FE] 'Total to collect' = balance due (+ Payment support charge if any). [BE] collect-cash → collect-payment; SaleRecord persists with a real number (no TEMP- prefix). STOP before submitting payment if the run policy forbids burning the IMEI/SIM"
+        }
+      ]
+    },
+    {
+      "name": "Silently reactivate a previously activated tablet found in store inventory",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "Tablet",
+        "Reactivation",
+        "MultiLine",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nWhen a previously activated dealer-stock tablet is still present in the store's local POS inventory, RTGO auto-accepts the reactivation instead of interrupting the rep with a confirmation prompt. The flow proceeds directly to SIM validation, and because it is a reactivation the order carries no SIM line at all. This removes a needless click for the most common walk-in reactivation and is new behavior versus RTPOS.\n\n## Related tickets\nRTPL-1925 (auto-accept A-Stock reactivation), RTPL-1819 (BE Tablet ASTOCK)\n\n## Preconditions\n- Tablet activation feature flag ON.\n- Primary phone line activated on the order first, then add-line (tablet cannot be line 1).\n- Activation type is new-activation/add-new-line — NOT upgrade-device (auto-accept is guarded off for upgrades, validate-device-repository.ts:199).\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** Previously activated A-Stock tablet IMEI present in local store inventory (mock seed: 370100000000221, REACTIVATION_IMEIS_IN_LOCAL_INVENTORY)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- The negative assertion (dialog NEVER appears) needs a bounded wait, not a poll-until-timeout on the happy screen — assert the SIM validation header within the normal validate-device response time.\n- Same shared branch covers watches (flags.isWatchDevice || isTablet) — this case is the tablet guard; keep one watch variant manual if coverage budget is tight.",
+      "steps": [
+        {
+          "action": "On the added line, enter the previously activated in-inventory tablet IMEI",
+          "expected": "[BE] POST validate-device completes with NO device-previously-activated wait state: requiresAction=false, deviceValidationDetails.inLocalInventory=true, deviceType='Tablet', isReactivation=true (validate-device-repository.ts:190-204). [FE] NO reactivation confirm dialog appears; flow advances directly to 'SIM validation'"
+        },
+        {
+          "action": "Inspect the running cart for the reactivated tablet line",
+          "expected": "[Both] simPricingData is null for a reactivation — cart shows NO 'SIM card' row for this line (validate-sim-card-repository.ts:671-693; use-case-config.ts:456-463)"
+        }
+      ]
+    },
+    {
+      "name": "Prompt before reactivating a tablet that is not in store inventory",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "Tablet",
+        "Reactivation",
+        "MultiLine",
+        "Dialog"
+      ],
+      "custom_requirements": "## Feature description\nA previously activated tablet that is NOT in the store's local inventory must not silently reactivate — the rep is shown a confirmation asking whether to continue, because the device may belong to another store or customer. Accepting resumes the flow at SIM validation; declining stops the line. This is the guarded counterpart of the silent in-inventory reactivation.\n\n## Related tickets\nRTPL-1925 (ValidateDevice split), RTPL-1819 (BE Tablet ASTOCK)\n\n## Preconditions\n- Tablet activation feature flag ON.\n- Primary phone line activated first, then add-line.\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** Previously activated A-Stock tablet IMEI NOT in local store inventory (mock seed: 370100000000121)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Upgrade-device flows use a DIFFERENT reason code for the same IMEI: device-previously-activated-device-change with accept/decline-device-change actions (validate-device.test.ts:598-621) — do not reuse this case's assertions there.\n- deviceValidationDetails is null while waiting — guard any cart drilldown until after accept.",
+      "steps": [
+        {
+          "action": "On the added line, enter the previously activated not-in-inventory tablet IMEI",
+          "expected": "[BE] validate-device waits with reasonCodeForAction='device-previously-activated', availableActions=['accept-reactivation','decline-reactivation'], deviceValidationDetails=null (validate-device.test.ts:576-596). [FE] confirm dialog shows message 'The device IMEI # {0} was previously activated. Do you want to continue with activation?' with the entered IMEI substituted"
+        },
+        {
+          "action": "Accept the reactivation",
+          "expected": "[Both] POST activity with action='accept-reactivation' returns 200; flow advances to 'SIM validation'; no SIM row is added to the cart (reactivation carries no SIM line)"
+        }
+      ]
+    },
+    {
+      "name": "Block tablet activation with a clear message when the tablet feature is off",
+      "priority": "Medium",
+      "tags": [
+        "Astock",
+        "Tablet",
+        "FeatureFlag",
+        "Negative",
+        "Dialog"
+      ],
+      "custom_requirements": "## Feature description\nTablet activation is gated behind its own feature flag. With the flag off, entering a tablet IMEI must fail fast with the unsupported-device message directing the rep to RTPOS — and must not affect handset activations, which stay fully functional. This protects staged rollouts: turning one device type off cannot take the store down.\n\n## Related tickets\nRTPL-1819 (feature-flag dependency risk), RTPL-2141 (inventory-type gating)\n\n## Preconditions\n- Tablet activation feature flag OFF (subscriber_activation_tablet_enabled=false); handset/BYOD flags unchanged.\n- Primary phone line activated first, then add-line.\n\n## Test Data (FE — what the rep types)\n- **Tablet IMEI:** A-Stock tablet catalog IMEI (mock seed: 370100000000202)\n- **Handset IMEI:** A-Stock handset catalog IMEI from the data sheet (control run)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Errors surface as auto-dismissing top-right toasts/dialogs — capture synchronously on the 4xx, do not poll the main pane later.\n- Known copy defect: the full-screen 'Device not supported' dialog's supports-list still says 'Device Type = Handset' / 'Account Type = New account' (subscriber-activation.base.json:78-86) even though tablet/watch/HINT flags are live — do NOT assert that stale list body; assert the header + error code only.",
+      "steps": [
+        {
+          "action": "On the added line, enter the A-Stock tablet IMEI with the tablet flag OFF",
+          "expected": "[BE] validate-device returns 400 with code 'unsupported-device-type' and detail \"Device type 'TABLET' is not supported yet. Only A-Stock devices are currently available for activation.\" (error-cases.ts:268-270; gate order static→Watch→BYOD→HINT→Tablet→IOT, validate-device-repository.ts:58-94). [FE] unsupported-device dialog appears; flow does NOT advance past IMEI entry"
+        },
+        {
+          "action": "Dismiss the dialog and enter an A-Stock handset IMEI on the same line",
+          "expected": "[Both] validate-device succeeds with deviceType='Handset' and the flow advances to 'SIM validation' — the tablet flag does not leak into handset validation"
+        }
+      ]
+    },
+    {
+      "name": "Activate a dealer-stock smartwatch on a paired plan with a rep-chosen voice line",
+      "priority": "Critical",
+      "tags": [
+        "Astock",
+        "Watch",
+        "ESIM",
+        "Pairing",
+        "MultiLine",
+        "Cash"
+      ],
+      "custom_requirements": "## Feature description\nDealer A-stock smartwatches activate in RTGO on eSIM only. After IMEI validation recognizes the device as a Wearable, the plan step offers the watch-only catalog, and for paired watch plans the rep must explicitly choose which voice line on the account the watch pairs with — the system never auto-picks. The selection is confirmed on screen and submitted with the plan, taking the watch through the standard chain to checkout.\n\n## Related tickets\nRTPL-2013 (FE Enable Wearable for ASTOCK), RTPL-2012 (Wearable Activations epic), RTPL-2347 (pairing + standalone plan selection)\n\n## Preconditions\n- Watch activation feature flag ON (subscriber_activation_watch_enabled=true).\n- Primary phone (voice) line activated on the order first, then add-line — a watch cannot be line 1 AND pairing needs a voice line to exist.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** A-Stock smartwatch catalog IMEI, eSIM variant (probe live; mock seed: 360100000000101 Apple Watch)\n- **EID:** Watch EID matching ^[0-9]{32}$ (mock auto-generates when absent, validate-device-repository.ts:243-245)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Pairing MDN is rep-selected, never auto-picked (RTPL-2347) — the test must assert Continue stays disabled BEFORE selection, not just enabled after.\n- Assert watch plans by socCode (AWATCHPR $10, FAMWATCH $15, AWATCHSA $25 in mock plan-seeds.ts:212-263) — mock/Jira prices differ from live.\n- Live data caveat: watch EIDs in the SharePoint data sheet are float-corrupted; source EIDs elsewhere or rely on validate-device auto-EID in mock.",
+      "steps": [
+        {
+          "action": "On the added line, enter the A-Stock watch IMEI",
+          "expected": "[BE] validate-device returns deviceType='Wearable', deviceSource='D', isByod=false, isWatch=true, flags isWatchDevice=true (activation-strategies.ts:120-128). [FE] advances to SIM step with NO BYOD picker"
+        },
+        {
+          "action": "On SIM validation, verify eSIM-only presentation and Continue",
+          "expected": "[FE] eSIM card 'IMEI 2 - ESIM' path only — NO physical-SIM entry control is presented anywhere for a watch (watches are eSIM-only, RTPL-2576/RTPL-2013 AC-5). [Both] Continue → validate-sim-card returns state line; GET available-mdns"
+        },
+        {
+          "action": "Select a new phone number and Continue; select protection and Continue",
+          "expected": "[Both] configure-mdn then configure-protection complete; GET selection-options/plans returns the WATCH plan catalog (MOCK_WATCH_PLANS) and a non-null availableSubscriberForPairing list (configure-protection-repository.ts:93,107). [BE] isInsuranceRequired=false for a watch (validate-device-mapper.ts:135)"
+        },
+        {
+          "action": "On Plan selection, select a PAIRED watch plan by socCode (e.g. AWATCHPR or FAMWATCH)",
+          "expected": "[FE] 'Pair with voice line' selector appears with placeholder '— Select a voice line —' and helper 'Required to continue.'; Continue is DISABLED until a voice line is chosen (plan-configure.vue:117-130). Assert plan by socCode, not price"
+        },
+        {
+          "action": "Choose the primary voice line MDN in the pairing selector",
+          "expected": "[FE] helper turns green 'Pairing confirmed.'; MDN displays formatted '(NNN) NNN-NNNN'; Continue ENABLED"
+        },
+        {
+          "action": "Continue from Plan selection",
+          "expected": "[BE] POST configure-plan action='select-plan' with inputData {socCode, selectedPairingMdn=<digits-only chosen MDN>} (plan-configure.vue:239-248); response stores PlanConfigDetails.selectedPairingMdn. [FE] Promotion selection header appears; cart gains 'Plan (SOC)' = $x / mo."
+        },
+        {
+          "action": "Continue through Promotions and Add-ons, confirm Create subscriber, then Continue to order summary",
+          "expected": "[Both] configure-promotions, configure-addons, activate-subscriber complete; order-summary shows 'Lines in order' = 2"
+        },
+        {
+          "action": "Review Order Summary, pass Add Accessory with zero accessories, collect exact CASH",
+          "expected": "[FE] 'Order summary' rows populated; 'Review invoice' Balance due = payment.totalAmount. [BE] prepare-payment then collect-cash → collect-payment; SaleRecord real number. STOP before payment submit if run policy forbids burning the IMEI"
+        }
+      ]
+    },
+    {
+      "name": "Standalone watch plan turns off voice-line pairing",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "Watch",
+        "Pairing",
+        "Standalone",
+        "Plan"
+      ],
+      "custom_requirements": "## Feature description\nWatch plans come in paired and standalone variants. Selecting a standalone plan (unpaired watch SOC) must automatically suppress pairing: the voice-line selector is disabled with an explanatory helper, and the plan is submitted with no pairing line at all. Pairing a standalone plan is a backend-rejected state, so the UI must make it unreachable.\n\n## Related tickets\nRTPL-2347 (standalone plan selection)\n\n## Preconditions\n- Watch activation feature flag ON.\n- Primary voice line activated first, then add-line; watch line advanced through device, eSIM, MDN and protection to Plan selection.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** A-Stock smartwatch catalog IMEI, eSIM variant (mock seed: 360100000000201 Galaxy Watch)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Backend guard for the unreachable state: standalone + non-empty MDN → 400 'standalone-pairing-not-allowed', detail 'Standalone watch plans cannot be paired with a voice line.' (configure-plan-service.ts:67-76). Cover via API-level test; the UI must never produce it.\n- Pairing state must clear on every plan switch — assert the cleared value, not just the disabled control.",
+      "steps": [
+        {
+          "action": "On Plan selection, select a STANDALONE watch plan by socCode (AWATCHSA / AWATCHSAT / WATCHSA / WATCHSAT)",
+          "expected": "[FE] 'Pair with voice line' select becomes DISABLED with helper 'Unpaired plan selected — voice line pairing unavailable.' (plan-pairing-selector.vue:41-43); any previously chosen pairing MDN is cleared (plan-configure.vue:133-136); Continue ENABLED without a pairing selection. [BE] wearablePlanType='standalone' on the plan option (configure-plan-mapper.ts:30-39, UNPAIRED_WATCH_SOC_CODES)"
+        },
+        {
+          "action": "Continue from Plan selection",
+          "expected": "[BE] POST configure-plan sends inputData {socCode, selectedPairingMdn: null} (plan-configure.vue:239-248); 200 response; PlanConfigDetails.selectedPairingMdn stays empty. [FE] Promotion selection header appears"
+        },
+        {
+          "action": "Switch back to a PAIRED plan on the same screen (regression toggle)",
+          "expected": "[FE] selector re-enables with placeholder '— Select a voice line —' and helper 'Required to continue.'; Continue DISABLED again until a voice line is chosen"
+        }
+      ]
+    },
+    {
+      "name": "Hold a paired watch plan until a pairing voice line is selected",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "Watch",
+        "Pairing",
+        "Negative",
+        "API"
+      ],
+      "custom_requirements": "## Feature description\nA paired watch plan cannot be submitted without a pairing voice line. The UI blocks Continue until the rep picks one; the backend independently rejects a missing, invalid, or unavailable pairing line with specific error messages shown inline at the selector (not as toasts). Both layers must hold, or watches ship unpaired and fail to provision against the customer's voice line.\n\n## Related tickets\nRTPL-2347 (pairing validation)\n\n## Preconditions\n- Watch activation feature flag ON.\n- Primary voice line activated first, then add-line; watch line advanced to Plan selection with a PAIRED plan selected.\n\n## Test Data (FE — what the rep types)\n- **Watch IMEI:** A-Stock smartwatch catalog IMEI, eSIM variant (mock seed: 360100000000102)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Fourth matrix cell for API coverage: paired plan + EMPTY candidate list → 400 'pairing-mdn-unavailable', detail 'No voice lines are available on this account to pair this watch with.' (configure-plan-service.ts:83-92); FE shows blocking red-border selector with 'No voice lines on this account' (plan-pairing-selector.vue:44-46,78-82). Needs an account fixture with zero voice lines — hard to stage via UI on this flow since rule 9 forces a voice line first; keep as API-only assertion.\n- Inline-vs-toast distinction is the regression oracle — a toast for pairing errors is a bug.",
+      "steps": [
+        {
+          "action": "With a paired plan selected and NO voice line chosen, inspect the Continue control",
+          "expected": "[FE] Continue DISABLED; pairing selector shows placeholder '— Select a voice line —' and helper 'Required to continue.' (plan-pairing-selector.vue:50-52)"
+        },
+        {
+          "action": "Force-submit select-plan without selectedPairingMdn (API-level, bypassing the disabled button)",
+          "expected": "[BE] 400 'pairing-mdn-required', detail 'Please select a Pairing MDN to continue.' (configure-plan-service.ts:94-103); process state unchanged, still at configure-plan"
+        },
+        {
+          "action": "Force-submit select-plan with an MDN NOT in availableSubscriberForPairing",
+          "expected": "[BE] 400 'pairing-mdn-invalid', detail 'Selected pairing MDN is not available. Please choose another.' (configure-plan-service.ts:105-114). [FE] error renders INLINE at the pairing selector — pairing-mdn-invalid/unavailable are in PAIRING_INLINE_ERROR_CODES, not toasts (plan-configure.vue:40, :176-178)"
+        }
+      ]
+    },
+    {
+      "name": "Activate home internet at an eligible address with dual acknowledgement",
+      "priority": "Critical",
+      "tags": [
+        "Astock",
+        "HINT",
+        "AddressEligibility",
+        "Consent",
+        "Cash"
+      ],
+      "custom_requirements": "## Feature description\nHome internet (HINT) gateways from dealer stock activate through a dedicated eligibility step: the rep confirms the device is a home internet gateway, enters the customer's service address, and — when the address is covered — both the customer and the retailer accept on-screen acknowledgements before the flow continues to SIM validation. The gateway itself is always free of charge. This gates HINT sales to covered addresses only, protecting against chargebacks from customers who can't get signal.\n\n## Related tickets\nRTPL-2289 (FE HINT device validation + address eligibility), RTPL-2008 (HINT epic), RTPL-1889 (BE eligibility), RTPL-1925 (ValidateHint activity)\n\n## Preconditions\n- HINT activation feature flag ON (subscriber_activation_hint_enabled=true).\n- Rep logged in; new-account activation started (HINT gateway may be line 1).\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Service address:** Street + city + state auto-derived; ZIP 33101 (mock: eligible scenario)\n- **SIM:** eSIM/ICCID per gateway variant from the data sheet\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- The device-confirm drawer auto-opens on mount (hint-validate.vue:340-352) — deep-linking or back-nav without HINT_DEVICE state can dead-end; always enter via IMEI submit.\n- Known FE defect: HINT lines render the fallback i-far-mobile icon instead of i-far-signal — deviceType 'HomeInternet' misses the lowercased icon map key 'hint' (constants.ts:230-236). Do not assert the line icon until fixed.\n- Back/breadcrumb from the HINT panel executes cancel-line (hint-validate.vue:329-338) — RTPL-2289 AC-9 said return to device validation; code cancels. Automation should pin CURRENT behavior and link the AC discrepancy.",
+      "steps": [
+        {
+          "action": "Enter the HINT gateway IMEI",
+          "expected": "[BE] validate-device flags isHintDevice=true and routes to validate-hint (validate-device-repository.ts:825-828); reason 'hint-device-detected' with action ['provide-hint-address']. [FE] drawer opens: header 'Confirm home internet device', message 'The IMEI entered is a home internet device and requires extra details to activate. Click continue to proceed with activating this home internet device.'"
+        },
+        {
+          "action": "Confirm the home internet device",
+          "expected": "[FE] 'Home internet address eligibility' panel appears with note 'Confirm the customer's address where the device will be located to check for service eligibility then click continue to proceed with activating this home internet device.'"
+        },
+        {
+          "action": "Type the 5-digit ZIP code",
+          "expected": "[Both] GET /sales/customers/zip-codes/33101 returns zipCodeRegion; [FE] city and state auto-fill from the ZIP (hint-validate.vue:68-99); fields addressLine1 (2-30 chars), addressLine2 (max 15), city (max 40), zip masked 99999"
+        },
+        {
+          "action": "Enter the street address and Continue",
+          "expected": "[BE] POST activity validate-hint action='provide-hint-address' with inputData {address, city, state, zipCode} (address = addressLine1 + ' ' + addressLine2, hint-validate.vue:119-124); 200 → reason 'hint-consent-required', actions ['accept-hint-consent','decline-hint-consent']"
+        },
+        {
+          "action": "Review the acknowledgement panel",
+          "expected": "[FE] 'Home internet acknowledgement' panel: banner 'Good news - 5G home internet is available.'; the submitted address echoed for review; 'Customer acknowledgement' and 'Retailer acknowledgement' sections each with their consent text; Continue gated on BOTH acknowledgements checked"
+        },
+        {
+          "action": "Accept both acknowledgements and Continue",
+          "expected": "[Both] action='accept-hint-consent' (no inputData) → 200, hintConsentGiven=true, next activity validate-sim-card (use-case-config.ts:1153-1160); resolve-device-pricing auto-chains with device price $0, SKU 'HINT-DEVICE', isTaxable=false (resolve-device-pricing-repository.ts:24-37). [FE] 'SIM validation' header appears; cart Device row = $0"
+        },
+        {
+          "action": "Complete SIM, MDN, protection, plan, promotions, add-ons; confirm Create subscriber; Continue to order summary",
+          "expected": "[Both] standard chain completes for the HINT line; 'Subscriber created' dialog; order-summary response returned"
+        },
+        {
+          "action": "Review Order Summary, pass Add Accessory with zero accessories, collect exact CASH",
+          "expected": "[FE] 'Order summary' rows populated; 'Review invoice' Balance due = payment.totalAmount. [BE] prepare-payment → collect-cash → collect-payment. STOP before payment submit if run policy forbids burning the IMEI"
+        }
+      ]
+    },
+    {
+      "name": "Recover from an ineligible home internet address by trying a different one",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "HINT",
+        "AddressEligibility",
+        "Retry",
+        "Dialog"
+      ],
+      "custom_requirements": "## Feature description\nWhen the service address fails the coverage check, the rep gets an explicit choice: try a different address or remove the home internet line and keep the rest of the order. Retrying re-opens the address form with a fresh eligibility check; the customer's sale is never silently lost to a single bad address.\n\n## Related tickets\nRTPL-2289 (AC-5/AC-10), RTPL-2565 (cancel HINT line on failed eligibility)\n\n## Preconditions\n- HINT activation feature flag ON.\n- HINT gateway IMEI validated and device confirmed; address form open.\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Ineligible ZIP:** 33102 (mock: not-eligible scenario)\n- **Eligible ZIP:** 33101 (mock: eligible scenario)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- 'Remove this line' branch: when an order summary already exists the decline override routes to viewOrderSummary instead of cancel-line (hint-validate.vue:294-315) — cover that variant once multi-line HINT automation exists.\n- RTPL-2565 (GTM feedback) tracked the missing cancel path — this dialog's reject-label is the fix; assert both buttons by exact label.",
+      "steps": [
+        {
+          "action": "Submit the address with the ineligible ZIP",
+          "expected": "[BE] provide-hint-address → 200 with reason 'hint-address-not-eligible', actions ['retry-hint-address','decline-hint-address']; eligibilityId cleared (validate-hint-repository.ts:95-107). [FE] confirm dialog: title 'Address not eligible', message 'This address isn't eligible for home internet service. Try a different address, or remove this line and keep the rest of the order.', buttons 'Try a different address' / 'Remove this line'"
+        },
+        {
+          "action": "Choose 'Try a different address'",
+          "expected": "[BE] action='retry-hint-address' resets eligibilityId, hintAddress and stage to initial, re-prompts 'hint-device-detected' (validate-hint-repository.ts:114-128). [FE] address form re-opens; previously entered values available for edit"
+        },
+        {
+          "action": "Correct the ZIP to the eligible one and resubmit",
+          "expected": "[Both] fresh provide-hint-address → 'hint-consent-required'; 'Home internet acknowledgement' panel opens — the retry triggered a genuinely new coverage check, not a cached verdict"
+        }
+      ]
+    },
+    {
+      "name": "Treat a capped home internet address as not eligible",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "HINT",
+        "AddressEligibility",
+        "Parity",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nAddresses that qualify only for capped/limited 'Home Internet Lite' service must be treated as NOT eligible for the unlimited HINT product sold in this flow. Legacy POS forces these ineligible; if RTGO advanced them to acknowledgement, reps would sell unlimited home internet at Lite-only addresses — a guaranteed churn and chargeback case. This is the highest-risk parity check in the HINT flow.\n\n## Related tickets\nRTPL-2289 (parity gap #1 — capped/Lite), RTPL-1889 (BE eligibility mapping)\n\n## Preconditions\n- HINT activation feature flag ON.\n- HINT gateway IMEI validated and device confirmed; address form open.\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Limited-tier ZIP:** 33103 (mock: limited/capped scenario)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- If this ever advances to 'Home internet acknowledgement', file a P1 immediately (RTPL-2289 parity TC-3 precedent — POS realtimepos.prg:11695,11764 forces capped ineligible).\n- Negative navigation oracle: assert the not-eligible dialog AND assert the consent panel title is absent within the response window.",
+      "steps": [
+        {
+          "action": "Submit the address with the limited-tier ZIP",
+          "expected": "[BE] provide-hint-address → 200 with reason 'hint-address-not-eligible' — the capped tier maps to the SAME ineligible outcome as no coverage (use-case-config.ts:1039-1137, ZIP 33103 = ZIP 33102 behavior). [FE] 'Address not eligible' dialog appears; the acknowledgement panel must NEVER open"
+        }
+      ]
+    },
+    {
+      "name": "Keep the entered address when the eligibility service fails",
+      "priority": "Medium",
+      "tags": [
+        "Astock",
+        "HINT",
+        "ServiceError",
+        "Negative",
+        "Resilience"
+      ],
+      "custom_requirements": "## Feature description\nIf the coverage service is down or times out while checking an address, the rep sees a service error and can retry — without re-typing the address. Clearing the form on a transient outage would slow every HINT sale and risk a mistyped address landing on the customer record.\n\n## Related tickets\nRTPL-2289 (AC-10 retry without re-entry)\n\n## Preconditions\n- HINT activation feature flag ON.\n- HINT gateway IMEI validated and device confirmed; address form open.\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Outage ZIP:** 33104 (mock: eligibility service error scenario)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- RTPL-2289 gap #4 flagged the submit button as not disabled during loading → duplicate HINT_PROVIDE risk; add a rapid double-click probe on submit and assert exactly one in-flight request.\n- Retry CTA presence was unconfirmed at ticket time (gap #3) — pin whatever current behavior is and link the AC.",
+      "steps": [
+        {
+          "action": "Submit the address with the outage ZIP",
+          "expected": "[BE] provide-hint-address → 503 'service-unavailable' (use-case-config.ts ZIP 33104). [FE] loading state closes; error surfaced synchronously (top-right toast — capture on the 5xx, don't poll later); ALL address fields retain their entered values; process still at validate-hint"
+        },
+        {
+          "action": "Resubmit the same address unchanged after the error",
+          "expected": "[Both] a fresh provide-hint-address fires with the identical inputData — no re-typing needed; a healthy response then proceeds normally"
+        }
+      ]
+    },
+    {
+      "name": "Reject an incomplete home internet address before checking coverage",
+      "priority": "Medium",
+      "tags": [
+        "Astock",
+        "HINT",
+        "Validation",
+        "BVA",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nThe address form validates input before any coverage check runs: street, city, state and ZIP are all required, and an address that fails validation is rejected with a 400 — no eligibility call is wasted on garbage input. Field bounds (street 2-30, unit max 15, city max 40, ZIP exactly 5 digits) keep the submission inside what the coverage service accepts.\n\n## Related tickets\nRTPL-2289 (address form validation), RTPL-1889 (BE input validation)\n\n## Preconditions\n- HINT activation feature flag ON.\n- HINT gateway IMEI validated and device confirmed; address form open.\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Invalid-address ZIP:** 00000 (mock: address-validation failure scenario)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Boundary set for the form: addressLine1 at 1/2/30/31 chars; addressLine2 at 15/16; city at 40/41; ZIP mask 99999 rejects alpha input client-side.\n- addressLine2 truncation at 15 chars may under-specify multi-unit buildings (RTPL-2289 gap #6) — informational, not an assertion.",
+      "steps": [
+        {
+          "action": "Attempt Continue with an empty street address",
+          "expected": "[FE] form validation blocks submission — addressLine1 requires 2-30 chars (hint-address-eligibility-core.vue:60-155); no provide-hint-address request fires"
+        },
+        {
+          "action": "Fill the form but use the invalid-address ZIP and Continue",
+          "expected": "[BE] provide-hint-address → 400 'invalid-hint-address' — address validation runs BEFORE eligibility (validate-hint-service.ts:139-155, :172-183); no eligibility check performed. [FE] error surfaced; fields retain values"
+        }
+      ]
+    },
+    {
+      "name": "Cancel the home internet line when the customer declines the acknowledgement",
+      "priority": "Medium",
+      "tags": [
+        "Astock",
+        "HINT",
+        "Consent",
+        "Cancel",
+        "Negative"
+      ],
+      "custom_requirements": "## Feature description\nThe home internet acknowledgements are a hard gate: if the customer (or retailer) declines, the HINT line does not proceed — the line is cancelled rather than left half-configured. A declined acknowledgement must never produce an activated gateway.\n\n## Related tickets\nRTPL-2289 (consent gating), RTPL-2565 (line cancellation)\n\n## Preconditions\n- HINT activation feature flag ON.\n- HINT line advanced to the 'Home internet acknowledgement' panel (eligible address accepted).\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** A-Stock HINT hotspot catalog IMEI (mock seed: 390100000000101)\n- **Eligible ZIP:** 33101\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Teardown-friendly: this case self-cancels its line; still call cancel-process in teardown to release the IMEI in live envs.\n- Assert the cart afterwards — the HINT line's rows must be gone, remaining lines untouched.",
+      "steps": [
+        {
+          "action": "On the acknowledgement panel, verify Continue is gated",
+          "expected": "[FE] Continue DISABLED until BOTH 'Customer acknowledgement' and 'Retailer acknowledgement' are confirmed — one checkbox alone does not enable it"
+        },
+        {
+          "action": "Decline the consent (close/decline path)",
+          "expected": "[BE] decline executes cancel-line (hint-validate.vue:271); decline-hint-consent maps to 400 'validation-aborted' at the activity level (reason-codes.ts:197, use-case-config.ts:1161-1167). [FE] the HINT line is removed from the order; no subscriber is created for it"
+        }
+      ]
+    },
+    {
+      "name": "Collect the gateway EID before checking home internet eligibility",
+      "priority": "Medium",
+      "tags": [
+        "Astock",
+        "HINT",
+        "EID",
+        "Edge",
+        "Routing"
+      ],
+      "custom_requirements": "## Feature description\nSome home internet gateways require their eSIM EID to be captured before eligibility can be checked. For these devices the flow inserts a collect-device-info step (provide-eid) between IMEI validation and the address eligibility check, then continues through the normal HINT chain. Skipping the EID would leave the gateway unprovisionable even at an eligible address.\n\n## Related tickets\nRTPL-2289 (device validation), RTPL-1925 (activity routing)\n\n## Preconditions\n- HINT activation feature flag ON.\n- New-account activation started.\n\n## Test Data (FE — what the rep types)\n- **Gateway IMEI:** HINT gateway IMEI whose variant requires EID capture (mock seed: 390100000000104)\n- **EID:** Gateway EID matching ^[0-9]{32}$\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Order of activities is the oracle: completedActivities must show collect-device-info BEFORE validate-hint for this IMEI variant.\n- EID format guard: ^[0-9]{32}$ — boundary-test 31/33 digits at the FE input.",
+      "steps": [
+        {
+          "action": "Enter the EID-required HINT gateway IMEI",
+          "expected": "[BE] validate-device routes to collect-device-info awaiting provide-eid — NOT directly to validate-hint (collect-device-info-repository.ts:444-445). [FE] 'Add to inventory: EID' panel appears"
+        },
+        {
+          "action": "Enter the 32-digit EID and Continue",
+          "expected": "[Both] provide-eid completes collect-device-info; routing proceeds to validate-hint — the 'Confirm home internet device' drawer opens next"
+        },
+        {
+          "action": "Confirm the device and complete address eligibility with an eligible ZIP",
+          "expected": "[Both] provide-hint-address → 'hint-consent-required'; the EID captured earlier persists on deviceValidationDetails.eid through the HINT chain"
+        }
+      ]
+    },
+    {
+      "name": "Sell a phone, tablet, and watch from dealer stock in one order",
+      "priority": "High",
+      "tags": [
+        "Astock",
+        "MultiLine",
+        "Tablet",
+        "Watch",
+        "Pairing",
+        "Cash",
+        "Regression"
+      ],
+      "custom_requirements": "## Feature description\nA family walk-in buys a phone, a tablet, and a smartwatch from dealer stock in a single order. The phone activates first as the primary voice line; the tablet and watch are added as lines two and three, each recognized automatically from its IMEI with no BYOD prompts; the watch pairs to the phone line; and one shared order summary, accessory pass, and cash payment closes the whole basket. Multi-line orders with mixed device types have a defect history — this is the standing regression for it.\n\n## Related tickets\nRTPL-2297 (multi-line wearable activation failure), RTPL-2010/RTPL-2013 (tablet/wearable ASTOCK enablement), RTPL-2641 (wearable line missing from receipt)\n\n## Preconditions\n- Tablet AND watch activation feature flags ON.\n- Rep logged in; new-account activation started.\n\n## Test Data (FE — what the rep types)\n- **Phone IMEI:** A-Stock handset catalog IMEI from the data sheet\n- **Phone SIM (ICCID):** First unused physical SIM matching ^89[a-zA-Z0-9]{17}F$\n- **Tablet IMEI:** A-Stock tablet catalog IMEI, eSIM variant (mock seed: 370100000000101)\n- **Watch IMEI:** A-Stock smartwatch catalog IMEI, eSIM variant (mock seed: 360100000000101)\n\n_All other values (device type, MDN, plan, coupon, protection, add-on) are discovered at run time — not pinned._\n\n## Automation Notes\n- Longest case in the suite — budget ~3x single-line runtime; keep it out of smoke, in nightly regression.\n- Receipt/summary line-count assertions are the core oracle (RTPL-2641: wearable line dropped from receipt on multi-device BYOD).\n- Max-lines guard: 'subscriber-generated-max-lines' subtitle appears at the line cap — if it fires at 3 lines, the store config differs; fail fast with a clear message.",
+      "steps": [
+        {
+          "action": "Run the phone line through the full chain to activate-subscriber (device → SIM → MDN → protection → plan → promotions → add-ons → Create subscriber)",
+          "expected": "[Both] line 1 completes; 'Subscriber created' dialog offers 'Add another line' / 'Continue to order summary'"
+        },
+        {
+          "action": "Choose Add another line and enter the tablet IMEI",
+          "expected": "[BE] add-new-line process starts; validate-device → deviceType='Tablet', deviceSource='D', no BYOD picker. [FE] line 2 advances to its SIM step; cart shows both lines"
+        },
+        {
+          "action": "Complete the tablet line through its chain and Create subscriber",
+          "expected": "[Both] tablet subscriber created; dialog offers adding another line; cart line 2 rows complete (Device, SIM/eSIM, Phone number, Plan)"
+        },
+        {
+          "action": "Add a third line and enter the watch IMEI",
+          "expected": "[BE] validate-device → deviceType='Wearable', isWatch=true; eSIM-only SIM step. [FE] line 3 opens with NO physical-SIM option"
+        },
+        {
+          "action": "On the watch plan step, select a paired plan and pair to the phone line's MDN, then complete the line and Create subscriber",
+          "expected": "[FE] pairing selector lists the phone line's voice MDN; 'Pairing confirmed.' after selection. [BE] select-plan carries selectedPairingMdn = the phone MDN; watch subscriber created — no activity-sequence error on the multi-line order (RTPL-2297 regression)"
+        },
+        {
+          "action": "Choose Continue to order summary",
+          "expected": "[FE] 'Order summary': 'Lines in order' = 3; Total MRC = sum of all three plans; Edge due immediately populated. All three lines present — the wearable line must NOT be missing (RTPL-2641 regression)"
+        },
+        {
+          "action": "Pass Add Accessory with zero accessories and collect exact CASH for the full order",
+          "expected": "[FE] 'Review invoice' lists items for all 3 lines; Balance due = payment.totalAmount. [BE] single prepare-payment → collect-cash → collect-payment for the whole basket. STOP before payment submit if run policy forbids burning IMEIs"
+        }
+      ]
+    }
+  ],
+  "folder_name": "Astock - AI"
+}
