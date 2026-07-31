@@ -1,24 +1,20 @@
-"""Probe Testmo case PRIORITY support. Round 4.
+"""Probe Testmo case PRIORITY support. Round 5.
 
-Rounds 1-3 solved case->Jira issue links (see git history).
-Round 4: priorities never stick — create_testmo_cases.py resolves
-GET /projects/3/priorities into a {name: id} map, and that map is
-evidently empty at run time, so priority_id is never sent.
+Round 4 findings (probe-results/priority-schema.txt @ 53d207b run):
+- /priorities endpoints: 404 everywhere -> create script's map was empty.
+- GET /projects/3/templates WORKS: template 2 "Case (steps)" has field
+  id=2 "Priority" type=8 options High=1 / Normal=2 / Low=3.
+- GET /projects/3/cases?folder_id=431 -> 422 (wrong param).
+- Folders: 426 BYOD at root; 430 HINT + 431 Astock under 382.
 
-Questions this probe answers:
-1. What does GET /projects/{id}/priorities actually return here?
-2. Is there a global GET /priorities (or another fields endpoint)
-   that exposes the priority value list + ids?
-3. What priority-ish keys does a real case carry? (LIST cases in
-   folder 431 and dump case 3751's full JSON.)
-4. Can PATCH /projects/3/cases set the priority on case 3751
-   (Astock happy-path tablet, authored priority: Critical)?
-   Try the documented shape {ids, priority_id} with the id
-   discovered in 1-3; verify by re-listing the case.
-5. Where does folder 431 live (parent_id)? — confirms whether the
-   unpushed root-folder fix is needed retroactively.
-
-Output -> probe-results/priority-schema.txt (committed by the workflow).
+Round 5:
+1. Show the 422 body for cases list; retry with ?folder=431 and no
+   filter + per_page, to find the right list param and dump case 3751's
+   real field keys.
+2. PATCH /projects/3/cases {ids:[3751], priority_id:1}  (High).
+   If that 4xxes, retry key variants: custom_priority, priority.
+3. Read the case back and show its priority-ish keys.
+Output -> probe-results/priority-schema.txt
 """
 import json
 import os
@@ -39,7 +35,7 @@ def curl(method, url, payload=None):
     return code, body
 
 
-def show(label, code, body, limit=8000):
+def show(label, code, body, limit=6000):
     OUT.append(f"\n===== {label} -> HTTP {code} =====")
     try:
         OUT.append(json.dumps(json.loads(body), indent=2)[:limit])
@@ -54,74 +50,78 @@ def jbody(body):
         return {}
 
 
-# 1-2. Candidate endpoints for the priority value list.
-priority_map = {}
+def find_case(cases, cid=3751):
+    return next((c for c in cases if c.get("id") == cid), None)
+
+
+# 1. Find the working cases-list call.
+case = None
 for label, url in [
-    ("GET /projects/3/priorities", f"{BASE}/projects/3/priorities"),
-    ("GET /priorities", f"{BASE}/priorities"),
-    ("GET /projects/3/case-fields", f"{BASE}/projects/3/case-fields"),
-    ("GET /case-fields", f"{BASE}/case-fields"),
-    ("GET /projects/3/templates", f"{BASE}/projects/3/templates"),
+    ("GET cases?folder_id=431 (show 422 body)", f"{BASE}/projects/3/cases?folder_id=431"),
+    ("GET cases?folder=431", f"{BASE}/projects/3/cases?folder=431"),
+    ("GET cases (no filter, page 1)", f"{BASE}/projects/3/cases?per_page=100&page=38"),
 ]:
     code, body = curl("GET", url)
-    show(label, code, body, limit=4000)
-    if code == "200" and not priority_map:
-        data = jbody(body)
-        items = data.get("result", []) if isinstance(data, dict) else []
-        # direct priorities list
-        cand = {str(p.get("name", "")).strip().lower(): p.get("id")
-                for p in items if isinstance(p, dict) and p.get("name") and p.get("id")}
-        if cand and "priorities" in url:
-            priority_map = cand
-        # fields/templates: hunt nested option lists mentioning priority
-        for it in items if isinstance(items, list) else []:
-            s = json.dumps(it).lower()
-            if "priority" in s:
-                OUT.append(f"\n--- priority-ish entry in {label}: ---")
-                OUT.append(json.dumps(it, indent=2)[:3000])
-
-# 3. Dump a real case's fields (folder 431, case 3751).
-code, body = curl("GET", f"{BASE}/projects/3/cases?folder_id=431&per_page=5")
-data = jbody(body)
-cases = data.get("result", []) if isinstance(data, dict) else []
-target = next((c for c in cases if c.get("id") == 3751), cases[0] if cases else None)
-if target is not None:
-    show("case 3751 (or first in folder 431) full JSON", code, json.dumps(target))
-    prio_keys = {k: v for k, v in target.items() if "prio" in k.lower()}
-    OUT.append(f"\npriority-ish keys on the case: {prio_keys}")
-else:
-    show("GET cases?folder_id=431", code, body, limit=2000)
-
-# 5. Folder 431 location.
-code, body = curl("GET", f"{BASE}/projects/3/folders")
-data = jbody(body)
-for f in data.get("result", []) if isinstance(data, dict) else []:
-    if f.get("id") in (426, 430, 431) or f.get("name") in ("Astock - AI", "HINT - AI", "BYOD - AI"):
-        OUT.append(f"\nfolder {f.get('id')} {f.get('name')!r} parent_id={f.get('parent_id')}")
-
-# 4. Guarded live PATCH: set 3751 to Critical (authored priority).
-patch_id = None
-for name in ("critical", "highest", "high"):
-    if name in priority_map:
-        patch_id = priority_map[name]
-        OUT.append(f"\nUsing priority_map[{name!r}] = {patch_id}")
-        break
-if patch_id is None and target is not None and "priority_id" in target:
-    OUT.append("\nNo value list found, but case carries priority_id — trying raw ids 1..4 read-back style is unsafe; PATCH with 1 as a probe.")
-    patch_id = 1
-
-if patch_id is not None:
-    code, body = curl("PATCH", f"{BASE}/projects/3/cases",
-                      {"ids": [3751], "priority_id": patch_id})
-    show(f"PATCH /projects/3/cases ids=[3751] priority_id={patch_id}", code, body)
-    code, body = curl("GET", f"{BASE}/projects/3/cases?folder_id=431&per_page=5")
     data = jbody(body)
-    after = next((c for c in data.get("result", []) if c.get("id") == 3751), None)
+    cases = data.get("result", []) if isinstance(data, dict) else []
+    hit = find_case(cases)
+    if hit is not None:
+        case = hit
+        show(label + " [case 3751 found]", code, json.dumps(hit))
+        break
+    show(label, code, body, limit=1500)
+
+# Fallback: walk pages of the unfiltered list until 3751 appears.
+if case is None:
+    for page in range(1, 60):
+        code, body = curl("GET", f"{BASE}/projects/3/cases?per_page=100&page={page}")
+        data = jbody(body)
+        cases = data.get("result", []) if isinstance(data, dict) else []
+        if not cases:
+            break
+        hit = find_case(cases)
+        if hit is not None:
+            case = hit
+            show(f"case 3751 found on page {page}", code, json.dumps(hit))
+            break
+
+if case is not None:
+    OUT.append(f"\npriority-ish keys BEFORE: "
+               f"{ {k: v for k, v in case.items() if 'prio' in k.lower()} }")
+    OUT.append(f"case top-level keys: {sorted(case.keys())}")
+
+# 2. PATCH attempts — stop at first 2xx.
+patched_shape = None
+for label, payload in [
+    ("priority_id", {"ids": [3751], "priority_id": 1}),
+    ("custom_priority", {"ids": [3751], "custom_priority": 1}),
+    ("priority", {"ids": [3751], "priority": 1}),
+]:
+    code, body = curl("PATCH", f"{BASE}/projects/3/cases", payload)
+    show(f"PATCH cases {label}=1", code, body, limit=1500)
+    if code.startswith("2"):
+        patched_shape = label
+        break
+
+OUT.append(f"\npatched_shape = {patched_shape!r}")
+
+# 3. Read back.
+if patched_shape and case is not None:
+    code, body = curl("GET", f"{BASE}/projects/3/cases?per_page=100&page=1")
+    # cheap read-back: walk pages again for 3751
+    after = None
+    for page in range(1, 60):
+        code, body = curl("GET", f"{BASE}/projects/3/cases?per_page=100&page={page}")
+        data = jbody(body)
+        cases = data.get("result", []) if isinstance(data, dict) else []
+        if not cases:
+            break
+        after = find_case(cases)
+        if after is not None:
+            break
     if after is not None:
-        OUT.append(f"\nafter PATCH, 3751 priority-ish keys: "
+        OUT.append(f"\npriority-ish keys AFTER: "
                    f"{ {k: v for k, v in after.items() if 'prio' in k.lower()} }")
-else:
-    OUT.append("\nNo priority id discovered anywhere — PATCH skipped.")
 
 os.makedirs("probe-results", exist_ok=True)
 with open("probe-results/priority-schema.txt", "w") as f:
