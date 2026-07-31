@@ -1,0 +1,26 @@
+{
+  "status": "success",
+  "filename": "astock-ai.json",
+  "ticket_key": "Astock",
+  "ticket_title": "AI",
+  "folder_id": 431,
+  "folder_name": "Astock - AI",
+  "cases_created": 15,
+  "case_ids": [
+    3751,
+    3752,
+    3753,
+    3754,
+    3755,
+    3756,
+    3757,
+    3758,
+    3759,
+    3760,
+    3761,
+    3762,
+    3763,
+    3764,
+    3765
+  ]
+}
