@@ -1,0 +1,63 @@
+{
+  "status": "success",
+  "filename": "byod-receipt-sweep.json",
+  "updated": 5,
+  "total": 5,
+  "updates": [
+    {
+      "case_id": 3696,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3701,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3707,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3708,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3698,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    }
+  ]
+}
