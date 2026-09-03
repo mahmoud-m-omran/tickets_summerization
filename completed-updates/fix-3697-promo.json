@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "filename": "fix-3697-promo.json",
+  "updated": 1,
+  "total": 1,
+  "updates": [
+    {
+      "case_id": 3697,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    }
+  ]
+}
