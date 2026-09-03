@@ -1,0 +1,157 @@
+{
+  "name": "byod-receipt-sweep",
+  "project_id": 3,
+  "updates": [
+    {
+      "case_id": 3696,
+      "name": "Charge the SIM correctly by device source and SIM type",
+      "custom_requirements": "When a customer brings their own phone (BYOD) they pay for the physical SIM card with NO discount, and the phone itself costs $0.00 because it is already theirs. Wrong pricing over- or under-charges every BYOD sale. This case covers ONLY the BYOD situation.\n\nSCOPE CORRECTION 2026-08-27 (automation team): their runs stop before submitting payment so ICCIDs/IMEIs are not consumed, and they never reach the receipt screen. Any receipt / \"sale saved\" step has been removed - everything this case proves is visible BEFORE submit. Post-submit checks need burnable data and a manual/API run.\n\nWhere the other pricing situations live: store-stock phone = free SIM -> checked from the BYOD side in QA-2692 (a dealer-stock free SIM must never appear on a customer-owned phone). Reactivation = no SIM charge -> the A-Stock reactivation cases. eSIM = no SIM charge -> NOT covered and not testable today: no usable EID in the test environments (data-seeding request).\n\nTest data: IMEI = 359028039693195 (verified in UAT3). SIM = an unused SIM number from the RTGO Data workbook (UAT3 SIMs sheet).\n\nJira: QA-2693.",
+      "steps": [
+        {
+          "action": "Login into the app (UAT3 environment)",
+          "expected": "Dashboard is displayed"
+        },
+        {
+          "action": "Create the account, pass ID verification, enter the IMEI, click Continue on the \"Imei not found\" window, choose Android",
+          "expected": "SIM validation page; cart shows Device $0.00"
+        },
+        {
+          "action": "Enter the SIM number and Continue",
+          "expected": "Cart shows the SIM card charged at its full price, tax charged on it, and NO discount line"
+        },
+        {
+          "action": "Complete phone number, protection (Skip), plan, promotions (Skip), add-ons (Skip), Create Subscriber, Order Summary",
+          "expected": "Order Summary repeats the same numbers: Device $0.00, SIM card charged plus tax, no discount"
+        },
+        {
+          "action": "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment",
+          "expected": "The amount to collect matches the Order Summary: device $0.00, SIM charged plus tax, no discount. Submitting would consume the IMEI and SIM - leave them reusable for the next run"
+        }
+      ]
+    },
+    {
+      "case_id": 3701,
+      "name": "Show the true plan price on the cart and order summary",
+      "custom_requirements": "The plan's real monthly charge must be shown to the customer. A past bug rendered the plan as $0 on BYOD sales, and another showed a wrong discount in the cart. This case proves the money the customer sees is right across several plan price points, and that the cart and the Order Summary agree.\n\nSCOPE CORRECTION 2026-08-27 (automation team): their runs stop before submitting payment so ICCIDs/IMEIs are not consumed, and they never reach the receipt screen. Any receipt / \"sale saved\" step has been removed - everything this case proves is visible BEFORE submit. Post-submit checks need burnable data and a manual/API run.\n\nNOT covered here: the printed receipt. Reaching it requires submitting the payment and burning the SIM/IMEI. If receipt rendering needs coverage it needs dedicated burnable data or a manual/API check, raised separately.\n\nNotes: compare the displayed plan price against the price the plan-selection screen offered in the SAME run - do not hard-code a dollar figure, so a catalog price change does not fail the test. The discount line must match what the backend returns, not a figure the screen recalculates.\n\nTest data: a BYOD handset IMEI that shows the \"Imei not found\" window; an unused SIM from the RTGO Data workbook (UAT3 SIMs sheet); plans BYOD10GB3 (about $30), BFLX50 (about $50), BFLX60 (about $60).\n\nJira: QA-2698.",
+      "steps": [
+        {
+          "action": "Login into the app (UAT3 environment)",
+          "expected": "Dashboard is displayed"
+        },
+        {
+          "action": "Create the account, pass ID verification, enter the IMEI, click Continue on the \"Imei not found\" window, choose Android, enter the SIM",
+          "expected": "Phone number selection page; cart shows Device $0.00"
+        },
+        {
+          "action": "Choose a phone number, then a protection offer (or Skip), then select plan BYOD10GB3",
+          "expected": "The cart shows the plan's real monthly price (around $30.00) - never $0.00"
+        },
+        {
+          "action": "Continue through promotions and add-ons, click Create Subscriber, then open the Order Summary",
+          "expected": "Order Summary shows the same plan monthly as the cart (not $0.00), Device $0.00, and lists Order ID, Account number, Lines in order, Total MRC, Total taxes & fees, and the amount due immediately"
+        },
+        {
+          "action": "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment",
+          "expected": "The amount to collect matches the Order Summary total. Submitting would consume the IMEI and SIM and they could not be reused"
+        },
+        {
+          "action": "Repeat the whole run for plan BFLX50, then for BFLX60",
+          "expected": "Each run shows that plan's own monthly price in the cart and on the Order Summary - no run shows $0.00, and the cart and Order Summary always agree"
+        }
+      ]
+    },
+    {
+      "case_id": 3707,
+      "name": "Add a real accessory to a BYOD sale and bill it correctly",
+      "custom_requirements": "At the mandatory Add Accessory (Review invoice) step of a BYOD activation the rep can add a real, non-serialized accessory (case, charger, screen protector, cable) to the same order as the activated line. It becomes its own line item, is taxed on its selling price, and raises the balance due. Every other BYOD case adds zero accessories - this one proves a real accessory flows through the invoice correctly and that removing it restores the original balance.\n\nSCOPE CORRECTION 2026-08-27 (automation team): their runs stop before submitting payment so ICCIDs/IMEIs are not consumed, and they never reach the receipt screen. Any receipt / \"sale saved\" step has been removed - everything this case proves is visible BEFORE submit. Post-submit checks need burnable data and a manual/API run. The accessory's effect on the invoice is fully provable before submitting; SaleRecord persistence at submit time is NOT part of this case.\n\nPreconditions: a new account created and the customer ID verified; at least one tangible, non-serialized accessory in local inventory with stock greater than zero.\n\nTest data: a customer-owned handset IMEI; an unused SIM from the RTGO Data workbook; the accessory is discovered at run time (first eligible tangible accessory) - do not pin a specific item number.\n\nKnown issue: the browse filter may still list non-sellable items (activation fees, ESN change, payment fees) - skip until that is fixed.\n\nJira: QA-2681.",
+      "steps": [
+        {
+          "action": "Run the BYOD flow through device and SIM: enter the IMEI, Continue on the \"Imei not found\" window, choose Android, enter the SIM",
+          "expected": "Cart shows Device $0.00 and the SIM card charge plus tax"
+        },
+        {
+          "action": "Select a new phone number, then protection (Skip), plan (first eligible), promotions (Skip), add-ons (Skip), then Create Subscriber",
+          "expected": "The subscriber is created with no error; the dialog offers Continue to order summary"
+        },
+        {
+          "action": "Click Continue to order summary and review it",
+          "expected": "Order Summary shows Order ID, Account number, Lines in order, Total MRC, Total taxes & fees, the amount due immediately, Device $0.00 and the SIM charge plus tax"
+        },
+        {
+          "action": "Open Add Accessory (Review invoice) and browse inventory",
+          "expected": "\"Review invoice\" page with the Balance due shown. Browse lists sellable accessories only - no activation fees, no ESN change, no payment fees"
+        },
+        {
+          "action": "Add the first eligible accessory (scan or type its item number, or pick it from browse)",
+          "expected": "One more item row appears; Balance due increases by the accessory price plus its own tax"
+        },
+        {
+          "action": "Remove the accessory",
+          "expected": "The accessory row disappears; Balance due returns to exactly what it was before - no residual charge"
+        },
+        {
+          "action": "Re-add the accessory and click Continue to payment",
+          "expected": "Payment screen; the amount to collect includes the accessory price and its tax"
+        },
+        {
+          "action": "Read the amount to collect on the payment screen - STOP HERE, do NOT submit the payment",
+          "expected": "Amount to collect = the Review-invoice Balance due with the accessory included; the accessory line, its own tax and the Device $0.00 line are all still shown. Submitting would consume the IMEI and SIM"
+        }
+      ]
+    },
+    {
+      "case_id": 3708,
+      "name": "Keep the customer's number by porting it in during a BYOD activation",
+      "custom_requirements": "At the phone-number step the customer can either take a brand-new Metro number or keep their existing number by transferring (\"porting\") it from their current carrier. When the rep picks \"Port phone number\" they enter the customer's current number plus the transfer details from the OLD carrier. Getting this wrong either loses the customer's number or gives them a wrong new one.\n\nIMPORTANT: the account number and transfer PIN belong to the customer's CURRENT (old) carrier account. They are NOT the name or PIN created on the new-account page, and they cannot be made up.\n\nWAITING ON TEST DATA - keep on hold: this needs a real portable test phone number together with its old-carrier account number and transfer PIN. No such fixture exists in UAT3 today.\n\nSCOPE CORRECTION 2026-08-27 (automation team): their runs stop before submitting payment so ICCIDs/IMEIs are not consumed, and they never reach the receipt screen. Any receipt / \"sale saved\" step has been removed - everything this case proves is visible BEFORE submit. Post-submit checks need burnable data and a manual/API run. Whether the completed sale carries the ported number is a submit-time check, raised separately.\n\nTest data: IMEI = 359028039693195 (verified in UAT3); an unused SIM from the RTGO Data workbook; number to port plus old-carrier account number, transfer PIN, billing zip and carrier name - to be provided.\n\nJira: QA-2682.",
+      "steps": [
+        {
+          "action": "Login into the app (UAT3 environment), create the account, pass ID verification, enter the IMEI, Continue as BYOD, choose Android, enter the SIM",
+          "expected": "Phone number selection page; cart shows Device $0.00 and the SIM card charge plus tax"
+        },
+        {
+          "action": "Read the two choices on the screen",
+          "expected": "Two cards: \"New phone number - Get a new Metro phone number\" (selected by default) and \"Port phone number - Switch carrier and keep existing phone number\""
+        },
+        {
+          "action": "Select the \"Port phone number\" card",
+          "expected": "The port fields appear: number to transfer, old-carrier account number, transfer PIN, billing zip and current carrier - the flow does not move on yet"
+        },
+        {
+          "action": "Enter the provided port test data and Continue",
+          "expected": "Accepted; the protection page opens and the cart now shows the customer's kept number"
+        },
+        {
+          "action": "Complete protection (Skip), plan, promotions (Skip), add-ons (Skip), Create Subscriber, and open the Order Summary",
+          "expected": "Order Summary shows the ported (kept) number, Device $0.00 and the SIM charge plus tax"
+        },
+        {
+          "action": "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment",
+          "expected": "The payment screen shows the amount to collect matching the Order Summary, still against the customer's kept number. Submitting would consume the IMEI and SIM"
+        }
+      ]
+    },
+    {
+      "case_id": 3698,
+      "name": "Save a BYOD sale and print the receipt even with a long promo code (NOT UI-automatable)",
+      "custom_requirements": "NOT FOR THE UI AUTOMATION BACKLOG (decided 2026-08-27). This case cannot be automated in the UI suite, and it is not a wording problem - it is the nature of the check. The defect it guards against (the sale never being saved, the register stuck retrying, no receipt) happens AT PAYMENT SUBMIT; everything before submit looks perfectly healthy. The automation team's runs deliberately stop before submitting payment so ICCIDs/IMEIs are not consumed, so they never reach the sale-saved or receipt state. Removing the submit would leave nothing of this case: there is no pre-submit assertion that proves a sale saved correctly.\n\nIt needs EITHER a manual run OR an API-level check, using dedicated BURNABLE test data (devices and SIMs that are expected to be consumed). Please decide which, and either re-file it in that suite or cancel it. Do not add it to the UI automation backlog.\n\nALSO STILL BLOCKED ON DATA: a promotion whose code is longer than 15 characters (for example COUP_NEUFREESIMPOBYD) has to be seeded in UAT3. It does not exist today. So this case is double-blocked: missing data AND not UI-automatable.\n\nFor whoever runs it manually or via API: burnable IMEI/SIM, the long-code promotion once seeded, cash payment - and in this case the payment IS submitted, deliberately.\n\nJira: QA-2695.",
+      "steps": [
+        {
+          "action": "Run a full BYOD activation (account, ID verification, IMEI, Continue as BYOD, Android, SIM, phone number, protection Skip, plan) and at the promotions step select the long-code promotion",
+          "expected": "The promotion is accepted; the cart shows its effect"
+        },
+        {
+          "action": "Finish the activation (add-ons Skip, Create Subscriber, Order Summary, Add Accessory: add none) and SUBMIT the cash payment",
+          "expected": "Payment completes and a REAL sale number is shown - not a temporary one - and the register does not sit retrying the save"
+        },
+        {
+          "action": "Print and email the receipt",
+          "expected": "Both work; the receipt shows the sale with the promotion applied"
+        },
+        {
+          "action": "Repeat once with a short-code promotion (for example COUP_NEU3F3 on plan 40L1WEB)",
+          "expected": "Same success - sale saved, receipt prints - proving the code length was the difference"
+        }
+      ]
+    }
+  ]
+}
