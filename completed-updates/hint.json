@@ -1,0 +1,41 @@
+{
+  "status": "success",
+  "filename": "hint.json",
+  "updated": 3,
+  "total": 3,
+  "updates": [
+    {
+      "case_id": 3740,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3745,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3747,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    }
+  ]
+}
