@@ -1,0 +1,68 @@
+{
+  "status": "success",
+  "filename": "quick-sale-ai.json",
+  "links": [
+    {
+      "case_id": 3768,
+      "display_id": "QA-2805",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3769,
+      "display_id": "QA-2806",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3770,
+      "display_id": "QA-2807",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3771,
+      "display_id": "QA-2808",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3772,
+      "display_id": "QA-2809",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3773,
+      "display_id": "QA-2810",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3774,
+      "display_id": "QA-2811",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3775,
+      "display_id": "QA-2812",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3776,
+      "display_id": "QA-2813",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3778,
+      "display_id": "QA-2814",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 10,
+  "total": 10
+}
