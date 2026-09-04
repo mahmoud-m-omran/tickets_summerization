@@ -1,0 +1,331 @@
+{
+  "name": "hint-(t-mobile-home-internet)",
+  "project_id": 3,
+  "updates": [
+    {
+      "case_id": 3740,
+      "name": "Add a home internet gateway as line 2 with an eligible address, a promotion and an add-on",
+      "custom_requirements": "## What this test is about\nAs a Metro by T-Mobile authorized dealer, I want to sign up a new customer for a phone and a home internet gateway in the same visit, so the customer leaves the store with service on their phone and internet at home.\n\nSome background, because this is retail telecom and none of it is obvious. When a customer buys service in a Metro store, the rep creates an account and then adds a \"line\" to it for each device the customer is putting on that account. A phone is one line. Metro also sells home internet: instead of a phone, the customer takes home a small box (a \"gateway\") that picks up the Metro 5G signal and turns it into home Wi-Fi. Because it is fixed to the customer's home, the network has to check that 5G home internet actually reaches that street address before the sale can go ahead. That check is what the eligibility screen does.\n\nTwo rules shape this test. First, home internet is never the customer's first line — so this test opens a brand-new account, activates the phone as line 1, and only then adds the gateway as line 2. Second, once the address is approved and the acknowledgements are signed off, the gateway is sold exactly like a phone from that point on — it gets a phone number, a plan, and the rep can attach a promotion and an add-on service before taking payment. This test walks that whole sale, from the gateway's serial number through to the amount the rep is asked to collect.\n\n## Related tickets\nRTPL-2289 (screens and acceptance criteria), RTPL-2008 (Home internet epic)\n\n## Preconditions\n- Nothing pre-existing is needed — this test builds its own account from scratch. Home internet cannot be the first line on an account, so the phone is activated first as line 1 and the home internet gateway is added afterwards as line 2.\n- The store is set up to sell home internet. If the home internet screens never appear for a gateway serial number, stop and contact the manual QA team before going further — the feature is switched off for the environment, not broken.\n\n## Test data\n- **New customer details:** Any test customer: a first name, a last name, a unique email address per run, and a street address with its zip code (for example 405 LEXINGTON AVE, 10174, NEW YORK, NY)  _(verified: QA / UAT3 2026-09-04 — the Account information screen was read live and asks only for First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City and State)_\n- **Customer phone number for the identity check:** 2125551234  _(verified: QA / UAT3 — this number has passed the identity check in previous activation runs on this environment)_\n- **Phone for line 1 (IMEI):** The next unused phone IMEI from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — the workbook's Used column is unreliable, so take the first IMEI the app actually accepts. Which phone it is does not matter to this test)_\n- **SIM card for line 1:** The next unused physical SIM card number from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — same caveat; if a SIM is rejected, move to the next row)_\n- **Home internet gateway IMEI (the gateway's serial number):** 999977129737997  _(verified: UAT3 2026-07-29 — this serial number was accepted as a home internet device and opened the home internet screens)_\n- **Service address:** 31455 NORTHWESTERN HWY  _(verified: QA / UAT3 2026-09-04 — rep screenshot of the acknowledgement screen reading \"Good news - 5G home internet is available.\" for this address)_\n- **City:** FARMINGTON  _(verified: QA / UAT3 2026-09-04 — same screenshot, filled in automatically from the Zip Code)_\n- **State:** MI  _(verified: QA / UAT3 2026-09-04 — same screenshot, filled in automatically from the Zip Code)_\n- **Zip Code:** 48334  _(verified: QA / UAT3 2026-09-04 — same screenshot)_\n\n## Automation Notes\n- Stop at the payment screen. The gateway's serial number is only consumed when the payment is submitted, so ending here keeps the same test device reusable run after run.\n- The plan, promotion and add-on offered for a home internet line are not fixed values — take whichever the environment offers. Nothing later in this test depends on which one is picked, only that it appears against the line and in the totals.\n- If the gateway serial number is refused, or the home internet screens never appear, try the next candidate serial number from the RTGO Data workbook first. If none work, contact the manual QA team to get a working home internet gateway serial number — do not sit blocked and do not go hunting for data alone.\n- CONFIRM BEFORE AUTOMATING: the exact wording on the SIM step for a home internet line was not re-checked live on 2026-09-04 (the environment could not be reached). Record what the screen actually says on the first run and correct this ticket.\n- The account and the phone line are built by this test, not assumed. If the phone IMEI or the SIM is rejected, take the next row from the RTGO Data workbook; if the whole pool is exhausted, contact the manual QA team for working device data rather than sitting blocked.\n- CONFIRM BEFORE AUTOMATING: the account screens were re-read live on 2026-09-04 only as far as \"Account information\" — the environment refused to create the account past that point that day. Confirm the identity-check screen and the phone-line steps on the first run and correct this ticket if the app asks for anything else.",
+      "steps": [
+        {
+          "action": "Login into the app.",
+          "expected": "The rep is signed in and the store dashboard is shown."
+        },
+        {
+          "action": "Start a new account for a new customer.",
+          "expected": "The \"Account information\" screen is shown, asking for the customer's name, email and address."
+        },
+        {
+          "action": "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+          "expected": "The details are accepted and the \"ID verification\" screen is shown. Use a different email address on every run; the app rejects an email that is already on another account."
+        },
+        {
+          "action": "Enter the customer's phone number for the identity check and select Continue.",
+          "expected": "The identity check passes and the \"IMEI validation\" screen is shown for the customer's first line."
+        },
+        {
+          "action": "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
+          "expected": "The phone is accepted and the \"SIM validation\" screen is shown."
+        },
+        {
+          "action": "Enter the SIM card number for the phone and select Continue.",
+          "expected": "The SIM is accepted and the \"Phone number selection\" screen is shown."
+        },
+        {
+          "action": "Choose one of the offered phone numbers for the phone line and select Continue.",
+          "expected": "The chosen number is attached to line 1 and the \"Protection selection\" screen is shown."
+        },
+        {
+          "action": "On \"Protection selection\", select Skip and confirm the decline when asked.",
+          "expected": "No device protection is added to the phone line and the \"Plan selection\" screen is shown."
+        },
+        {
+          "action": "Choose the offered phone plan and select Continue.",
+          "expected": "The plan and its monthly charge are shown against line 1 in the cart, and the \"Promotion selection\" screen is shown."
+        },
+        {
+          "action": "On \"Promotion selection\", decline the promotions for the phone line and confirm when asked.",
+          "expected": "No promotion is added to the phone line and the \"Add on services\" screen is shown."
+        },
+        {
+          "action": "On \"Add on services\", select Skip for the phone line.",
+          "expected": "No add-on is added to the phone line and the rep is offered Create subscriber."
+        },
+        {
+          "action": "Select Create subscriber and confirm it in the panel that opens.",
+          "expected": "A \"Subscriber created\" confirmation is shown for the phone line — line 1 is now active — offering to add another line or to continue to the order summary."
+        },
+        {
+          "action": "Select \"Add another line\" to start line 2.",
+          "expected": "The \"IMEI validation\" screen is shown again, this time for line 2. The activated phone line stays in the cart."
+        },
+        {
+          "action": "Type the home internet gateway's serial number into the IMEI field and select Continue.",
+          "expected": "A panel titled \"Confirm home internet device\" opens and reads: \"The IMEI entered is a home internet device and requires extra details to activate. Click continue to proceed with activating this home internet device.\" It offers Back and Continue."
+        },
+        {
+          "action": "Select Continue on the \"Confirm home internet device\" panel.",
+          "expected": "The \"Home internet address eligibility\" screen is shown, reading \"Confirm the customer's address where the device will be located to check for service eligibility then click continue to proceed with activating this home internet device.\" It has the fields Address (required), Address 2, City (required), State (required) and Zip Code (required), with Back and Continue at the bottom."
+        },
+        {
+          "action": "Type the service address into the Address field.",
+          "expected": "The address is accepted and shown in capital letters."
+        },
+        {
+          "action": "Type the Zip Code into the Zip Code field.",
+          "expected": "City fills in automatically as FARMINGTON and State fills in automatically as MI. The rep does not have to type either one."
+        },
+        {
+          "action": "Select Continue to send the address for its eligibility check.",
+          "expected": "A panel titled \"Home internet acknowledgement\" opens. It leads with \"Good news - 5G home internet is available.\" followed by \"Please review the address below to confirm it is correct; then review and accept both acknowledgements before clicking continue.\" It lists Street Address 31455 NORTHWESTERN HWY, an empty \"Apartment, suite, other\" row, and City, State, Zip Code FARMINGTON, MI 48334. Below that are two tick boxes: \"Customer acknowledgement\" reading \"I acknowledge the home internet gateway (fixed-wireless device) is approved to be used ONLY at the address approved for eligibility. Use outside of the approved address will result in impacts to your service.\" and \"Retailer acknowledgement\" reading \"I confirm I informed the customer that the home internet gateway cannot be used at an address different from the one approved for eligibility. Use outside of the approved address will result in impacts to their service.\" Both start unticked and Continue cannot be used."
+        },
+        {
+          "action": "Tick the Customer acknowledgement box only.",
+          "expected": "The Customer acknowledgement box is ticked and Continue still cannot be used, because the retailer has not confirmed yet."
+        },
+        {
+          "action": "Tick the Retailer acknowledgement box as well.",
+          "expected": "Both boxes are ticked and Continue becomes available."
+        },
+        {
+          "action": "Select Continue on the acknowledgement panel.",
+          "expected": "The acknowledgement panel closes and the home internet line moves on to the SIM step. The rep is not asked for a physical SIM card number — home internet gateways carry their SIM built in."
+        },
+        {
+          "action": "On the \"Phone number selection\" screen, choose one of the offered phone numbers and select Continue.",
+          "expected": "The chosen number is attached to the home internet line and the \"Protection selection\" screen is shown."
+        },
+        {
+          "action": "On \"Protection selection\", select Skip and confirm the decline when asked.",
+          "expected": "No device protection is added to the line and the \"Plan selection\" screen is shown."
+        },
+        {
+          "action": "On \"Plan selection\", choose the offered home internet plan and select Continue.",
+          "expected": "The chosen plan and its monthly charge are shown against the home internet line in the cart, and the \"Promotion selection\" screen is shown."
+        },
+        {
+          "action": "On \"Promotion selection\", choose one of the offered promotions and select Continue.",
+          "expected": "The chosen promotion is shown against the home internet line, and the \"Add on services\" screen is shown."
+        },
+        {
+          "action": "On \"Add on services\", choose one of the offered add-on services and select Continue.",
+          "expected": "The chosen add-on is shown against the home internet line with its charge."
+        },
+        {
+          "action": "Select Create subscriber and confirm it in the panel that opens.",
+          "expected": "A \"Subscriber created\" confirmation is shown for the home internet line, offering to add another line or to continue to the order summary."
+        },
+        {
+          "action": "Select \"Continue to order summary\".",
+          "expected": "The \"Order summary\" screen shows 2 lines in the order — the phone line activated earlier in this test and the new home internet line — with the home internet plan, the promotion and the add-on listed against the home internet line, plus the total monthly charge, the total taxes and fees, and the amount due today."
+        },
+        {
+          "action": "Select Continue on the order summary.",
+          "expected": "The \"Add inventory item\" screen is shown, where an accessory could be added to the sale, with the current total due displayed."
+        },
+        {
+          "action": "Select Continue without adding an accessory.",
+          "expected": "The \"Collect payment from customer\" screen is shown and the amount it asks the rep to collect matches the amount due from the order summary."
+        },
+        {
+          "action": "Stop here. Do NOT submit the payment and do NOT complete the order.",
+          "expected": "The sale is left sitting on the payment screen. Nothing is charged, and the gateway's serial number is left unused so the same one can be used again on the next run."
+        }
+      ]
+    },
+    {
+      "case_id": 3745,
+      "name": "Refuse an incomplete or invalid home internet service address before the eligibility check",
+      "custom_requirements": "## What this test is about\nAs a Metro by T-Mobile authorized dealer, I want the home internet address screen to stop me before I send an incomplete or nonsense address for checking, so the customer is never told their home is covered on the strength of a bad address.\n\nSome background. Metro sells home internet as a small box (a \"gateway\") that the customer takes home and that turns the Metro 5G signal into home Wi-Fi. Because the box only works at one place, the network checks the customer's street address before the sale can go ahead. Everything downstream — whether the sale is allowed at all, and the paperwork the customer signs promising to use the box only at that address — hangs off the address the rep types on this one screen. So the screen has to hold the line on its own: an address that is empty, too short, too long, or a Zip Code that is not five digits must never reach the eligibility check.\n\nThis test pushes bad values at that form on purpose and confirms the rep is kept on the screen with a plain message each time, then confirms the form does accept a proper address and fills in the city and state from the Zip Code by itself.\n\nThis test starts from nothing: it opens a new account and activates a phone as line 1 first, because home internet can never be a customer's first line, and only then puts the gateway on as line 2.\n\n## Related tickets\nRTPL-2289 (screens and acceptance criteria), RTPL-2008 (Home internet epic)\n\n## Preconditions\n- Nothing pre-existing is needed — this test builds its own account from scratch. Home internet cannot be the first line on an account, so the phone is activated first as line 1 and the home internet gateway is added afterwards as line 2.\n- The store is set up to sell home internet. If the home internet screens never appear for a gateway serial number, stop and contact the manual QA team before going further — the feature is switched off for the environment, not broken.\n\n## Test data\n- **New customer details:** Any test customer: a first name, a last name, a unique email address per run, and a street address with its zip code (for example 405 LEXINGTON AVE, 10174, NEW YORK, NY)  _(verified: QA / UAT3 2026-09-04 — the Account information screen was read live and asks only for First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City and State)_\n- **Customer phone number for the identity check:** 2125551234  _(verified: QA / UAT3 — this number has passed the identity check in previous activation runs on this environment)_\n- **Phone for line 1 (IMEI):** The next unused phone IMEI from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — the workbook's Used column is unreliable, so take the first IMEI the app actually accepts. Which phone it is does not matter to this test)_\n- **SIM card for line 1:** The next unused physical SIM card number from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — same caveat; if a SIM is rejected, move to the next row)_\n- **Home internet gateway IMEI (the gateway's serial number):** 999977129737997  _(verified: UAT3 2026-07-29 — this serial number was accepted as a home internet device and opened the home internet screens)_\n- **Too-short address:** A  _(verified: Shipped build 2026-09-04 — the Address field on this screen requires at least 2 characters)_\n- **Too-long address:** 31455 NORTHWESTERN HIGHWAY SUITE 100  _(verified: Shipped build 2026-09-04 — 36 characters, over the 30-character limit the Address field on this screen allows)_\n- **Letters typed into Zip Code:** ABCDE  _(verified: Shipped build 2026-09-04 — the Zip Code field on this screen takes 5 digits only)_\n- **Incomplete Zip Code:** 483  _(verified: Shipped build 2026-09-04 — city and state are only filled in once all 5 digits are entered)_\n- **Valid Zip Code:** 48334  _(verified: QA / UAT3 2026-09-04 — rep screenshot showing this Zip Code filling City as FARMINGTON and State as MI)_\n\n## Automation Notes\n- This test never sends an address for checking — it only proves the screen refuses bad input. It deliberately stops one click short of the eligibility check.\n- The wording of each message is fixed by the app and is worth asserting exactly, because a reworded or missing message is what lets a bad address through unnoticed.\n- If the gateway serial number is refused, or the home internet screens never appear, try the next candidate serial number from the RTGO Data workbook first. If none work, contact the manual QA team to get a working home internet gateway serial number — do not sit blocked and do not go hunting for data alone.\n- CONFIRM BEFORE AUTOMATING: on the too-long address, record which of the two behaviours the build actually shows — the field capping at 30 characters, or the \"Address cannot exceed 30 characters\" message — and narrow this step to the one you see. The environment could not be reached on 2026-09-04 to settle it.\n- The account and the phone line are built by this test, not assumed. If the phone IMEI or the SIM is rejected, take the next row from the RTGO Data workbook; if the whole pool is exhausted, contact the manual QA team for working device data rather than sitting blocked.\n- CONFIRM BEFORE AUTOMATING: the account screens were re-read live on 2026-09-04 only as far as \"Account information\" — the environment refused to create the account past that point that day. Confirm the identity-check screen and the phone-line steps on the first run and correct this ticket if the app asks for anything else.",
+      "steps": [
+        {
+          "action": "Login into the app.",
+          "expected": "The rep is signed in and the store dashboard is shown."
+        },
+        {
+          "action": "Start a new account for a new customer.",
+          "expected": "The \"Account information\" screen is shown, asking for the customer's name, email and address."
+        },
+        {
+          "action": "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+          "expected": "The details are accepted and the \"ID verification\" screen is shown. Use a different email address on every run; the app rejects an email that is already on another account."
+        },
+        {
+          "action": "Enter the customer's phone number for the identity check and select Continue.",
+          "expected": "The identity check passes and the \"IMEI validation\" screen is shown for the customer's first line."
+        },
+        {
+          "action": "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
+          "expected": "The phone is accepted and the \"SIM validation\" screen is shown."
+        },
+        {
+          "action": "Enter the SIM card number for the phone and select Continue.",
+          "expected": "The SIM is accepted and the \"Phone number selection\" screen is shown."
+        },
+        {
+          "action": "Choose one of the offered phone numbers for the phone line and select Continue.",
+          "expected": "The chosen number is attached to line 1 and the \"Protection selection\" screen is shown."
+        },
+        {
+          "action": "On \"Protection selection\", select Skip and confirm the decline when asked.",
+          "expected": "No device protection is added to the phone line and the \"Plan selection\" screen is shown."
+        },
+        {
+          "action": "Choose the offered phone plan and select Continue.",
+          "expected": "The plan and its monthly charge are shown against line 1 in the cart, and the \"Promotion selection\" screen is shown."
+        },
+        {
+          "action": "On \"Promotion selection\", decline the promotions for the phone line and confirm when asked.",
+          "expected": "No promotion is added to the phone line and the \"Add on services\" screen is shown."
+        },
+        {
+          "action": "On \"Add on services\", select Skip for the phone line.",
+          "expected": "No add-on is added to the phone line and the rep is offered Create subscriber."
+        },
+        {
+          "action": "Select Create subscriber and confirm it in the panel that opens.",
+          "expected": "A \"Subscriber created\" confirmation is shown for the phone line — line 1 is now active — offering to add another line or to continue to the order summary."
+        },
+        {
+          "action": "Select \"Add another line\" to start line 2.",
+          "expected": "The \"IMEI validation\" screen is shown again, this time for line 2. The activated phone line stays in the cart."
+        },
+        {
+          "action": "Type the home internet gateway's serial number into the IMEI field and select Continue.",
+          "expected": "A panel titled \"Confirm home internet device\" opens and reads: \"The IMEI entered is a home internet device and requires extra details to activate. Click continue to proceed with activating this home internet device.\""
+        },
+        {
+          "action": "Select Continue on the \"Confirm home internet device\" panel.",
+          "expected": "The \"Home internet address eligibility\" screen is shown with the fields Address (required), Address 2, City (required), State (required) and Zip Code (required), all empty, and Back and Continue at the bottom."
+        },
+        {
+          "action": "Leave every field empty and select Continue.",
+          "expected": "Nothing is sent for checking and the rep stays on the same screen. Each empty required field is called out: \"Address is required\", \"City is required\", \"State is required\" and \"Zip Code is required\"."
+        },
+        {
+          "action": "Type the too-short address into the Address field and select Continue.",
+          "expected": "Nothing is sent for checking and the rep stays on the same screen. The Address field reads \"Address must be at least 2 characters\"."
+        },
+        {
+          "action": "Clear the Address field, type the too-long address into it and select Continue.",
+          "expected": "Nothing is sent for checking. The address is not accepted at its full length: either the field stops taking characters at 30, or the rep stays on the screen with the Address field reading \"Address cannot exceed 30 characters\"."
+        },
+        {
+          "action": "Clear the Address field and type a proper address of between 2 and 30 characters into it.",
+          "expected": "The address is accepted and shown in capital letters, with no message against the Address field."
+        },
+        {
+          "action": "Try to type letters into the Zip Code field.",
+          "expected": "The letters are refused. The Zip Code field stays empty and takes digits only."
+        },
+        {
+          "action": "Type the incomplete Zip Code into the Zip Code field and select Continue.",
+          "expected": "Nothing is sent for checking and the rep stays on the same screen. City and State are still empty — they are only filled in once a full 5-digit Zip Code has been entered."
+        },
+        {
+          "action": "Complete the Zip Code to its full five digits.",
+          "expected": "City fills in automatically as FARMINGTON and State fills in automatically as MI, and no message is shown against any field."
+        },
+        {
+          "action": "Stop here. Do NOT select Continue to send this address for checking, and do NOT submit any payment.",
+          "expected": "The form is left filled in and valid, with nothing sent for checking. The gateway's serial number is left unused so the same one can be used again on the next run."
+        }
+      ]
+    },
+    {
+      "case_id": 3747,
+      "name": "Back out of the home internet screens and land back on IMEI validation",
+      "custom_requirements": "## What this test is about\nAs a Metro by T-Mobile authorized dealer, I want Back on either home internet screen to put me back at the point where I enter the device's serial number, so that when a customer changes their mind I can start the line over cleanly instead of being stranded mid-sale.\n\nSome background. Metro sells home internet as a small box (a \"gateway\") the customer takes home, which turns the Metro 5G signal into home Wi-Fi. Because the box only works at one address, selling one puts the rep through two extra screens a phone sale never sees: a screen where the customer's street address is checked for coverage, and a screen where both the customer and the rep have to sign off that the box will only be used at that address. A rep in a store backs out of these all the time — the customer is not sure of the address, or decides against home internet once they hear the terms.\n\nWhat has to happen in that case is specific: Back must take the rep all the way back to the serial-number screen, NOT one step back to the address form, and it must leave nothing behind. The line being built is dropped, the same gateway can be entered again straight away, and the address form comes up blank rather than holding the last address that was typed. This test does it from both screens in turn and checks where the rep lands each time.\n\nThis test starts from nothing: it opens a new account and activates a phone as line 1 first, because home internet can never be a customer's first line, and only then starts the gateway on line 2.\n\n## Related tickets\nRTPL-2289 AC-9 (Back from the acknowledgement returns to device validation), RTPL-2008 (Home internet epic)\n\n## Preconditions\n- Nothing pre-existing is needed — this test builds its own account from scratch. Home internet cannot be the first line on an account, so the phone is activated first as line 1 and the home internet gateway is added afterwards as line 2.\n- The store is set up to sell home internet. If the home internet screens never appear for a gateway serial number, stop and contact the manual QA team before going further — the feature is switched off for the environment, not broken.\n\n## Test data\n- **New customer details:** Any test customer: a first name, a last name, a unique email address per run, and a street address with its zip code (for example 405 LEXINGTON AVE, 10174, NEW YORK, NY)  _(verified: QA / UAT3 2026-09-04 — the Account information screen was read live and asks only for First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City and State)_\n- **Customer phone number for the identity check:** 2125551234  _(verified: QA / UAT3 — this number has passed the identity check in previous activation runs on this environment)_\n- **Phone for line 1 (IMEI):** The next unused phone IMEI from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — the workbook's Used column is unreliable, so take the first IMEI the app actually accepts. Which phone it is does not matter to this test)_\n- **SIM card for line 1:** The next unused physical SIM card number from the RTGO Data workbook  _(verified: RTGO Data workbook, UAT3 sheet — same caveat; if a SIM is rejected, move to the next row)_\n- **Home internet gateway IMEI (the gateway's serial number):** 999977129737997  _(verified: UAT3 2026-07-29 — this serial number was accepted as a home internet device and opened the home internet screens)_\n- **Service address:** 31455 NORTHWESTERN HWY  _(verified: QA / UAT3 2026-09-04 — rep screenshot of the acknowledgement screen reading \"Good news - 5G home internet is available.\" for this address)_\n- **Zip Code:** 48334  _(verified: QA / UAT3 2026-09-04 — same screenshot; fills City as FARMINGTON and State as MI)_\n\n## Automation Notes\n- The point of this test is WHERE the rep lands. Landing on the address form instead of the serial-number screen is the failure this test exists to catch — it is called out explicitly in the requirement for this screen.\n- Backing out drops the whole home internet line, not just the current screen. Assert the cart as well as the screen the rep lands on — a line left behind in the cart is the other way this can go wrong.\n- If the gateway serial number is refused, or the home internet screens never appear, try the next candidate serial number from the RTGO Data workbook first. If none work, contact the manual QA team to get a working home internet gateway serial number — do not sit blocked and do not go hunting for data alone.\n- The account and the phone line are built by this test, not assumed. If the phone IMEI or the SIM is rejected, take the next row from the RTGO Data workbook; if the whole pool is exhausted, contact the manual QA team for working device data rather than sitting blocked.\n- CONFIRM BEFORE AUTOMATING: the account screens were re-read live on 2026-09-04 only as far as \"Account information\" — the environment refused to create the account past that point that day. Confirm the identity-check screen and the phone-line steps on the first run and correct this ticket if the app asks for anything else.",
+      "steps": [
+        {
+          "action": "Login into the app.",
+          "expected": "The rep is signed in and the store dashboard is shown."
+        },
+        {
+          "action": "Start a new account for a new customer.",
+          "expected": "The \"Account information\" screen is shown, asking for the customer's name, email and address."
+        },
+        {
+          "action": "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+          "expected": "The details are accepted and the \"ID verification\" screen is shown. Use a different email address on every run; the app rejects an email that is already on another account."
+        },
+        {
+          "action": "Enter the customer's phone number for the identity check and select Continue.",
+          "expected": "The identity check passes and the \"IMEI validation\" screen is shown for the customer's first line."
+        },
+        {
+          "action": "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
+          "expected": "The phone is accepted and the \"SIM validation\" screen is shown."
+        },
+        {
+          "action": "Enter the SIM card number for the phone and select Continue.",
+          "expected": "The SIM is accepted and the \"Phone number selection\" screen is shown."
+        },
+        {
+          "action": "Choose one of the offered phone numbers for the phone line and select Continue.",
+          "expected": "The chosen number is attached to line 1 and the \"Protection selection\" screen is shown."
+        },
+        {
+          "action": "On \"Protection selection\", select Skip and confirm the decline when asked.",
+          "expected": "No device protection is added to the phone line and the \"Plan selection\" screen is shown."
+        },
+        {
+          "action": "Choose the offered phone plan and select Continue.",
+          "expected": "The plan and its monthly charge are shown against line 1 in the cart, and the \"Promotion selection\" screen is shown."
+        },
+        {
+          "action": "On \"Promotion selection\", decline the promotions for the phone line and confirm when asked.",
+          "expected": "No promotion is added to the phone line and the \"Add on services\" screen is shown."
+        },
+        {
+          "action": "On \"Add on services\", select Skip for the phone line.",
+          "expected": "No add-on is added to the phone line and the rep is offered Create subscriber."
+        },
+        {
+          "action": "Select Create subscriber and confirm it in the panel that opens.",
+          "expected": "A \"Subscriber created\" confirmation is shown for the phone line — line 1 is now active — offering to add another line or to continue to the order summary."
+        },
+        {
+          "action": "Select \"Add another line\" to start line 2.",
+          "expected": "The \"IMEI validation\" screen is shown again, this time for line 2. The activated phone line stays in the cart."
+        },
+        {
+          "action": "Type the home internet gateway's serial number into the IMEI field and select Continue.",
+          "expected": "A panel titled \"Confirm home internet device\" opens and reads: \"The IMEI entered is a home internet device and requires extra details to activate. Click continue to proceed with activating this home internet device.\""
+        },
+        {
+          "action": "Select Continue on the \"Confirm home internet device\" panel.",
+          "expected": "The \"Home internet address eligibility\" screen is shown with an empty address form and Back and Continue at the bottom."
+        },
+        {
+          "action": "Select Back on the \"Home internet address eligibility\" screen.",
+          "expected": "The rep is taken back to the \"IMEI validation\" screen. The home internet line that was being built is dropped — it is no longer in the cart, and no home internet step is left showing anywhere in the flow."
+        },
+        {
+          "action": "Type the same home internet gateway serial number into the IMEI field again and select Continue.",
+          "expected": "The serial number is accepted again — backing out did not lock it up — and the \"Confirm home internet device\" panel opens as it did the first time."
+        },
+        {
+          "action": "Select Continue on the \"Confirm home internet device\" panel.",
+          "expected": "The \"Home internet address eligibility\" screen opens with every field empty. Nothing is carried over from the line that was backed out of."
+        },
+        {
+          "action": "Type the service address into the Address field, then type the Zip Code into the Zip Code field.",
+          "expected": "The address is accepted in capital letters, City fills in automatically as FARMINGTON and State fills in automatically as MI."
+        },
+        {
+          "action": "Select Continue to send the address for its eligibility check.",
+          "expected": "The \"Home internet acknowledgement\" panel opens, leading with \"Good news - 5G home internet is available.\", showing the submitted address, and offering the two acknowledgement tick boxes with Back and Continue. Both boxes start unticked."
+        },
+        {
+          "action": "Select Back on the \"Home internet acknowledgement\" panel without ticking either acknowledgement.",
+          "expected": "The rep is taken back to the \"IMEI validation\" screen — NOT back to the address form. The home internet line is dropped from the cart, and the address that was approved is not kept anywhere."
+        },
+        {
+          "action": "Stop here. Do NOT submit any payment.",
+          "expected": "The order is left with only the phone line activated earlier in this test on it, and the gateway's serial number is left unused so the same one can be used again on the next run."
+        }
+      ]
+    }
+  ]
+}
