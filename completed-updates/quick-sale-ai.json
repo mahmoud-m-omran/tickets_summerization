@@ -1,0 +1,28 @@
+{
+  "status": "success",
+  "filename": "quick-sale-ai.json",
+  "project_id": 3,
+  "updated": 2,
+  "total": 2,
+  "updates": [
+    {
+      "case_id": 3768,
+      "http": 200,
+      "fields": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ]
+    },
+    {
+      "case_id": 3774,
+      "http": 200,
+      "fields": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ]
+    }
+  ],
+  "note": "Testmo PATCHes returned HTTP 200; the workflow job failed only on pushing this receipt (concurrent push from create-testmo-cases). Receipt written locally."
+}
