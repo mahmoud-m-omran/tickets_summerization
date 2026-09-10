@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "filename": "byot-ai-v2.json",
+  "ticket_key": "BYOT",
+  "ticket_title": "AI",
+  "folder_id": 429,
+  "folder_name": "BYOT - AI",
+  "cases_created": 4,
+  "case_ids": [
+    3781,
+    3782,
+    3783,
+    3784
+  ]
+}
