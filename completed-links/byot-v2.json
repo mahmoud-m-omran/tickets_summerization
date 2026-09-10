@@ -1,0 +1,32 @@
+{
+  "status": "success",
+  "filename": "byot-v2.json",
+  "links": [
+    {
+      "case_id": 3781,
+      "display_id": "QA-2824",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3782,
+      "display_id": "QA-2825",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3783,
+      "display_id": "QA-2826",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3784,
+      "display_id": "QA-2827",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 4,
+  "total": 4
+}
