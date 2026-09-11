@@ -136,15 +136,18 @@ for trigger_path in trigger_files:
         if keep_folders and folder not in keep_folders:
             continue
         actions = _steps_of(c)
-        if not actions:
-            # The list payload may omit steps; fetch the case for its detail.
-            code, body = curl("GET", f"{BASE}/cases/{c.get('id')}")
-            if code == "200":
-                detail = _json(body) or {}
-                detail = detail.get("result", detail)
-                actions = _steps_of(detail)
-                if not c.get("issues"):
-                    c["issues"] = detail.get("issues")
+        # The list payload carries steps but NOT linked issues (verified
+        # 2026-09-11: cases 3781-3784 came back with issues [] minutes after
+        # being linked to QA-2824..2827). Always fetch the detail for the Jira
+        # keys — a snapshot that cannot name the existing ticket makes the
+        # prior-art gate's abort message useless to act on.
+        code, body = curl("GET", f"{BASE}/cases/{c.get('id')}")
+        if code == "200":
+            detail = _json(body) or {}
+            detail = detail.get("result", detail)
+            actions = actions or _steps_of(detail)
+            if not c.get("issues"):
+                c["issues"] = detail.get("issues")
         out.append({
             "id": c.get("id"),
             "name": c.get("name"),
