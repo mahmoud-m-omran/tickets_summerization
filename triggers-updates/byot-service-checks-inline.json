@@ -1,0 +1,120 @@
+{
+  "name": "byot",
+  "project_id": 3,
+  "updates": [
+    {
+      "case_id": 3781,
+      "name": "As a Metro by T-Mobile authorized dealer, I want to add a customer's own tablet as a second line on an order and see it charged at nothing, so that the customer pays only for the SIM and the service",
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the device as well. Some customers already own the device they want on the account - very often a tablet they bought elsewhere - and they only want service for it. The trade calls this BYOD, bring your own device; when the device is a tablet the store calls it BYOT. A tablet is almost never the customer's only line: it sits alongside a phone, so the rep sets up the phone line first and then adds the tablet to the same order. The rep's job on the tablet line is to tell the system the tablet belongs to the customer rather than to the store, so the tablet itself is never charged for. The customer pays for the SIM, the monthly plan, and tax on those - and nothing for the tablet. Getting that wrong is expensive in both directions: charge for the tablet and the customer is billed for something they walked in holding; fail to register it properly and the tablet is never activated on the network. This test walks the whole thing: a first line completed, then the customer's tablet added as the second line, right up to the order summary.\n\n## Related tickets\nRTPL-2061 (BYOD epic), RTPL-2205 (device type selection and second-IMEI rules), RTPL-2077 (device registration form), RTPL-2574 (Tablet added to the picker), RTPL-2403 (the chosen device type must be kept)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC on station AK_METROPC, with the Metro environment set to UAT3.\n- A brand-new account is being created; the order has no lines on it yet.\n- The till has no customer tablet paired to it. The customer-facing signature tablet plays no part in registering a customer's own device, and this test never touches it.\n- Two unused SIM numbers are to hand - one for each line - taken from the UAT3 SIM list in the RTGO Data workbook.\n- The tablet used must be a device the store does not stock and the carrier records as having two SIM slots, so that the second IMEI is asked for.\n\n## Test data\n- **Device for the first line:** IMEI 350108847628507  _(verified: UAT3 2026-09-10, accepted live as a customer-owned device and taken through to a created subscriber)_\n- **Tablet for the second line:** IMEI 350108843291805, second IMEI 350108846558176  _(verified: UAT3 2026-09-10, taken through the order live; the carrier returned both numbers together and the second one pre-filled)_\n- **SIM numbers:** 8901260000075263310F for the first line, 8901260000075263338F for the tablet  _(verified: UAT3 2026-09-10, both accepted live as unused physical SIMs)_\n- **Customer details:** Alex Tester, 1234 NE 1st St, MIAMI, FL 33179, a fresh email each run, PIN 135790, any three security questions  _(verified: UAT3 2026-09-10, accepted live; the PIN must be 6 to 15 characters and the email must not have been used before)_\n- **Store and station:** Store EZLOGIC, dealer code 30247306, station AK_METROPC  _(verified: UAT3 2026-09-10, shown in the page header after sign-in)_\n- **Expected charge for the tablet:** Nothing for the device, no tax on it; the SIM is still taxed  _(verified: UAT3 2026-09-10, the order summary read device cost 0 and device tax 0 with SIM tax still charged)_\n\n## Automation Notes\n- Do NOT hard-code a plan code or price. The plan catalogue follows the market the phone number comes from - a Florida number returned one set of plans, a Michigan number a different set with different prices. Read the code and price from the screen and compare them to what the line recorded.\n- The order summary figures only exist once the order reaches the summary step. They are empty before that, so do not assert them earlier.\n- An order left idle for 60 minutes is cancelled automatically. If a run stalls and later steps fail with a message about the order already being cancelled, restart rather than debugging the step.\n- If the tablet named in the test data no longer behaves as described - it is refused, or it goes straight to the SIM step without offering the device-type screen - take the next tablet from the same block of the workbook. If several in a row behave differently, contact the manual QA team to help get working data rather than staying blocked or hunting for data alone.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC, DEALER CODE 30247306, STATION AK_METROPC."
+        },
+        {
+          "action": "On the dashboard, click the New account tile, fill in the customer details from the test data and click Continue",
+          "expected": "The account is created and the ID verification screen opens, headed with the note Important to know: Accurate information unlocks the best phone deals."
+        },
+        {
+          "action": "Click Skip, then click Continue on the confirmation dialog",
+          "expected": "The dialog reads Are you sure you want to skip, explaining You are skipping ID Verification and will not be able to come back to this step. Confirming opens the IMEI validation screen, which reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Set up the first line: enter the first-line device's IMEI, confirm it as the customer's own device when prompted, enter the first SIM number, pick a new phone number for the service area, decline protection, choose the first plan offered, decline promotions and decline add-ons",
+          "expected": "Each step is accepted and the order reaches the point where the rep is asked to create the subscriber for the first line."
+        },
+        {
+          "action": "Click Create subscriber for the first line",
+          "expected": "The first line is created. The rep is asked whether to add another line to the order or go to the charge summary, offering Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Add another line",
+          "expected": "A second line opens on the same order, back at the IMEI validation screen. The cart on the right now shows the completed first line alongside the new empty second line."
+        },
+        {
+          "action": "Type the tablet's IMEI into the IMEI box and click Continue",
+          "expected": "Because the store does not stock this tablet, the order offers to register it as the customer's own device rather than selling it from stock."
+        },
+        {
+          "action": "Confirm that the tablet is the customer's own device and continue to the device-type screen",
+          "expected": "The screen reads Add BYOD device with the line Select the device type to register this device as a BYOD (Bring Your Own Device), and the label Select device type. Three choices are offered: BYOP Android, BYOP iPhone and Tablet."
+        },
+        {
+          "action": "Choose Tablet and click Continue",
+          "expected": "The tablet is registered as the customer's own. Because this tablet has two SIM slots, the rep is asked for its second IMEI, and the carrier's own second number for that tablet is already filled in."
+        },
+        {
+          "action": "Accept the second IMEI that is offered and continue",
+          "expected": "The second number is accepted and the order moves on to the SIM step, which reads The device is physical SIM compatible and pairs the tablet's IMEI with a SIM entry box."
+        },
+        {
+          "action": "Enter the second SIM number and continue",
+          "expected": "The SIM is accepted and the order moves on to the phone number step for the tablet line. SERVICE CHECK: the device recorded against this line must read selectedByodDeviceType BYOT, deviceSource B and isByod true. This is what separates a real tablet registration from a line that merely looks right on screen - a device that skipped the device-type screen arrives with no device type recorded at all."
+        },
+        {
+          "action": "Pick a new phone number for the service area and continue",
+          "expected": "A number is reserved for the tablet line and the order moves on to protection."
+        },
+        {
+          "action": "Decline protection and continue to the plan list",
+          "expected": "The plan list for the tablet line opens. Alongside the ordinary plans it now also offers the plans reserved for customer-owned devices and the tablet-only data plans - the ones a store-stock line is never shown."
+        },
+        {
+          "action": "Choose a plan for the tablet and continue",
+          "expected": "The chosen plan is applied to the tablet line and the monthly figure in the cart rises by that plan's price. The order moves on to promotions. SERVICE CHECK: planConfigDetails.selectedPlanSocCode and planConfigDetails.selectedPlanRate must equal the plan code and price just chosen on screen."
+        },
+        {
+          "action": "Decline promotions, then decline add-ons",
+          "expected": "No promotion and no add-on is applied to the tablet line, and the monthly figure does not change. The rep is asked to create the subscriber for the tablet line. SERVICE CHECK: with promotions declined, promotionsSkipped must be true and selectedPromotions must be an empty array. With add-ons declined, addonsSkipped must be true and totalAddonsRate must be 0. If a promotion or an add-on is selected instead, it must appear in that same place - the promotion by its own code, the add-on by its soc and monthlyPrice."
+        },
+        {
+          "action": "Click Create subscriber for the tablet line",
+          "expected": "The tablet line is created. The rep is again offered Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The order summary opens showing both lines. The tablet is listed at nothing - no price and no tax against the device - while the SIM is still taxed. The rep is offered the choice of adding another line or going on to payment. SERVICE CHECK: under orderSummary, linesInOrder must equal the number of lines on the order, totalDeviceCost and totalDeviceTax must both be 0, and totalSimTax must still be charged. Those figures together are the proof that the customer's own tablet was billed at nothing."
+        },
+        {
+          "action": "Stop here - do NOT go on to payment and do NOT submit the order",
+          "expected": "The order is left on the summary with both lines created and nothing paid. No SIM is consumed by payment and the run can be repeated."
+        }
+      ]
+    },
+    {
+      "case_id": 3783,
+      "name": "As a Metro by T-Mobile authorized dealer, I want to be stopped if I try to move on without saying what kind of device the customer brought, so that a device is never registered with no kind at all",
+      "custom_requirements": "## What this test is about\nThe device kind the rep picks is sent on to the carrier and decides how the customer's device is recorded. It is the whole point of this screen, and there is no sensible default the system could pick on the rep's behalf - a tablet and an iPhone are not interchangeable. So the screen must not let the rep past until the choice is made. This matters most at a busy counter, where a rep working quickly might click straight through and only discover much later that a device went in wrongly recorded. This test clicks the button with nothing chosen and checks the order stays where it is.\n\n## Related tickets\nRTPL-2077 (device registration form), RTPL-2403 (the chosen device type must be kept and used)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC on station AK_METROPC, with the Metro environment set to UAT3.\n- A brand-new account is being created; the order has no lines on it yet.\n- The device used must be one the store does not stock, so that the device-type screen is reached.\n- The till has no customer tablet paired to it.\n\n## Test data\n- **Device to reach the device-type screen:** IMEI 350108845246823  _(verified: UAT3 2026-09-10, from the customer-owned block of the RTGO Data workbook)_\n- **Expected result with nothing chosen:** The order does not move on and the choice is marked as needing an answer  _(verified: Derived from the screen's own required-field rule; the app's wording for a required choice is 'Select device type is required')_\n\n## Automation Notes\n- Assert two things: that the screen does not advance, and that the choice is flagged as needing an answer. A button that appears to do nothing but has quietly registered the device would be the worse outcome.\n- The last step deliberately completes the choice afterwards, which confirms the block was the missing selection rather than an unrelated failure on the screen.\n- Use a fresh email address on the account each run, and take the next device from the same block of the workbook if this one is refused. If several in a row fail, contact the manual QA team to help get working data rather than staying blocked.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC, DEALER CODE 30247306, STATION AK_METROPC."
+        },
+        {
+          "action": "On the dashboard, click the New account tile, fill in the customer details and click Continue",
+          "expected": "The account is created and the ID verification screen opens."
+        },
+        {
+          "action": "Click Skip, then click Continue on the confirmation dialog",
+          "expected": "The IMEI validation screen opens asking for the IMEI of the device."
+        },
+        {
+          "action": "Type the device's IMEI into the IMEI box and click Continue, then confirm it as the customer's own device",
+          "expected": "The Add BYOD device screen opens with the label Select device type and the three choices BYOP Android, BYOP iPhone and Tablet. None of them is selected."
+        },
+        {
+          "action": "Without choosing any device type, click Continue",
+          "expected": "The order does not move on. The screen stays on Add BYOD device, the SIM step does not open, and the device-type choice is flagged as needing an answer before the rep can continue."
+        },
+        {
+          "action": "Now choose Tablet and click Continue",
+          "expected": "With a choice made the order moves on and the SIM step opens, showing the tablet's IMEI paired with a SIM entry box - proving the only thing standing in the way was the missing choice. SERVICE CHECK: with Tablet chosen, the line must record selectedByodDeviceType BYOT, deviceSource B and isByod true."
+        },
+        {
+          "action": "Stop here - do NOT enter a SIM number and do not take the order any further",
+          "expected": "The order is left at the SIM step. No SIM has been used and no payment has been taken."
+        }
+      ]
+    }
+  ]
+}
