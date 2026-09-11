@@ -86,10 +86,15 @@ def _steps_of(case):
 
 
 def _issues_of(case):
+    # Testmo stores the Jira key as `display_id` (that is what
+    # link_testmo_issues.py PATCHes and reads back). Checking only
+    # name/key/external_id silently produced an empty list for every case even
+    # where the link existed — verified 2026-09-11 on 3781-3784.
     keys = []
     for issue in case.get("issues") or []:
         if isinstance(issue, dict):
-            k = issue.get("name") or issue.get("key") or issue.get("external_id")
+            k = (issue.get("display_id") or issue.get("name")
+                 or issue.get("key") or issue.get("external_id"))
             if k:
                 keys.append(str(k))
         elif issue:
@@ -156,11 +161,26 @@ for trigger_path in trigger_files:
             "issues": _issues_of(c),
         })
 
+    # Diagnostic: if links come back empty again, this says whether the detail
+    # endpoint carries an `issues` field at all, and under which keys — so the
+    # next fix is based on the payload instead of another guess.
+    diag = {}
+    for probe_id in (3781, 3784):
+        code, body = curl("GET", f"{BASE}/cases/{probe_id}")
+        detail = (_json(body) or {})
+        detail = detail.get("result", detail)
+        diag[str(probe_id)] = {
+            "http": code,
+            "top_level_keys": sorted(detail.keys()) if isinstance(detail, dict) else None,
+            "issues_raw": detail.get("issues") if isinstance(detail, dict) else None,
+        }
+
     result = {
         "status": "success" if out else "empty",
         "filename": filename,
         "project_id": project_id,
         "count": len(out),
+        "link_diagnostic": diag,
         "cases": out,
     }
     dest = os.path.join("completed-dumps", filename)
