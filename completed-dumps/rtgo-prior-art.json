@@ -3,6 +3,22 @@
   "filename": "rtgo-prior-art.json",
   "project_id": 3,
   "count": 611,
+  "link_diagnostic": {
+    "3781": {
+      "http": "404",
+      "top_level_keys": [
+        "message"
+      ],
+      "issues_raw": null
+    },
+    "3784": {
+      "http": "404",
+      "top_level_keys": [
+        "message"
+      ],
+      "issues_raw": null
+    }
+  },
   "cases": [
     {
       "id": 3784,
