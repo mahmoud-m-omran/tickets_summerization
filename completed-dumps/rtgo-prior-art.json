@@ -4,20 +4,32 @@
   "project_id": 3,
   "count": 611,
   "link_diagnostic": {
-    "3781": {
-      "http": "404",
-      "top_level_keys": [
-        "message"
-      ],
-      "issues_raw": null
-    },
-    "3784": {
-      "http": "404",
-      "top_level_keys": [
-        "message"
-      ],
-      "issues_raw": null
-    }
+    "detail_endpoint": "/projects/3/cases?ids={id}",
+    "detail_carries_issues": false,
+    "list_sample_keys": [
+      "created_at",
+      "created_by",
+      "custom_automated",
+      "custom_description",
+      "custom_priority",
+      "custom_steps",
+      "estimate",
+      "folder_id",
+      "forecast",
+      "has_automation",
+      "has_automation_status",
+      "id",
+      "key",
+      "name",
+      "project_id",
+      "repo_id",
+      "state_id",
+      "status_at",
+      "status_id",
+      "template_id",
+      "updated_at",
+      "updated_by"
+    ]
   },
   "cases": [
     {
