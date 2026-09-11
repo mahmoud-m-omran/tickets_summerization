@@ -49,6 +49,38 @@ def _json(body):
         return None
 
 
+def detect_detail_endpoint(project_id, probe_id):
+    """Find a case-detail URL that actually exists.
+
+    GET /cases/{id} returns 404 (verified 2026-09-11 via the link_diagnostic on
+    cases 3781/3784) — assuming it worked meant 611 silent failures per run.
+    Try the plausible shapes once and keep the first that answers 200.
+    Returns (template, carries_issues) or (None, False).
+    """
+    candidates = [
+        f"{BASE}/cases/{{id}}",
+        f"{BASE}/projects/{project_id}/cases/{{id}}",
+        f"{BASE}/repositories/cases/{{id}}",
+        f"{BASE}/projects/{project_id}/cases?ids={{id}}",
+    ]
+    for tpl in candidates:
+        code, body = curl("GET", tpl.format(id=probe_id))
+        if code != "200":
+            print(f"  detail probe {tpl.split(BASE)[1]} -> {code}")
+            continue
+        data = _json(body)
+        if data is None:
+            continue
+        node = data.get("result", data) if isinstance(data, dict) else data
+        if isinstance(node, list):
+            node = node[0] if node else {}
+        has_issues = isinstance(node, dict) and "issues" in node
+        print(f"  detail probe {tpl.split(BASE)[1]} -> 200, "
+              f"issues field {'present' if has_issues else 'ABSENT'}")
+        return tpl, has_issues
+    return None, False
+
+
 def _list_cases(project_id, page):
     """Return (cases, raw) for one page, trying known param shapes."""
     attempts = [
@@ -135,23 +167,29 @@ for trigger_path in trigger_files:
             break
         page += 1
 
+    probe_id = collected[0].get("id") if collected else None
+    detail_tpl, detail_has_issues = (None, False)
+    if probe_id:
+        detail_tpl, detail_has_issues = detect_detail_endpoint(project_id, probe_id)
+        if not detail_tpl:
+            print("  no working case-detail endpoint; Jira keys will be absent")
+
     out = []
     for c in collected:
         folder = c.get("folder_id") or c.get("folder")
         if keep_folders and folder not in keep_folders:
             continue
         actions = _steps_of(c)
-        # The list payload carries steps but NOT linked issues (verified
-        # 2026-09-11: cases 3781-3784 came back with issues [] minutes after
-        # being linked to QA-2824..2827). Always fetch the detail for the Jira
-        # keys — a snapshot that cannot name the existing ticket makes the
-        # prior-art gate's abort message useless to act on.
-        code, body = curl("GET", f"{BASE}/cases/{c.get('id')}")
-        if code == "200":
-            detail = _json(body) or {}
-            detail = detail.get("result", detail)
-            actions = actions or _steps_of(detail)
-            if not c.get("issues"):
+        # Fetch the detail only when an endpoint was actually found AND it
+        # carries issues; otherwise this is 611 pointless round trips.
+        if detail_tpl and detail_has_issues and not c.get("issues"):
+            code, body = curl("GET", detail_tpl.format(id=c.get("id")))
+            if code == "200":
+                detail = _json(body) or {}
+                detail = detail.get("result", detail)
+                if isinstance(detail, list):
+                    detail = detail[0] if detail else {}
+                actions = actions or _steps_of(detail)
                 c["issues"] = detail.get("issues")
         out.append({
             "id": c.get("id"),
@@ -164,16 +202,11 @@ for trigger_path in trigger_files:
     # Diagnostic: if links come back empty again, this says whether the detail
     # endpoint carries an `issues` field at all, and under which keys — so the
     # next fix is based on the payload instead of another guess.
-    diag = {}
-    for probe_id in (3781, 3784):
-        code, body = curl("GET", f"{BASE}/cases/{probe_id}")
-        detail = (_json(body) or {})
-        detail = detail.get("result", detail)
-        diag[str(probe_id)] = {
-            "http": code,
-            "top_level_keys": sorted(detail.keys()) if isinstance(detail, dict) else None,
-            "issues_raw": detail.get("issues") if isinstance(detail, dict) else None,
-        }
+    diag = {
+        "detail_endpoint": detail_tpl.split(BASE)[1] if detail_tpl else None,
+        "detail_carries_issues": detail_has_issues,
+        "list_sample_keys": sorted(collected[0].keys()) if collected else None,
+    }
 
     result = {
         "status": "success" if out else "empty",
