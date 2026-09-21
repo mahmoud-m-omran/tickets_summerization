@@ -2,7 +2,7 @@
   "status": "success",
   "filename": "rtgo-prior-art.json",
   "project_id": 3,
-  "count": 611,
+  "count": 648,
   "link_diagnostic": {
     "detail_endpoint": "/projects/3/cases?ids={id}",
     "detail_carries_issues": false,
@@ -32,6 +32,339 @@
     ]
   },
   "cases": [
+    {
+      "id": 3821,
+      "name": "TC-060 - Smoke: `rtpl-2866-store-scope-smoke.ps1` adaptation for each family",
+      "folder_id": 436,
+      "actions": [
+        "1. AccountExisting: hit `CancelProcess` / `CheckProcess` / `ExecuteActivity` with foreign-store `ProcessId`.<br />\n  2. AccountNew: same three endpoints with foreign-store `ProcessId`.<br />\n  3. Payment: `CancelProcess` / `CheckProcess` / `ExecuteActivity` with foreign-store `ProcessId`; `StartProcess` with foreign-store `ParentProcessId`.<br />\n  4. SubscriberActivation: `CancelLine`, `CancelProcess` (primary), `CheckProcess`, `ExecuteActivity`, four `GetSelectionOptions` endpoints with foreign-store `ProcessId`; `StartProcess` with foreign-store `ParentProcessId`; `CancelProcess` with `AutoRestart: true` and foreign-store `RestartParentProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3820,
+      "name": "TC-059 - Quick Sale unchanged: existing 403 behaviour untouched",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each Quick Sale guarded endpoint."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3819,
+      "name": "TC-058 - Existing parent-state exception precedence preserved",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each parent-guarded handler for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3818,
+      "name": "TC-057 - Compatibility rule end-to-end: SubscriberActivation (incl. GetSelectionOptions) - byte-identical baseline",
+      "folder_id": 436,
+      "actions": [
+        "1. Replay each endpoint against the post-change build."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3817,
+      "name": "TC-056 - Compatibility rule end-to-end: Payment - byte-identical baseline",
+      "folder_id": 436,
+      "actions": [
+        "1. Replay each endpoint against the post-change build."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3816,
+      "name": "TC-055 - Compatibility rule end-to-end: AccountExisting / AccountNew - byte-identical baseline",
+      "folder_id": 436,
+      "actions": [
+        "1. Replay each endpoint against the post-change build with the same request."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3815,
+      "name": "TC-054 - Test-harness prerequisite & diagnostic-order note (documented as TC)",
+      "folder_id": 436,
+      "actions": [
+        "1. Verify `ScenarioHooks` seeds every AccountNew / activation-parent process via the **metadata-carrying** `AppendEventAsync` overload (not the metadata-less one).<br />\n  2. Run the acceptance suite against the seeded fixture.<br />\n  3. Document (in this TC's Notes / linked runbook) the diagnostic rule from spec §7."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3814,
+      "name": "TC-053 - Guardrail: parent created via metadata-less overload is rejected by parent guard",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each parent-guarded handler referencing that parent id."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3813,
+      "name": "TC-052 - Guardrail: process created via metadata-less overload is rejected by primary guard",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke a primary-guarded handler with that process's `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3812,
+      "name": "TC-051 - Guardrail: `CosmosProcessEventStore.AppendEventAsync` metadata-less overload writes `Data = {}`",
+      "folder_id": 436,
+      "actions": [
+        "1. Call the metadata-less `AppendEventAsync` overload with a `null`/absent metadata argument.<br />\n  2. Inspect the persisted event document."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3811,
+      "name": "TC-050 - Ownership-storage failure propagates (Cosmos 429) across every guarded site",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each guarded handler."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3810,
+      "name": "TC-026 - Payment/StartProcess with `ParentProcessId` omitted - pre-guard path unchanged",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` without a parent id."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3809,
+      "name": "TC-025 - SubscriberActivation/CancelProcess with AutoRestart, caller `RtStoreId <= 0` - ordering + no side effect",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `CancelProcess`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3808,
+      "name": "TC-024 - SubscriberActivation/CancelProcess with AutoRestart, `{}` restart-parent metadata - ordering + no side effect",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `CancelProcess`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3807,
+      "name": "TC-023 - SubscriberActivation/CancelProcess with AutoRestart, absent restart-parent metadata - ordering + no side effect",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `CancelProcess`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3806,
+      "name": "TC-022 - SubscriberActivation/CancelProcess with AutoRestart, foreign-store restart parent - ordering + no side effect",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `CancelProcess` with `AutoRestart: true`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3805,
+      "name": "TC-021 - SubscriberActivation/CancelProcess with AutoRestart, valid same-store restart parent - happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `CancelProcess` with `AutoRestart: true` and a valid same-store `RestartParentProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3804,
+      "name": "TC-020 - SubscriberActivation/StartProcess parent-guard refusal for AccountExisting parent (foreign-store)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` with foreign-store AccountExisting parent."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3803,
+      "name": "TC-019 - SubscriberActivation/StartProcess parent-guard refusal for AccountNew parent (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3802,
+      "name": "TC-018 - SubscriberActivation/StartProcess parent-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` with the valid same-store parent."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3801,
+      "name": "TC-017 - Payment/StartProcess parent-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3800,
+      "name": "TC-016 - Payment/StartProcess parent-guard same-store happy path (with ParentProcessId supplied)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke `StartProcess` with the valid same-store parent."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3799,
+      "name": "TC-015 - SubscriberActivation/GetSelectionOptions family primary-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each `GetSelectionOptions` handler for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3798,
+      "name": "TC-014 - SubscriberActivation/GetSelectionOptions family primary-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each `GetSelectionOptions` handler with a valid same-store `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3797,
+      "name": "TC-013 - SubscriberActivation family primary-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with the primary `ProcessId` for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3796,
+      "name": "TC-012 - SubscriberActivation family primary-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with a valid same-store `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3795,
+      "name": "TC-011 - Payment family primary-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with the primary `ProcessId` for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3794,
+      "name": "TC-010 - Payment family primary-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with valid same-store `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3793,
+      "name": "TC-009 - AccountNew family primary-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with the primary `ProcessId` for each row."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3792,
+      "name": "TC-008 - AccountNew family primary-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with a valid same-store `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3791,
+      "name": "TC-007 - AccountExisting family primary-guard refusal (foreign / null / `{}` / RtStoreId<=0)",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with the primary `ProcessId` for each row above."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3790,
+      "name": "TC-006 - AccountExisting family primary-guard same-store happy path",
+      "folder_id": 436,
+      "actions": [
+        "1. Invoke each handler with a valid same-store `ProcessId`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3789,
+      "name": "TC-005 - Item 1 route-supplied foreign store creates no counter row",
+      "folder_id": 436,
+      "actions": [
+        "1. Send `GET /api/sale-records/777/next-number`.<br />\n  2. Inspect counter storage for store `777`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3788,
+      "name": "TC-004 - Item 1 caller `RtStoreId <= 0` refusal",
+      "folder_id": 436,
+      "actions": [
+        "1. Send `GET /api/sale-records/42/next-number`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3787,
+      "name": "TC-003 - Item 1 validator preserved (`next-number/0` → 400)",
+      "folder_id": 436,
+      "actions": [
+        "1. Send `GET /api/sale-records/0/next-number`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3786,
+      "name": "TC-002 - Item 1 foreign-store route id ignored (uses caller's store)",
+      "folder_id": 436,
+      "actions": [
+        "1. Send `GET /api/sale-records/999/next-number`."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3785,
+      "name": "TC-001 - Item 1 same-store happy path (counter increments, payload unchanged)",
+      "folder_id": 436,
+      "actions": [
+        "1. Send `GET /api/sale-records/42/next-number`."
+      ],
+      "issues": []
+    },
     {
       "id": 3784,
       "name": "As a Metro by T-Mobile authorized dealer, I want a device whose IMEI fails the carrier's own check to be refused clearly, so that I am not left with an order I cannot finish or undo",
@@ -590,9 +923,9 @@
       "name": "Add a home internet gateway as line 2 with an eligible address, a promotion and an add-on",
       "folder_id": 430,
       "actions": [
-        "Login into the app.",
-        "Start a new account for a new customer.",
-        "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+        "<p>Login into the app.</p>",
+        "<p>Start a new account for a new customer.</p>",
+        "<p>Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.</p>",
         "Enter the customer's phone number for the identity check and select Continue.",
         "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
         "Enter the SIM card number for the phone and select Continue.",
@@ -1657,8 +1990,8 @@
     },
     {
       "id": 3619,
-      "name": "HINT",
-      "folder_id": 377,
+      "name": "As a Metro by T-Mobile authorized dealer, I want to Create subscriber using HINT Lite",
+      "folder_id": 378,
       "actions": [],
       "issues": []
     },
