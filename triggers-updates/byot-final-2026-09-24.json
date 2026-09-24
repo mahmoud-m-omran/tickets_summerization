@@ -1,0 +1,157 @@
+{
+  "name": "byot",
+  "project_id": 3,
+  "updates": [
+    {
+      "case_id": 3781,
+      "name": "As a Metro by T-Mobile authorized dealer, I want to add a customer's own tablet as a second line on an order and see it charged at nothing, so that the customer pays only for the SIM and the service",
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the device as well. Some customers already own the device they want on the account - very often a tablet they bought elsewhere - and they only want service for it. The trade calls this BYOD, bring your own device; when the device is a tablet the store calls it BYOT. A tablet is almost never the customer's only line: it sits alongside a phone, so the rep sets up the phone line first and then adds the tablet to the same order. The rep's job on the tablet line is to tell the system the tablet belongs to the customer rather than to the store, so the tablet itself is never charged for. The customer pays for the SIM, the monthly plan, and tax on those - and nothing for the tablet. Getting that wrong is expensive in both directions: charge for the tablet and the customer is billed for something they walked in holding; fail to register it properly and the tablet is never activated on the network. This test walks the whole thing: a first line completed, then the customer's tablet added as the second line, right up to the payment screen, stopping before any money is taken.\n\nWords used in this test: an IMEI is the 15-digit serial number that identifies a phone or tablet; a device with two SIM slots has two IMEIs. A SIM number (also called ICCID) is the long number printed on a physical SIM card. An eSIM is a SIM built into the device, identified by its EID. BYOD (bring your own device) means the customer already owns the device; the screen calls a customer's own phone BYOP (bring your own phone) and a customer's own tablet simply Tablet. A plan code such as TAB30SD is the carrier's short name for a monthly plan. MRC means the monthly recurring charge.\n\n## Related tickets\nRTPL-2061 (BYOD epic), RTPL-2205 (device type selection and second-IMEI rules), RTPL-2077 (device registration form), RTPL-2574 (Tablet added to the picker), RTPL-2403 (the chosen device type must be kept)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site with the team's QA sign-in, and the Metro environment in the user menu (top right) is set to UAT3.\n- A brand-new account is being created; the order has no lines on it yet.\n- Customer credential capture on the customer tablet is switched off for this store, so the PIN and security questions are filled in on the till screen. The customer-facing signature tablet plays no part in this test.\n- Two unused SIM numbers are to hand, one for each line, and two customer-owned devices the carrier has not yet registered: one phone and one tablet, each with two SIM slots.\n\n## Test data\n- **Customer's phone for the first line:** IMEI 350108845671228, second IMEI 350108846697495  _(verified: UAT3 2026-09-24 (build 5.924.0): reached the Add BYOD device screen live and was left unregistered. The full walk that day used 350108847628507, which is now used up)_\n- **Customer's tablet for the second line:** IMEI 350108849128084, second IMEI 350108843338754  _(verified: UAT3 2026-09-24 (build 5.924.0): reached the Add BYOD device screen live and was left unregistered. The full walk that day used 350108847196786 / 350108841755116, which is now used up)_\n- **SIM numbers:** 8901260000075260000F for the phone, 8901260000075260019F for the tablet  _(verified: UAT3 2026-09-24 (build 5.924.0): the neighbouring SIMs 8901260000075259986F and 8901260000075259995F were accepted in the full walk; these two are the next unused SIMs in the same block and have not been entered yet. If one is refused, take the next SIM in the UAT3_SIMS list)_\n- **Customer details:** Alex Tester, 1234 NE 1st St, zip 33179, PIN 135790, any three security questions, a new email each run using letters and digits only  _(verified: UAT3 2026-09-24 (build 5.924.0): accepted live; an email with a plus sign was refused with the message subscriberEmailAddress field format error)_\n- **Store:** EZLOGIC, dealer code 30247306; the station is the one you sign in on  _(verified: UAT3 2026-09-24 (build 5.924.0): the header showed Station Omran for this run)_\n- **Expected charges:** Tablet line: device $0.00, SIM card $11.00, plan TAB30SD $30.00 a month. Order: Total MRC $90.00, taxes and fees $10.70, amount to collect $122.70  _(verified: UAT3 2026-09-24 (build 5.924.0), Miami (FL) number: the two-line figures were read off the cart and order summary; the rule that the payment screen asks for exactly the cart total was checked on the same order after a third line had been added ($157.70 collected = $157.70 cart total). The $122.70 two-line payment figure itself was not displayed on the payment screen)_\n\n## Automation Notes\n- Both devices are used up by every run: choosing a device type registers the device with the carrier. Take a new pair for each line every run from the RTGO Data workbook, tab UAT2_BYODBYOW, rows whose IMEI starts 350108 (they work on UAT3). Spare pairs confirmed on 24 September 2026 to reach the Add BYOD device screen: 350108846539671 / 350108844710688 and 350108841926717 / 350108848332034. Already used or refused as Device already active, do not use: 350108847628507, 350108847196786, 350108843291805, 350108849933921, 350108843569390, 350108845058533.\n- A device that was already registered on an earlier run behaves differently: on 24 September 2026 the tablet 350108843291805 skipped the device-type, second-IMEI and SIM screens and was given an eSIM automatically. If that happens, the device is used up - take the next pair.\n- A device that was already registered also loses the tablet plans: on 24 September 2026 the registered tablet 350108843291805 was offered phone plans such as MAU55AAL.\n- If several pairs in a row are refused or behave differently from these steps, contact the manual QA team to help get working data rather than staying blocked or hunting for data alone.\n- Always switch the SIM step to IMEI 1 - PSIM. Continuing on the eSIM choice has stalled on an endless loading spinner in past runs.\n- Do not hard-code plan codes or prices. They follow the market of the phone number. What must hold on the tablet line is that every plan offered is a tablet plan and no phone plan appears.\n- Error messages appear at the top right of the screen and disappear after a few seconds. Read them at the moment they appear.\n- An order left idle for 60 minutes is cancelled automatically. If later steps fail with a message about the order already being cancelled, start again rather than debugging the step.\n- The payment screen amount is the reliable money check: it equals the cart total. The Order summary figure Edge due immediately leaves out SIM cards (known issue, see step 33).",
+      "steps": [
+        {
+          "action": "Open the RT Go sign-in page, fill in Email address, Password and Application key with the team's QA sign-in, type EZLOGIC in Store and click Verify",
+          "expected": "The sign-in page is headed RT Go Verification. After Verify, the dashboard opens with tiles including New account - Create a new account to activate. The header shows STORE ID EZLOGIC, Dealer Code 30247306 and Station with the name of the station you signed in on."
+        },
+        {
+          "action": "Click the New account tile",
+          "expected": "The Account information form opens with the fields First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, SIM block, PIN, Confirm PIN, and three security questions each with an answer."
+        },
+        {
+          "action": "Fill in the customer details from the test data, choose any three security questions, type an answer for each, and click Continue",
+          "expected": "City fills in as MIAMI and State as FL on their own after the zip code. The account is accepted and the ID verification screen opens with the note Important to know: Accurate information unlocks the best phone deals. If the email contains a plus sign or has been used before, a message appears at the top right instead and the form does not move on."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A dialog opens titled Are you sure you want to skip, reading You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in the dialog",
+          "expected": "The IMEI validation screen opens, reading Enter the IMEI of the device to verify network compatibility and inventory, with an IMEI box (hint 15-digit IMEI) and the Service tip: If this is a BYOD device, it must be unlocked to activate on the Metro by T-Mobile network. Contact the customer's previous carrier for assistance."
+        },
+        {
+          "action": "Type the customer's phone IMEI into the IMEI box and click Continue",
+          "expected": "Because the store does not stock this device, the Add BYOD device screen opens straight away, reading Select the device type to register this device as a BYOD (Bring Your Own Device), under the label Select device type, with three choices: BYOP Android, BYOP iPhone and Tablet. The cart on the right lists the device's IMEI at $0.00."
+        },
+        {
+          "action": "Choose BYOP Android and click Continue",
+          "expected": "The screen asks for the device's second IMEI. It is still titled Add BYOD device and shows the warning The device entered was not found by the compatibility checker, or the checker is currently unavailable. Network compatibility cannot be determined at this time. If you continue with the activation, the service and preinstalled apps may not work once the activation is complete. The box IMEI2 is already filled in with the device's second IMEI."
+        },
+        {
+          "action": "Leave the second IMEI as it is and click Continue",
+          "expected": "The SIM validation screen opens, reading The device is physical and eSIM compatible. Confirm your IMEI and SIM card pair below, then click continue. Two choices are shown: IMEI 1 - PSIM with the first IMEI and IMEI 2 - ESIM with the second. IMEI 2 - ESIM is chosen to begin with and its EID box is already filled in."
+        },
+        {
+          "action": "Click IMEI 1 - PSIM",
+          "expected": "The box changes to ICCID SIM, empty, with the hint Enter ICCID for SIM."
+        },
+        {
+          "action": "Type the SIM number and click Continue",
+          "expected": "The SIM is accepted and the Phone number selection screen opens, reading Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. The zip code 33179 is already filled in and a list titled Phone number npa nxx opens by itself, for example (305) 200-* MIAMI, FL. In the cart this line now shows Device $0.00 and SIM card $11.00. If a message at the top right reads SIM card is active or used. Please try a new SIM, type the next SIM from the test data instead."
+        },
+        {
+          "action": "Click the first number in the list",
+          "expected": "The list closes and the chosen area code and prefix show under Phone number NPA NXX."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The Protection selection screen opens with the note The quoted price per month for optional device protection does not include taxes and fees, which may be applicable in addition to the price in some locations. No protection options are listed for a customer's own device; only Skip and Continue are offered."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A dialog opens titled Decline all protection options?, explaining that the customer will have no insurance cover and only 30 days to add it, ending Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The Plan selection screen opens with the first plan already marked Selected (on 24 September 2026: MAU55, $60.00 per month, $55 with AutoPay-$60 1st Month). The list also includes the plans offered only to customers' own devices, 40L1WEB (6 Month Unlimited Plan) and BYOD10GB3 ($30 10GB BYOD PROMO). No plan with Tablet in its name is offered on this phone line."
+        },
+        {
+          "action": "Keep the plan that is already selected and click Continue",
+          "expected": "The Promotion selection screen opens, reading This customer is not eligible for any promotions at this time. You can continue with the current pricing. Only Continue is offered. The cart shows the plan by its code and monthly price."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The Add on services screen opens with the tabs International, Services, Data, Storage, Security and Others, listing optional extras such as Global Voice 100 Plus at $20.00 per month."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A dialog opens titled Create subscriber, reading Great job configuring IMEI 350108845671228. Click create subscriber to continue, with the buttons Create subscriber and Back."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "The first line is created. A dialog titled Subscriber created reads Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Add another line",
+          "expected": "The IMEI validation screen opens again for the second line. The cart shows Line 2 at $0.00 alongside the finished first line."
+        },
+        {
+          "action": "Type the customer's tablet IMEI into the IMEI box and click Continue",
+          "expected": "Because the store does not stock this device, the Add BYOD device screen opens straight away, reading Select the device type to register this device as a BYOD (Bring Your Own Device), under the label Select device type, with three choices: BYOP Android, BYOP iPhone and Tablet. The cart on the right lists the device's IMEI at $0.00."
+        },
+        {
+          "action": "Choose Tablet and click Continue",
+          "expected": "The screen asks for the device's second IMEI. It is still titled Add BYOD device and shows the warning The device entered was not found by the compatibility checker, or the checker is currently unavailable. Network compatibility cannot be determined at this time. If you continue with the activation, the service and preinstalled apps may not work once the activation is complete. The box IMEI2 is already filled in with the device's second IMEI."
+        },
+        {
+          "action": "Leave the second IMEI as it is and click Continue",
+          "expected": "The SIM validation screen opens, reading The device is physical and eSIM compatible. Confirm your IMEI and SIM card pair below, then click continue. Two choices are shown: IMEI 1 - PSIM with the first IMEI and IMEI 2 - ESIM with the second. IMEI 2 - ESIM is chosen to begin with and its EID box is already filled in."
+        },
+        {
+          "action": "Click IMEI 1 - PSIM",
+          "expected": "The box changes to ICCID SIM, empty, with the hint Enter ICCID for SIM."
+        },
+        {
+          "action": "Type the SIM number and click Continue",
+          "expected": "The SIM is accepted and the Phone number selection screen opens, reading Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. The zip code 33179 is already filled in and a list titled Phone number npa nxx opens by itself, for example (305) 200-* MIAMI, FL. In the cart this line now shows Device $0.00 and SIM card $11.00. If a message at the top right reads SIM card is active or used. Please try a new SIM, type the next SIM from the test data instead. SERVICE CHECK (for the automation engineer): the device recorded against this line must read selectedByodDeviceType BYOT, deviceSource B and isByod true. This is what separates a real tablet registration from a line that merely looks right on screen."
+        },
+        {
+          "action": "Click the first number in the list",
+          "expected": "The list closes and the chosen area code and prefix show under Phone number NPA NXX."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The Protection selection screen opens with the note The quoted price per month for optional device protection does not include taxes and fees, which may be applicable in addition to the price in some locations. No protection options are listed for a customer's own device; only Skip and Continue are offered."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A dialog opens titled Decline all protection options?, explaining that the customer will have no insurance cover and only 30 days to add it, ending Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The Plan selection screen opens and offers ONLY tablet plans: TAB30SD $30.00 ($30 UNL Tablet, already marked Selected), TAB25SD $25.00 ($25 UNL Tablet), TAB20SD $20.00 ($20 UNL Tablet), TAB15SD $15.00 ($15 UNL Tablet) and BTAB5 $5.00 ($5 BYO Tablet). None of the phone plans offered on the first line (for example MAU55, 40L1WEB or BYOD10GB3) appears on the tablet line. Prices shown are for a Miami (FL) number."
+        },
+        {
+          "action": "Keep TAB30SD and click Continue",
+          "expected": "The Promotion selection screen opens, reading This customer is not eligible for any promotions at this time. You can continue with the current pricing. In the cart the tablet line shows Device $0.00, SIM card $11.00, Protection Declined, Plan (TAB30SD) $30.00 / mo. and Total due $41.00. SERVICE CHECK (for the automation engineer): planConfigDetails.selectedPlanSocCode and planConfigDetails.selectedPlanRate must equal the plan code and price chosen on screen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The Add on services screen opens. For the tablet line the only extra offered is McAfee Protection at $3.00 per month (MCAFEE), under Security."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A dialog opens titled Create subscriber, reading Great job configuring IMEI 350108849128084. Click create subscriber to continue. SERVICE CHECK (for the automation engineer): addonsSkipped must be true and totalAddonsRate 0; promotionsSkipped must also be true with selectedPromotions empty, even though the promotion screen offered only Continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "The tablet line is created and the Subscriber created dialog appears again with Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The Order summary screen opens showing Order ID, Account number, Lines in order 2, Total MRC $90.00, Total taxes & fees $10.70 and Edge due immediately $100.70, a choice of SOS form language (English or Español), a box to Enter Metro bill payment, and a Continue button. In the cart the tablet line reads Device $0.00, SIM card $11.00, Protection Declined, Plan (TAB30SD) $30.00 / mo., Add-on Declined and Taxes & fees $10.70, Total due $51.70; the phone line reads $71.00. The tablet itself costs nothing: its device charge is $0.00. The $10.70 of taxes and fees belongs to the whole order and the cart shows it under the last line added. SERVICE CHECK (for the automation engineer): under orderSummary, linesInOrder must be 2 and totalDeviceCost and totalDeviceTax must both be 0. KNOWN ISSUE: Edge due immediately ($100.70) leaves out the two $11.00 SIM cards, so it is lower than what the customer is actually asked to pay on the payment screen. Do not assert that figure; assert the payment-screen amount instead."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The Add accessories screen opens with the choices Scan accessory item and Browse accessories. The cart lists both lines and an Inventory row at $0.00, with Total due $122.70 - the phone line's $71.00 plus the tablet line's $51.70."
+        },
+        {
+          "action": "Click Continue without adding an accessory",
+          "expected": "The Collect payment from customer screen opens, reading Collect $122.70 with cash, card, or split the payment across multiple methods. It offers Pay with Cash, Debit card or Credit card, an Amount box, a Collect amount button and a Submit order button. The cart shows Total due $122.70, Total collected $0.00 and Balance due $122.70."
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit order",
+          "expected": "The order is left on the payment screen with both lines created and nothing collected. Both devices are now registered; the SIM cards are only used up if the order is submitted."
+        }
+      ]
+    }
+  ]
+}
