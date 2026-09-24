@@ -1,0 +1,127 @@
+{
+  "name": "byot-retire-orphans",
+  "project_id": 3,
+  "updates": [
+    {
+      "case_id": 3722,
+      "name": "[SUPERSEDED by QA-2824] Activate a customer-owned tablet with a physical SIM as a second line, end to end",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe whole walk - a first line completed, then the customer's tablet added as line 2 with a physical SIM, up to the order summary - is exactly what QA-2824 (Testmo 3781) runs.\n\nRun instead: QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3723,
+      "name": "[SUPERSEDED by QA-2684] Phone-or-tablet BYOD picker offers exactly Android, iPhone and Tablet",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe device-type list (BYOP Android, BYOP iPhone, Tablet) is one shared screen, already checked by QA-2684. The tablet option sits in that same list; nothing about it differs for a tablet.\n\nRun instead: QA-2684 (Show only valid device types when registering a customer's phone).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2684 (Show only valid device types when registering a customer's phone) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3726,
+      "name": "[SUPERSEDED by QA-2824] Dual-IMEI tablet prompts for the second IMEI before the device is created",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe second-IMEI prompt on a two-SIM tablet is a step inside QA-2824 (Testmo 3781), which pins a two-SIM tablet and confirms its second IMEI before the SIM step.\n\nRun instead: QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3727,
+      "name": "[SUPERSEDED by QA-2685 / QA-2824] Single-SIM tablet skips the second-IMEI prompt",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nWhether the second-IMEI screen appears depends on the carrier's record of the device having two SIM slots, not on it being a tablet. A one-SIM customer device going straight to the SIM step is walked by QA-2685; the two-SIM tablet by QA-2824.\n\nRun instead: QA-2685 (Activate a customer's own phone on a new account with a physical SIM); QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2685 (Activate a customer's own phone on a new account with a physical SIM); QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3730,
+      "name": "[SUPERSEDED by QA-2703] Declining the customer-owned offer aborts the tablet line cleanly",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nDeclining the customer-owned device and the line being cancelled is the same screen and the same outcome for a tablet as for a phone - covered by QA-2703.\n\nRun instead: QA-2703 (Cancel the line cleanly when the rep declines a customer-owned device).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2703 (Cancel the line cleanly when the rep declines a customer-owned device) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3731,
+      "name": "[SUPERSEDED by QA-2702] With the BYOD feature off, a customer-owned tablet cannot enter the flow",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe customer-owned switch is store-wide, not tablet-specific. With it off the rep is sent to RTPOS - covered by QA-2702.\n\nRun instead: QA-2702 (Route reps to RTPOS when BYOD activation is turned off).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2702 (Route reps to RTPOS when BYOD activation is turned off) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3732,
+      "name": "[SUPERSEDED by QA-2824] Customer-owned tablet is priced at zero with an untaxed device and a standard charged SIM",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe tablet charged at nothing, untaxed, while the SIM is still charged, is asserted on the cart and the order summary in QA-2824 (Testmo 3781).\n\nRun instead: QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3733,
+      "name": "[SUPERSEDED by QA-2824] A customer-owned tablet line is offered the BYOD-only plans",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nThe extra plans offered to a customer-owned tablet line are asserted at the plan step of QA-2824 (Testmo 3781).\n\nRun instead: QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2824 (Add a customer's own tablet as a second line and see it charged at nothing) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3734,
+      "name": "[SUPERSEDED by QA-2744] A dealer-stock tablet bypasses the customer-owned flow entirely",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nA store-stock tablet goes the ordinary sold-device route, never the customer-owned route - covered by QA-2744.\n\nRun instead: QA-2744 (Activate a dealer-stock tablet with a physical SIM as an added line).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2744 (Activate a dealer-stock tablet with a physical SIM as an added line) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3735,
+      "name": "[SUPERSEDED by QA-2690] Activate a customer-owned tablet on an eSIM",
+      "custom_requirements": "## Retired 2026-09-24 - do not automate\n\nThis case never had a Jira ticket and is a duplicate of work already in the backlog.\n\nPutting a customer device on an eSIM uses the same SIM screen as a phone - covered by QA-2690. The tablet eSIM route currently stalls on a known loading-spinner defect, so it cannot be automated today anyway.\n\nRun instead: QA-2690 (Activate a customer's eSIM phone using its 32-digit EID).\n\nIf the behaviour changes, update the covering ticket rather than reviving this case.",
+      "steps": [
+        {
+          "action": "Do not run this case - it is retired.",
+          "expected": "Run QA-2690 (Activate a customer's eSIM phone using its 32-digit EID) instead."
+        }
+      ]
+    },
+    {
+      "case_id": 3729,
+      "name": "[API-ONLY - not for UI automation] A device type that was not offered to the line is rejected and the rep can recover",
+      "custom_requirements": "## Not a UI automation case - 2026-09-24\n\nThe device-type screen only ever shows the types the system offers, so a rep cannot pick a type that was not offered. This refusal can only be reached by sending a request directly, which belongs to the senior API suite, not the UI automation backlog.\n\nDo not automate through the screen.",
+      "steps": [
+        {
+          "action": "Do not run this case through the UI.",
+          "expected": "Route to the senior API suite."
+        }
+      ]
+    }
+  ]
+}
