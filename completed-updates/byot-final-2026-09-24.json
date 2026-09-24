@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "filename": "byot-final-2026-09-24.json",
+  "updated": 1,
+  "total": 1,
+  "updates": [
+    {
+      "case_id": 3781,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    }
+  ]
+}
