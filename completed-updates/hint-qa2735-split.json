@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "filename": "hint-qa2735-split.json",
+  "updated": 1,
+  "total": 1,
+  "updates": [
+    {
+      "case_id": 3747,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    }
+  ]
+}
