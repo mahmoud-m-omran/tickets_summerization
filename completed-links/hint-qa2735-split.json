@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "filename": "hint-qa2735-split.json",
+  "links": [
+    {
+      "case_id": 3825,
+      "display_id": "QA-2857",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 1,
+  "total": 1
+}
