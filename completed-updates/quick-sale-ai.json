@@ -1,28 +1,118 @@
 {
   "status": "success",
   "filename": "quick-sale-ai.json",
-  "project_id": 3,
-  "updated": 2,
-  "total": 2,
+  "updated": 10,
+  "total": 10,
   "updates": [
     {
       "case_id": 3768,
-      "http": 200,
-      "fields": [
+      "changed": [
         "name",
         "custom_requirements",
         "custom_steps"
-      ]
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3769,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3770,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3771,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3772,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3773,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
     },
     {
       "case_id": 3774,
-      "http": 200,
-      "fields": [
+      "changed": [
         "name",
         "custom_requirements",
         "custom_steps"
-      ]
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3775,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3776,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
+    },
+    {
+      "case_id": 3778,
+      "changed": [
+        "name",
+        "custom_requirements",
+        "custom_steps"
+      ],
+      "http": "200",
+      "updated": true,
+      "error": null
     }
-  ],
-  "note": "Testmo PATCHes returned HTTP 200; the workflow job failed only on pushing this receipt (concurrent push from create-testmo-cases). Receipt written locally."
+  ]
 }
