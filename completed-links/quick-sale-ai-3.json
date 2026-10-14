@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "filename": "quick-sale-ai-3.json",
+  "links": [
+    {
+      "case_id": 3853,
+      "display_id": "QA-2886",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 1,
+  "total": 1
+}
