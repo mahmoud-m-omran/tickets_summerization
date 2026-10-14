@@ -1,0 +1,42 @@
+{
+  "ticket_key": "Quick Sale",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want an accessory that is not on the carrier's approved list to be refused when I try to sell it, so that the store never sells a product it is not allowed to carry",
+      "priority": "High",
+      "tags": [
+        "AccessorySale"
+      ],
+      "custom_requirements": "## What this test is about\nThe carrier only lets this store sell accessories that are on its approved list. The store's own catalog is bigger than that list - it still holds old items, store-made entries and products from other suppliers - and they all still show up when the rep browses. If Accessory Sale let any of them onto the invoice, the store would sell something it is not allowed to carry. So when the rep tries to add an accessory that is not on the approved list, the sale refuses it with a message naming the item, and the invoice stays as it was. This test walks a rep picking a not-approved accessory from the list and trying to add it.\n\n## Related tickets\nRTPL-3061, RTPL-3067, RTPL-3070 (approved accessory list for carrier-exclusive stores)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC.\n- The till has no customer tablet paired to it.\n- The invoice is empty at the start.\n\n## Test data\n- **Accessory that is not on the approved list:** Item number SCREEN REPLACEMENT, $50.00, 577 on hand  _(verified: UAT3 2026-10-14, Browse accessories search: one row SCREEN REPLACEMENT, QTY 577, SRP $50.00; adding it produced the refusal message below)_\n- **Expected refusal message:** Unapproved sku - SKU 'SCREEN REPLACEMENT' is not approved and cannot be added. Only approved accessories are allowed.  _(verified: UAT3 2026-10-14, captured verbatim from the message that appeared after clicking Add accessories)_\n\n## Screens (design reference)\n- **Not-approved accessory refused** — screenshot: `screens/live-2026-10-14-05-unapproved-refused.png` (attach from the run folder)\n\n## Automation Notes\n- The message appears briefly at the top right of the screen and clears itself, so capture it at the moment Add accessories is clicked rather than looking for it later. Match the title and the explanation; the extra Code, Correlation ID and Timestamp lines under it change every run.\n- Check the invoice as well as the message - a refusal that still adds the line would be the more serious defect of the two.\n- The panel shows the line Item Not Found under its heading for this item, because the catalog holds no description for it. Do not assert on that line; it is not the refusal.\n- Clean up afterwards by cancelling the sale (Cart options, Cancel cart) if a cart is left open, so the next run starts with an empty invoice.\n- If SCREEN REPLACEMENT is added without a refusal when you run this - it has been put on the approved list - contact the manual QA team to get another not-approved item number for this store rather than hunting for data alone.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC, DEALER CODE 30247306 and STATION showing the station the rep signed in on."
+        },
+        {
+          "action": "On the dashboard, click the Accessory Sale tile",
+          "expected": "The Accessory Sale screen opens with the heading ACCESSORY SALE and an empty invoice reading Inventory $0.00 and Total due $0.00."
+        },
+        {
+          "action": "Click Browse accessories, type SCREEN REPLACEMENT into the search box, then click that row",
+          "expected": "The list narrows to one row: SCREEN REPLACEMENT, QTY 577, SRP $50.00. Clicking it opens a panel headed Item detail SCREEN REPLACEMENT showing Price $50.00, Tax $5.00, Discount ($0.00) and Final price $55.00, with the buttons Add accessories and Close. Nothing on the panel warns that the item cannot be sold."
+        },
+        {
+          "action": "Click Add accessories",
+          "expected": "The item is refused. A message appears reading Unapproved sku, with the explanation SKU 'SCREEN REPLACEMENT' is not approved and cannot be added. Only approved accessories are allowed. The message names the item the rep just tried to add."
+        },
+        {
+          "action": "Read the invoice panel",
+          "expected": "The invoice is still empty - it reads Inventory $0.00 and Total due $0.00, and no line was added. The rep cannot carry a not-approved accessory into the sale."
+        },
+        {
+          "action": "Stop here - do NOT click Continue and do not take any payment",
+          "expected": "The sale is left on the Add accessories screen with nothing on the invoice."
+        }
+      ]
+    }
+  ],
+  "folder_id": 434,
+  "folder_name": "Quick Sale - AI"
+}
