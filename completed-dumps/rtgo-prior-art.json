@@ -2,7 +2,7 @@
   "status": "success",
   "filename": "rtgo-prior-art.json",
   "project_id": 3,
-  "count": 648,
+  "count": 652,
   "link_diagnostic": {
     "detail_endpoint": "/projects/3/cases?ids={id}",
     "detail_carries_issues": false,
@@ -32,6 +32,102 @@
     ]
   },
   "cases": [
+    {
+      "id": 3825,
+      "name": "Back out of the home internet acknowledgement and land back on IMEI validation, not the address form",
+      "folder_id": 430,
+      "actions": [
+        "Login into the app.",
+        "Start a new account for a new customer.",
+        "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+        "Enter the customer's phone number for the identity check and select Continue.",
+        "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
+        "Enter the SIM card number for the phone and select Continue.",
+        "Choose one of the offered phone numbers for the phone line and select Continue.",
+        "On \"Protection selection\", select Skip and confirm the decline when asked.",
+        "Choose the offered phone plan and select Continue.",
+        "On \"Promotion selection\", decline the promotions for the phone line and confirm when asked.",
+        "On \"Add on services\", select Skip for the phone line.",
+        "Select Create subscriber and confirm it in the panel that opens.",
+        "Select \"Add another line\" to start line 2.",
+        "Type the home internet gateway's serial number into the IMEI field and select Continue.",
+        "Select Continue on the \"Confirm home internet device\" panel.",
+        "Type the service address into the Address field, then type the Zip Code into the Zip Code field.",
+        "Select Continue to send the address for its eligibility check.",
+        "Select Back on the \"Home internet acknowledgement\" panel without ticking either acknowledgement.",
+        "Stop here. Do NOT submit any payment."
+      ],
+      "issues": []
+    },
+    {
+      "id": 3824,
+      "name": "As a Metro by T-Mobile authorized dealer, I want a monthly add-on service bought on a prepaid multi-month line to be included in the amount paid in advance",
+      "folder_id": 437,
+      "actions": [
+        "Login into the app with the UAT2 environment selected, and start a new account from the dashboard",
+        "Fill in the customer details, set the account PIN, answer the three security questions and click Continue",
+        "Skip ID verification and confirm",
+        "Enter the customer-owned phone's IMEI, confirm the not-found message, choose BYOP Android, click Continue and confirm the compatibility notice",
+        "Enter the SIM card number, click Continue, pick a phone number area and click Continue",
+        "Skip protection and confirm, then select plan 40L1WEB and click Continue",
+        "Select the required promotion and click Continue",
+        "On the International tab, select the Global Voice 100 Plus add-on and click Continue",
+        "Confirm Create subscriber, then choose Continue to order summary",
+        "Read the money rows on the Order Summary",
+        "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
+      ],
+      "issues": []
+    },
+    {
+      "id": 3823,
+      "name": "As a Metro by T-Mobile authorized dealer, I want an order where every line takes the multi-month prepay promotion to show only the prepaid total, with each line's three months added up",
+      "folder_id": 437,
+      "actions": [
+        "Login into the app with the UAT2 environment selected, and start a new account from the dashboard",
+        "Fill in the customer details, set the account PIN, answer the three security questions and click Continue",
+        "Skip ID verification and confirm",
+        "Enter the first customer-owned phone's IMEI, confirm the not-found message, choose BYOP Android, click Continue and confirm the compatibility notice",
+        "Enter the first SIM card number, click Continue, pick a phone number area and click Continue",
+        "Skip protection and confirm, then select plan 40L1WEB and click Continue",
+        "Select the required promotion, then click Continue and skip the add-ons",
+        "Confirm Create subscriber for the first line, then choose Add another line",
+        "Enter the second customer-owned phone's IMEI, confirm the not-found message, choose BYOP Android, click Continue and confirm the compatibility notice",
+        "Enter the second SIM card number, click Continue, pick a phone number area and click Continue",
+        "Skip protection and confirm, then select plan 40L1WEB for the second line as well and click Continue",
+        "Select the required promotion on the second line too, click Continue and skip the add-ons",
+        "Confirm Create subscriber for the second line, then choose Continue to order summary",
+        "Read the money rows on the Order Summary",
+        "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
+      ],
+      "issues": []
+    },
+    {
+      "id": 3822,
+      "name": "As a Metro by T-Mobile authorized dealer, I want an order that mixes a prepaid multi-month line with an ordinary line to show both the monthly total and the prepaid total on the Order Summary",
+      "folder_id": 437,
+      "actions": [
+        "Login into the app with the UAT2 environment selected, and start a new account from the dashboard",
+        "Fill in the customer details (first name, last name, email, street address, zip code 33179), set the account PIN and answer the three security questions, then click Continue",
+        "Click Skip on the ID verification page and confirm on the message that appears",
+        "Enter the first customer-owned phone's IMEI and confirm the message saying the device was not found",
+        "Choose BYOP Android, click Continue, and confirm the network compatibility notice",
+        "Enter the first SIM card number and click Continue",
+        "Enter the service area zip code, click Select for the phone number area, pick the first area from the list, then click Continue",
+        "Click Skip on the Protection selection page and confirm the decline message",
+        "Select the multi-month plan 40L1WEB and click Continue",
+        "Select the required promotion on the Promotion selection page",
+        "Click Continue to the Add on services page, then click Skip",
+        "Confirm Create subscriber for the first line",
+        "Choose Add another line",
+        "Enter the second customer-owned phone's IMEI, confirm the not-found message, choose BYOP Android, click Continue and confirm the compatibility notice",
+        "Enter the second SIM card number, click Continue, then pick a phone number area and click Continue",
+        "Skip protection and confirm, then select the ordinary plan MAU55 and click Continue",
+        "Continue past the promotions without selecting one, skip the add-ons, and confirm Create subscriber for the second line",
+        "Choose Continue to order summary and read the Order Summary page",
+        "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
+      ],
+      "issues": []
+    },
     {
       "id": 3821,
       "name": "TC-060 - Smoke: `rtpl-2866-store-scope-smoke.ps1` adaptation for each family",
@@ -370,13 +466,14 @@
       "name": "As a Metro by T-Mobile authorized dealer, I want a device whose IMEI fails the carrier's own check to be refused clearly, so that I am not left with an order I cannot finish or undo",
       "folder_id": 429,
       "actions": [
-        "Login into the app",
-        "On the dashboard, click the New account tile, fill in the customer details and click Continue",
-        "Click Skip, then click Continue on the confirmation dialog",
-        "Type the invalid IMEI from the test data into the IMEI box and click Continue",
-        "Confirm it as the customer's own device and continue to the device-type screen",
+        "Open the RT Go sign-in page, fill in Email address, Password and Application key with the team's QA sign-in, type EZLOGIC in Store and click Verify",
+        "Click the New account tile",
+        "Fill in the customer details from the test data, choose any three security questions, type an answer for each, and click Continue",
+        "Click Skip",
+        "Click Continue in the dialog",
+        "Type the invalid IMEI into the IMEI box and click Continue",
         "Choose Tablet and click Continue",
-        "Try to back out of the registration and return to the IMEI box to correct the number",
+        "Click the back arrow to the left of the page title Add BYOD device, at the top of the screen",
         "Stop here - do NOT take the order any further"
       ],
       "issues": []
@@ -404,24 +501,42 @@
       "name": "As a Metro by T-Mobile authorized dealer, I want to add a customer's own tablet as a second line on an order and see it charged at nothing, so that the customer pays only for the SIM and the service",
       "folder_id": 429,
       "actions": [
-        "Login into the app",
-        "On the dashboard, click the New account tile, fill in the customer details from the test data and click Continue",
-        "Click Skip, then click Continue on the confirmation dialog",
-        "Set up the first line: enter the first-line device's IMEI, confirm it as the customer's own device when prompted, enter the first SIM number, pick a new phone number for the service area, decline protection, choose the first plan offered, decline promotions and decline add-ons",
-        "Click Create subscriber for the first line",
+        "Open the RT Go sign-in page, fill in Email address, Password and Application key with the team's QA sign-in, type EZLOGIC in Store and click Verify",
+        "Click the New account tile",
+        "Fill in the customer details from the test data, choose any three security questions, type an answer for each, and click Continue",
+        "Click Skip",
+        "Click Continue in the dialog",
+        "Type the customer's phone IMEI into the IMEI box and click Continue",
+        "Choose BYOP Android and click Continue",
+        "Leave the second IMEI as it is and click Continue",
+        "Click IMEI 1 - PSIM",
+        "Type the SIM number and click Continue",
+        "Click the first number in the list",
+        "Click Continue",
+        "Click Skip",
+        "Click Yes, continue",
+        "Keep the plan that is already selected and click Continue",
+        "Click Continue",
+        "Click Skip",
+        "Click Create subscriber",
         "Click Add another line",
-        "Type the tablet's IMEI into the IMEI box and click Continue",
-        "Confirm that the tablet is the customer's own device and continue to the device-type screen",
+        "Type the customer's tablet IMEI into the IMEI box and click Continue",
         "Choose Tablet and click Continue",
-        "Accept the second IMEI that is offered and continue",
-        "Enter the second SIM number and continue",
-        "Pick a new phone number for the service area and continue",
-        "Decline protection and continue to the plan list",
-        "Choose a plan for the tablet and continue",
-        "Decline promotions, then decline add-ons",
-        "Click Create subscriber for the tablet line",
+        "Leave the second IMEI as it is and click Continue",
+        "Click IMEI 1 - PSIM",
+        "Type the SIM number and click Continue",
+        "Click the first number in the list",
+        "Click Continue",
+        "Click Skip",
+        "Click Yes, continue",
+        "Keep TAB30SD and click Continue",
+        "Click Continue",
+        "Click Skip",
+        "Click Create subscriber",
         "Click Continue to order summary",
-        "Stop here - do NOT go on to payment and do NOT submit the order"
+        "Click Continue",
+        "Click Continue without adding an accessory",
+        "Stop here - do NOT click Collect amount and do NOT click Submit order"
       ],
       "issues": []
     },
@@ -432,12 +547,14 @@
       "actions": [
         "Login into the app",
         "On the dashboard, click the Accessory Sale tile",
-        "Click Browse accessories, then click the row for the accessory named in the test data",
+        "Click Browse accessories, type 141761-5085 into the search box, then click that row",
         "Open the Price adjustment section of that panel",
-        "Choose Price and type a price a dollar below the store's floor",
-        "Clear the Amount box and type a price above the item's list price",
+        "Choose Price and type a price one dollar below the store's floor",
+        "Select everything in the Amount box and type the floor price exactly",
+        "Select everything in the Amount box and type the list price exactly",
+        "Select everything in the Amount box and type a price one dollar above the item's list price",
         "Clear the Amount box completely",
-        "Stop here - close the panel without adding the item"
+        "Stop here - click Close without adding the item"
       ],
       "issues": []
     },
@@ -459,7 +576,8 @@
         "Click Add accessories",
         "Click Continue",
         "Under Pay with, choose Cash and click Collect amount, leaving the pre-filled amount as it is",
-        "Click the cancel control at the foot of the invoice panel",
+        "Click Cart options at the foot of the invoice panel",
+        "Click Cancel cart",
         "Choose the reason named in the test data",
         "Click Yes, cancel transaction"
       ],
@@ -487,14 +605,16 @@
       "actions": [
         "Login into the app",
         "On the dashboard, click the Accessory Sale tile",
-        "Click Browse accessories, then click the row for the accessory named in the test data",
+        "Click Browse accessories, type 141761-5085 into the search box, then click that row",
         "Open the Price adjustment section of that panel",
         "Choose Price and type the agreed price into the Amount box",
-        "Switch to Percent and type the percentage to take off",
-        "Switch to Amount and type the dollars to take off",
-        "Switch back to Price, type the agreed price again and click Add accessories",
-        "Click the discounted line in the invoice to reopen it",
-        "Stop here - do NOT click Continue and do not take any payment"
+        "Click Percent",
+        "Select everything in the Amount box and type the percentage to take off",
+        "Click Amount, select everything in the Amount box and type the dollars to take off",
+        "Click Price, select everything in the Amount box, type the agreed price again and click Add accessories",
+        "Click the discounted line in the invoice, open Price adjustment, then click Close",
+        "Click Continue",
+        "Stop here - do NOT take any payment and do NOT click Submit"
       ],
       "issues": []
     },
@@ -712,9 +832,9 @@
       "name": "Activate a dealer-stock smartwatch on a paired plan with a rep-chosen voice line",
       "folder_id": 431,
       "actions": [
-        "On the added line, enter the A-Stock watch IMEI",
-        "On SIM validation, verify eSIM-only presentation and Continue",
-        "Select a new phone number and Continue; select protection and Continue",
+        "<p>On the added line, enter the A-Stock watch IMEI</p>",
+        "<p>On SIM validation, verify eSIM-only presentation and Continue</p>",
+        "<p>Select a new phone number and Continue; select protection and Continue</p>",
         "On Plan selection, select a PAIRED watch plan by socCode (e.g. AWATCHPR or FAMWATCH)",
         "Choose the primary voice line MDN in the pairing selector",
         "Continue from Plan selection",
@@ -808,12 +928,12 @@
     },
     {
       "id": 3747,
-      "name": "Back out of the home internet screens and land back on IMEI validation",
+      "name": "Back out of the home internet address eligibility screen and land back on IMEI validation",
       "folder_id": 430,
       "actions": [
-        "Login into the app.",
-        "Start a new account for a new customer.",
-        "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
+        "<p>Login into the app.</p>",
+        "<p>Start a new account for a new customer.</p>",
+        "<p>Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.</p>",
         "Enter the customer's phone number for the identity check and select Continue.",
         "Type the phone's serial number into the IMEI field and select Continue. This phone becomes line 1.",
         "Enter the SIM card number for the phone and select Continue.",
@@ -829,9 +949,6 @@
         "Select Back on the \"Home internet address eligibility\" screen.",
         "Type the same home internet gateway serial number into the IMEI field again and select Continue.",
         "Select Continue on the \"Confirm home internet device\" panel.",
-        "Type the service address into the Address field, then type the Zip Code into the Zip Code field.",
-        "Select Continue to send the address for its eligibility check.",
-        "Select Back on the \"Home internet acknowledgement\" panel without ticking either acknowledgement.",
         "Stop here. Do NOT submit any payment."
       ],
       "issues": []
@@ -850,7 +967,7 @@
       "name": "Refuse an incomplete or invalid home internet service address before the eligibility check",
       "folder_id": 430,
       "actions": [
-        "Login into the app.",
+        "<p>Login into the app.</p>",
         "Start a new account for a new customer.",
         "Fill in the new customer's details — first name, last name, email, street address, zip code, city and state — and select Continue.",
         "Enter the customer's phone number for the identity check and select Continue.",
@@ -991,72 +1108,64 @@
     },
     {
       "id": 3735,
-      "name": "Activate a customer-owned tablet on an eSIM",
+      "name": "[SUPERSEDED by QA-2690] Activate a customer-owned tablet on an eSIM",
       "folder_id": 429,
       "actions": [
-        "PLACEHOLDER — when the backend implements BYOD eSIM provisioning: enter the tablet IMEI, accept as BYOD, select 'Tablet', and proceed to SIM with the eSIM/EID option"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3734,
-      "name": "A dealer-stock tablet bypasses the customer-owned flow entirely",
+      "name": "[SUPERSEDED by QA-2744] A dealer-stock tablet bypasses the customer-owned flow entirely",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the A-Stock tablet IMEI"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3733,
-      "name": "A customer-owned tablet line is offered the BYOD-only plans",
+      "name": "[SUPERSEDED by QA-2824] A customer-owned tablet line is offered the BYOD-only plans",
       "folder_id": 429,
       "actions": [
-        "Rep reaches Plan selection on the BYOT line and the plan list loads",
-        "Compare against a non-BYOD control line (the primary A-Stock phone line's plan list)"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3732,
-      "name": "Customer-owned tablet is priced at zero with an untaxed device and a standard charged SIM",
+      "name": "[SUPERSEDED by QA-2824] Customer-owned tablet is priced at zero with an untaxed device and a standard charged SIM",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep completes IMEI entry, accepts as BYOD, selects 'Tablet', and continues past device creation",
-        "Rep opens the cart device drilldown",
-        "Rep validates the physical SIM and continues"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3731,
-      "name": "With the BYOD feature off, a customer-owned tablet cannot enter the flow",
+      "name": "[SUPERSEDED by QA-2702] With the BYOD feature off, a customer-owned tablet cannot enter the flow",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the customer-owned tablet IMEI",
-        "Rep dismisses the dialog"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3730,
-      "name": "Declining the customer-owned offer aborts the tablet line cleanly",
+      "name": "[SUPERSEDED by QA-2703] Declining the customer-owned offer aborts the tablet line cleanly",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the IMEI and reaches the customer-owned offer",
-        "Rep declines the customer-owned offer (goes back)",
-        "Rep enters a different valid IMEI on the same line"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3729,
-      "name": "A device type that was not offered to the line is rejected and the rep can recover",
+      "name": "[API-ONLY - not for UI automation] A device type that was not offered to the line is rejected and the rep can recover",
       "folder_id": 429,
       "actions": [
-        "Via API, submit a watch code not offered to this line",
-        "Via API, submit an unknown code",
-        "Rep selects 'Tablet' in the UI and taps Continue"
+        "Do not run this case through the UI."
       ],
       "issues": []
     },
@@ -1075,20 +1184,19 @@
     },
     {
       "id": 3727,
-      "name": "Single-SIM tablet skips the second-IMEI prompt",
+      "name": "[SUPERSEDED by QA-2685 / QA-2824] Single-SIM tablet skips the second-IMEI prompt",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the IMEI, accepts as BYOD, selects 'Tablet' and taps Continue"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3726,
-      "name": "Dual-IMEI tablet prompts for the second IMEI before the device is created",
+      "name": "[SUPERSEDED by QA-2824] Dual-IMEI tablet prompts for the second IMEI before the device is created",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters IMEI1, accepts as BYOD, selects 'Tablet' and taps Continue",
-        "Rep confirms/enters the second IMEI and continues"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
@@ -1118,34 +1226,19 @@
     },
     {
       "id": 3723,
-      "name": "Phone-or-tablet BYOD picker offers exactly Android, iPhone and Tablet",
+      "name": "[SUPERSEDED by QA-2684] Phone-or-tablet BYOD picker offers exactly Android, iPhone and Tablet",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the customer-owned tablet IMEI",
-        "Rep continues, accepting the device as customer-owned (BYOD)",
-        "Rep inspects the device type picker screen"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
     {
       "id": 3722,
-      "name": "Activate a customer-owned tablet with a physical SIM as a second line, end to end",
+      "name": "[SUPERSEDED by QA-2824] Activate a customer-owned tablet with a physical SIM as a second line, end to end",
       "folder_id": 429,
       "actions": [
-        "On the added line (line 2), rep enters the customer-owned tablet IMEI",
-        "Rep continues, accepting the device as customer-owned (BYOD)",
-        "Rep selects the 'Tablet' option (selection only — no advance)",
-        "Rep taps Continue",
-        "Rep enters the physical SIM ICCID",
-        "Rep taps Continue on SIM validation",
-        "Rep keeps 'New phone number' with the first available MDN and taps Continue",
-        "Rep selects the first eligible protection (selection only), then taps Continue",
-        "Rep keeps the pre-selected plan (index 0) and taps Continue",
-        "Rep continues through Promotion selection without selecting (separate step from add-ons)",
-        "Rep continues through Add on services without selecting (separate step from promotions)",
-        "Rep confirms 'Create subscriber' then 'Continue to order summary'",
-        "Rep reviews the Order Summary and continues to Add Accessory (adds zero accessories)",
-        "Rep collects CASH for the exact balance due and completes payment"
+        "Do not run this case - it is retired."
       ],
       "issues": []
     },
