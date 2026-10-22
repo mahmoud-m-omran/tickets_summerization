@@ -1,0 +1,141 @@
+{
+  "ticket_key": "Prepaid Tax",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the details of an accessory on the invoice to show Prepaid Tax as its own amount, so that I can explain to the customer exactly what makes up the final price",
+      "priority": "High",
+      "tags": [
+        "PrepaidTax"
+      ],
+      "custom_requirements": "## What this test is about\nIn a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, plans and small accessories such as cases and speakers. Accessory Sale is the short path for a customer who only wants to buy something off the shelf: the rep puts the items on an invoice, takes the money and hands over a receipt. Some stores charge a second tax on top of the ordinary sales tax. It is called Prepaid Tax, and it appears on the screen as PP Tax. The rep must be able to see it as its own amount, never mixed into the sales tax, and the amount the customer is asked to pay must include it. This test puts one accessory on the invoice and opens its detail panel, which is where the rep sees how the price is built up. It proves the panel lists the item price, the ordinary sales tax and the Prepaid Tax on separate rows, and that the final price is the three added together.\n\n## Related tickets\nRTPL-3031 (Implement Prepaid Tax (PP Tax) Calculation), RTPL-1509 (Add PP Tax)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC and the environment shown in the user menu reads UAT2.\n- The Accessory Sale invoice is empty at the start. If a previous sale is still open on this till, cancel it before beginning.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens, shown in the page header after sign-in)_\n- **Accessory 1:** Item number BITTYVENOM, Bitty Boomers MARVEL VENOM Bluetooth Speaker, price $19.99, sales tax $2.00, PP Tax $0.20, final price $22.19  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens)_\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: the PP Tax amounts above are what this store charged on 2026-10-22 (1% of each item's price: $0.20 on $19.99 and $0.10 on $9.99). If the store's rate has been changed since, the amounts will differ, so re-read the item detail panel first and update the expected figures.\n- If the pinned accessories are out of stock or the amounts differ from this ticket, try another accessory from Browse accessories and recompute from its item detail panel. If you still cannot get matching data, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Never click Collect amount or Submit. The test ends before any payment is taken.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the Accessory Sale tile",
+          "expected": "The Accessory Sale screen opens with the heading ACCESSORY SALE. The left side shows Add accessories with two choices, Scan accessory item and Browse accessories, and a box reading Scan or type item #. The invoice panel on the right is headed Review invoice and reads Total due $0.00, with no lines listed."
+        },
+        {
+          "action": "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+          "expected": "A message Adding item and calculating total... shows briefly. The invoice then lists one line, Bitty Boomers MARVEL VENOM Bluetooth Speaker $22.19. Inventory reads $22.19, a row PP Tax reads $0.20, and Total due reads $22.19. The Continue button is available."
+        },
+        {
+          "action": "Click the small information icon at the start of the Bitty Boomers MARVEL VENOM Bluetooth Speaker line on the invoice",
+          "expected": "A panel opens headed Item detail BITTYVENOM with the item name Bitty Boomers MARVEL VENOM Bluetooth Speaker and three sections: Item details, Price adjustment and Tax settings. The Tax settings section reads Note: Tax is applied to the discounted price and lists Price $19.99, Tax $2.00, PP Tax $0.20, Discount ($0.00) and Final price $22.19. Two buttons are offered: Remove from invoice and Update item (greyed out)."
+        },
+        {
+          "action": "Click the X at the top right of the panel",
+          "expected": "The panel closes. The invoice is unchanged: one line of $22.19, a PP Tax row of $0.20 and Total due $22.19."
+        },
+        {
+          "action": "Stop here - do NOT click Continue and do not take any payment",
+          "expected": "Nothing further is checked."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want an invoice with two different accessories to show one PP Tax amount that adds both items together and to ask the customer for the full total, so that the customer is charged exactly what the screen shows",
+      "priority": "Critical",
+      "tags": [
+        "PrepaidTax"
+      ],
+      "custom_requirements": "## What this test is about\nIn a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, plans and small accessories such as cases and speakers. Accessory Sale is the short path for a customer who only wants to buy something off the shelf: the rep puts the items on an invoice, takes the money and hands over a receipt. Some stores charge a second tax on top of the ordinary sales tax. It is called Prepaid Tax, and it appears on the screen as PP Tax. The rep must be able to see it as its own amount, never mixed into the sales tax, and the amount the customer is asked to pay must include it. This test puts two different accessories on the invoice and follows the money to the payment screen. It proves the PP Tax row on the invoice is the two items' Prepaid Tax added together, that Total due includes it, and that the payment screen asks the rep to collect that exact total and no other. It stops before any payment is taken, so the same accessories can be used again.\n\n## Related tickets\nRTPL-3031 (Implement Prepaid Tax (PP Tax) Calculation)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC and the environment shown in the user menu reads UAT2.\n- The Accessory Sale invoice is empty at the start. If a previous sale is still open on this till, cancel it before beginning.\n- The till has no customer tablet paired to it, so the sale goes straight from the invoice to the payment screen.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens, shown in the page header after sign-in)_\n- **Accessory 1:** Item number BITTYVENOM, Bitty Boomers MARVEL VENOM Bluetooth Speaker, price $19.99, sales tax $2.00, PP Tax $0.20, final price $22.19  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens)_\n- **Accessory 2:** Item number 101026, POPSOCKETS CEILING, price $9.99, sales tax $1.00, PP Tax $0.10, final price $11.09  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens)_\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: the PP Tax amounts above are what this store charged on 2026-10-22 (1% of each item's price: $0.20 on $19.99 and $0.10 on $9.99). If the store's rate has been changed since, the amounts will differ, so re-read the item detail panel first and update the expected figures.\n- If the pinned accessories are out of stock or the amounts differ from this ticket, try another accessory from Browse accessories and recompute from its item detail panel. If you still cannot get matching data, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Never click Collect amount or Submit. The test ends before any payment is taken.\n- CONFIRM BEFORE AUTOMATING: step 6 was walked with Cash already highlighted when the payment screen opened; confirm that clicking it leaves the amount at 33.28.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the Accessory Sale tile",
+          "expected": "The Accessory Sale screen opens with the heading ACCESSORY SALE. The left side shows Add accessories with two choices, Scan accessory item and Browse accessories, and a box reading Scan or type item #. The invoice panel on the right is headed Review invoice and reads Total due $0.00, with no lines listed."
+        },
+        {
+          "action": "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+          "expected": "The invoice lists one line, Bitty Boomers MARVEL VENOM Bluetooth Speaker $22.19, with a PP Tax row of $0.20 and Total due $22.19."
+        },
+        {
+          "action": "Click the box reading Scan or type item #, type 101026 and press Enter",
+          "expected": "The invoice now lists two lines, Bitty Boomers MARVEL VENOM Bluetooth Speaker $22.19 and POPSOCKETS CEILING $11.09. Inventory reads $33.28, the PP Tax row reads $0.30 - the two items' $0.20 and $0.10 added together - and Total due reads $33.28."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The screen heading changes to PAYMENT and reads Collect payment from customer, with the line Collect $33.28 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card, and the Amount box reads 33.28. The invoice panel reads Inventory $33.28, Customer payments $0.00, Cash $0.00, PP Tax $0.30, Total due $33.28, Total collected $0.00, Balance due $33.28 and Change due back to customer $0.00, and shows a Collect amount button and a greyed-out Submit button. Below the invoice is the line Receipt: English, small, Quantity 1 - Edit Settings."
+        },
+        {
+          "action": "Under Pay with, click Cash",
+          "expected": "Cash is selected and the Amount box reads 33.28, matching the Balance due of $33.28."
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit",
+          "expected": "Nothing further is checked."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer working in Spanish, I want the Prepaid Tax row on the payment screen to be labelled Impuesto PP, so that I can read the invoice to a Spanish-speaking customer in their own language",
+      "priority": "Medium",
+      "tags": [
+        "PrepaidTax"
+      ],
+      "custom_requirements": "## What this test is about\nIn a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, plans and small accessories such as cases and speakers. Accessory Sale is the short path for a customer who only wants to buy something off the shelf: the rep puts the items on an invoice, takes the money and hands over a receipt. Some stores charge a second tax on top of the ordinary sales tax. It is called Prepaid Tax, and it appears on the screen as PP Tax. The rep must be able to see it as its own amount, never mixed into the sales tax, and the amount the customer is asked to pay must include it. Many Puerto Rico customers speak Spanish, so reps can switch the whole screen into Spanish from the user menu. This test proves the Prepaid Tax row is labelled in Spanish like the rest of the payment screen and still shows the right amount.\n\n## Related tickets\nRTPL-3031 (Implement Prepaid Tax (PP Tax) Calculation)\n\n## Preconditions\n- The rep is signed in at store EZLOGIC and the environment shown in the user menu reads UAT2.\n- The Accessory Sale invoice is empty at the start. If a previous sale is still open on this till, cancel it before beginning.\n- The rep's screen language is English at the start.\n- The till has no customer tablet paired to it.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens, shown in the page header after sign-in)_\n- **Accessory 1:** Item number BITTYVENOM, Bitty Boomers MARVEL VENOM Bluetooth Speaker, price $19.99, sales tax $2.00, PP Tax $0.20, final price $22.19  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens)_\n- **Accessory 2:** Item number 101026, POPSOCKETS CEILING, price $9.99, sales tax $1.00, PP Tax $0.10, final price $11.09  _(verified: UAT2 2026-10-22, read live in the Accessory Sale screens)_\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: the PP Tax amounts above are what this store charged on 2026-10-22 (1% of each item's price: $0.20 on $19.99 and $0.10 on $9.99). If the store's rate has been changed since, the amounts will differ, so re-read the item detail panel first and update the expected figures.\n- If the pinned accessories are out of stock or the amounts differ from this ticket, try another accessory from Browse accessories and recompute from its item detail panel. If you still cannot get matching data, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Never click Collect amount or Submit. The test ends before any payment is taken.\n- The screen only changes language after the page is refreshed. Clicking the language choice again to go back to English also needs a refresh before the screen reads English, so end the test with the language choice set back to English even if the screen still looks Spanish.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the Accessory Sale tile",
+          "expected": "The Accessory Sale screen opens with the heading ACCESSORY SALE. The left side shows Add accessories with two choices, Scan accessory item and Browse accessories, and a box reading Scan or type item #. The invoice panel on the right is headed Review invoice and reads Total due $0.00, with no lines listed."
+        },
+        {
+          "action": "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+          "expected": "The invoice lists one line, Bitty Boomers MARVEL VENOM Bluetooth Speaker $22.19, with a PP Tax row of $0.20 and Total due $22.19."
+        },
+        {
+          "action": "Click the box reading Scan or type item #, type 101026 and press Enter",
+          "expected": "The invoice now lists two lines, Bitty Boomers MARVEL VENOM Bluetooth Speaker $22.19 and POPSOCKETS CEILING $11.09. Inventory reads $33.28, the PP Tax row reads $0.30 - the two items' $0.20 and $0.10 added together - and Total due reads $33.28."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The screen heading changes to PAYMENT and reads Collect payment from customer, with the line Collect $33.28 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card, and the Amount box reads 33.28. The invoice panel reads Inventory $33.28, Customer payments $0.00, Cash $0.00, PP Tax $0.30, Total due $33.28, Total collected $0.00, Balance due $33.28 and Change due back to customer $0.00, and shows a Collect amount button and a greyed-out Submit button. Below the invoice is the line Receipt: English, small, Quantity 1 - Edit Settings."
+        },
+        {
+          "action": "Click Open user menu in the page header",
+          "expected": "A panel headed User settings opens on the right with the Environment box reading UAT2, a Language choice of English and Español with English selected, and a Modes choice."
+        },
+        {
+          "action": "Click Español",
+          "expected": "Español shows as selected. The payment screen behind the panel may still be in English until the page is refreshed."
+        },
+        {
+          "action": "Click the X at the top right of the User settings panel",
+          "expected": "The panel closes."
+        },
+        {
+          "action": "Refresh the browser page",
+          "expected": "The same payment step comes back in Spanish and the browser tab is titled Venta de accesorios - RT Go. The left side reads Cobrar pago del cliente and Cobra $33.28 en efectivo, con tarjeta o divide el pago entre varios métodos., with Pagar con * and the choices Efectivo, Tarjeta de débito and Tarjeta de crédito, then Monto * and a Recolectar monto button. The invoice panel reads Inventario $33.28, Pagos del cliente $0.00, Efectivo $0.00, Impuesto PP $0.30, Total de vencido $33.28, Total de cobrado $0.00, Saldo pendiente $33.28 and Cambio a devolver al cliente $0.00, with an Enviar button, and below it the line Recibo: Inglés, small, Cantidad 1 - Editar configuración."
+        },
+        {
+          "action": "Click Abrir menú de usuario in the page header",
+          "expected": "A panel headed Configuración del usuario opens with the Entorno box reading UAT2 and an Idioma choice of Inglés and Español, with Español selected."
+        },
+        {
+          "action": "Click Inglés",
+          "expected": "Inglés shows as selected, which puts the rep's language back to English for the next test."
+        },
+        {
+          "action": "Click the X at the top right of the panel",
+          "expected": "The panel closes."
+        },
+        {
+          "action": "Stop here - do NOT click Recolectar monto and do NOT click Enviar",
+          "expected": "Nothing further is checked."
+        }
+      ]
+    }
+  ],
+  "folder_name": "Prepaid Tax - AI"
+}
