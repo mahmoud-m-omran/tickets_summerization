@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "filename": "prepaid-tax.json",
+  "ticket_key": "Prepaid Tax",
+  "ticket_title": "AI",
+  "folder_id": 447,
+  "folder_name": "Prepaid Tax - AI",
+  "cases_created": 3,
+  "case_ids": [
+    3855,
+    3856,
+    3857
+  ]
+}
