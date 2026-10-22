@@ -1,0 +1,26 @@
+{
+  "status": "success",
+  "filename": "prepaid-tax.json",
+  "links": [
+    {
+      "case_id": 3855,
+      "display_id": "QA-2914",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3856,
+      "display_id": "QA-2915",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 3857,
+      "display_id": "QA-2916",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 3,
+  "total": 3
+}
