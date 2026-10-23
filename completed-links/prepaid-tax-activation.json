@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "filename": "prepaid-tax-activation.json",
+  "links": [
+    {
+      "case_id": 3858,
+      "display_id": "QA-2917",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 1,
+  "total": 1
+}
