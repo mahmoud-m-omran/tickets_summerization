@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "filename": "dsi.json",
+  "ticket_key": "DSI (Dealer Sourced Inventory)",
+  "ticket_title": "AI",
+  "folder_id": 450,
+  "folder_name": "DSI - AI",
+  "cases_created": 4,
+  "case_ids": [
+    4034,
+    4035,
+    4036,
+    4037
+  ]
+}
