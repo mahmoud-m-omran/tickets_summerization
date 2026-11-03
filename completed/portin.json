@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "filename": "portin.json",
+  "ticket_key": "Port-In Activations",
+  "ticket_title": "AI",
+  "folder_id": 449,
+  "folder_name": "Port-In Activations - AI",
+  "cases_created": 6,
+  "case_ids": [
+    4028,
+    4029,
+    4030,
+    4031,
+    4032,
+    4033
+  ]
+}
