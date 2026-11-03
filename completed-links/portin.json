@@ -1,0 +1,44 @@
+{
+  "status": "success",
+  "filename": "portin.json",
+  "links": [
+    {
+      "case_id": 4028,
+      "display_id": "QA-2947",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4029,
+      "display_id": "QA-2942",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4030,
+      "display_id": "QA-2943",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4031,
+      "display_id": "QA-2944",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4032,
+      "display_id": "QA-2945",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4033,
+      "display_id": "QA-2946",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 6,
+  "total": 6
+}
