@@ -1,0 +1,327 @@
+{
+  "ticket_key": "DSI (Dealer Sourced Inventory)",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to sell a phone the store sourced itself (a DSI phone) on a new account, so that RT Go registers it with the carrier as a store device, prices it as store stock and reaches the payment screen",
+      "priority": "Critical",
+      "tags": [
+        "DSI"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the phone as well. Most store phones come through the carrier, but a store may also buy phones on its own - the trade calls these DSI phones (Dealer Sourced Inventory). The carrier does not know such a phone until the store registers it, so the first time a rep scans a DSI phone RT Go opens a screen called Add store device with the choice BYOD DSI already picked; one click on Continue registers the phone and the sale carries on. The phone must then be sold exactly like any other store phone: at the store's own price (which may be nothing), with tax, with a free SIM card, with no activation fee, and it must come out of the store's stock when the sale is finished. Getting this wrong costs the store money: a DSI phone treated as the customer's own phone is given away for nothing and never leaves the stock count. RT Go has no DSI badge anywhere - the phone is recognised by its item number (DSI-SM-A516U1 for the phone used in this test) and its price. This test walks the whole thing for a DSI phone the carrier has never seen: the Add store device screen opens with BYOD DSI already chosen, one Continue registers the phone, the phone shows as a store item at the store's price with a free SIM and no activation fee, the plan list includes the plans the carrier offers for customer-owned phones, and the order reaches the payment screen. It stops before any money is taken.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Store stock (also called dealer stock) means a phone the store sells from its own shelves. A DSI phone (Dealer Sourced Inventory) is store stock the store bought on its own rather than through the carrier, so the carrier does not know the phone until the store registers it; in RT Go such a phone is listed under an item number that starts with DSI-. A customer's own phone (also called BYOD) is a phone the customer already owns, which is sold for nothing and never comes out of the store's stock. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan; plan codes that contain BYOD are plans the carrier offers for customer-owned phones. Registering a phone with the carrier means telling the carrier the phone exists so it can be activated.\n\n## Related tickets\nRTPL-3189 (DSI epic), RTPL-3201 (sold as dealer stock), RTPL-3202 (straight to the store-device step), RTPL-3203 (BYOD DSI pre-selected), RTPL-3423 (model check skipped), RTPL-3304 (registered phone scanned again)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself with an Environment box; set it to UAT2 (that is where the store phones below were checked). If the drawer does not open, the same Environment box is in the user menu at the top right.\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The store phone below is still in the store's stock (it has not been sold).\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name DSI, middle initial T, last name TESTER; email: type a brand-new address each run, for example dsi.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values on every walk)_\n- **DSI phone, not yet registered with the carrier:** IMEI 350320361003534 (store item DSI-SM-A516U1, DSI-SAM GALAXY A51 5G SM-A516U1). Store price today: $0.00 (the QA store has no price on this item)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: opened the Add store device screen on its first scan (twice, with a breadcrumb back-out in between) and was left unregistered - Continue was never clicked on it. The identical path on 350320368456800 (Add store device -> Continue -> ... -> Create subscriber -> Collect payment $60.00, order 630036412) is what this ticket describes. SINGLE USE - clicking Continue on Add store device registers it with the carrier, after which it behaves like the registered phone of the other DSI tickets. The store had 10 of these phones in stock on 2026-11-03 but RT Go shows no list of serial numbers; when this one is used up, ask the manual QA team for a fresh DSI serial (they add them to the QA store with the seed script from the RTPL-3203 comment of 2026-10-06))_\n- **SIM card:** ICCID 8901260000084313045F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F, ...027F and ...036F were all accepted at SIM validation today; 009F and 036F were then used up by a finished Create subscriber (the next scan answers SIM card is active or used. Please try a new SIM.), so 045F is the next unused one. If refused, take 8901260000084313054F, then the next row up the sheet)_\n- **Plan:** MAU55, $60.00 per month (already marked Selected on the Plan selection screen). The list also shows the customer-owned-phone plans 4F100L1AP $40.00, BYODU35 $35.00 and BYOD10GB3 $30.00  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; Plan selection read the same list on three walks; cart read Plan (MAU55) $60.00 / mo.)_\n- **Expected amounts:** Device $0.00, SIM card $0.00, no activation fee row. After the plan: Estimated monthly $60.00, Total due $60.00. Order summary: Total MRC $60.00, Total taxes & fees $0.00, Edge due immediately $60.00. Payment screen: Collect $60.00  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; read off the Cart, the Order summary and the Collect payment from customer screen on two finished walks (orders 630036370 and 630036412). CONFIRM BEFORE AUTOMATING: these amounts hold while the QA store has no price on item DSI-SM-A516U1; if someone sets a store price, the Device row, Tax and every total change - re-read the Cart at SIM validation and update the figures)_\n\n## Automation Notes\n- Create subscriber uses up the SIM card and activates the phone with the carrier: once that step succeeds, neither the SIM nor the DSI phone can be used for another run (the SIM answers SIM card is active or used). Take the next SIM from the Astock sheet of the UAT2 November data workbook and ask the manual QA team for a fresh DSI serial. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- RT Go has no list of the store's DSI serial numbers. The manual QA team adds them to the QA store with the seed script attached to the RTPL-3203 comment of 2026-10-06 (phone or watch); a serial added that way is unregistered with the carrier until someone clicks Continue on Add store device.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until a number is picked or it is closed.\n- There is no Back button on the Protection, Plan, Promotion and Add-on screens; the browser Back button leaves the order. To abandon a line before Create subscriber, open Cart options in the Cart and pick Cancel line (Cancel line and keep account in cart to continue); a window headed Cancel transaction asks Tell us why you want to cancel this order with the choices No issue to report, Customer changed their mind and System or technical issue and the buttons Yes, cancel transaction and No, go back; after Yes, cancel transaction the order is back at IMEI validation. The phone and SIM are not used up by a cancelled line.\n- CONFIRM BEFORE AUTOMATING: all dollar amounts assume the QA store has no price on item DSI-SM-A516U1 (Device $0.00). A store price of 149.99 was used once on QA for RTPL-3201 and reset; if the price comes back, the Device row shows the price plus tax and every total moves.\n- The phone's first scan is the only time the Add store device screen shows for that phone. After this run the phone is registered with the carrier; a later scan goes straight to SIM validation (that path has its own ticket).",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory. Below the IMEI box a service tip reads If this is a BYOD device, it must be unlocked to activate on the Metro by T-Mobile network. Contact the customer's previous carrier for assistance."
+        },
+        {
+          "action": "Type the DSI phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows for a few seconds. The heading then changes to Add store device and the screen reads Select the device type to register this store device with the carrier. Under the label Select device type there are exactly two cards, BYOD DSI and Tablet. The BYOD DSI card is already highlighted (selected) when the screen opens; the Tablet card is not. The Continue button is available straight away. No window headed Add to Edge inventory? and no drawer headed IMEI not found appears. The Cart lists the IMEI with $0.00, Estimated monthly $0.00 and Total due $0.00, with no Device row yet. SERVICE CHECK (for the automation engineer): the process state reads reasonCodeForAction \"select-byod-device-type\", availableByodDeviceTypes [\"BYOD-DSI\", \"BYOT\"], and deviceValidationDetails.isDsi true, localItemSku \"DSI-SM-A516U1\", inLocalInventory true, isByod false."
+        },
+        {
+          "action": "Click Continue without touching either card",
+          "expected": "The message Processing request... shows for up to ten seconds while the phone is registered with the carrier. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. Under Confirm IMEI the card IMEI 1 - PSIM shows the phone's IMEI and is selected, with an ICCID SIM * box below it. The Cart now lists the IMEI with $0.00 and a Device $0.00 row; Estimated monthly $0.00, Total due $0.00. SERVICE CHECK (for the automation engineer): deviceValidationDetails reads stage \"DeviceAddedAsByod\", selectedByodDeviceType \"BYOD-DSI\", isDsi true, isByod false, deviceSource \"D\", localItemSku \"DSI-SM-A516U1\", basePrice 0, isTaxable true."
+        },
+        {
+          "action": "In the Cart, click the Device row",
+          "expected": "A drawer slides in from the right headed Device detail with these rows: Device type Handset, Item ID DSI-SM-A516U1, Description DSI-SAM GALAXY A51 5G SM-A516U1, IMEI (the phone's IMEI), Price $0.00, a Price adjustment link, Tax $0.00, Final price $0.00, and a Back button. The item number starts with DSI-, which is how RT Go shows the phone is store stock."
+        },
+        {
+          "action": "Click Back in the drawer",
+          "expected": "The drawer closes and the SIM validation screen is unchanged."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 - the SIM is free, as for any store phone - and still reads Total due $0.00. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "In the Phone number npa nxx window click the first number offered",
+          "expected": "The window closes and the number shows on the Phone number selection screen; Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, reading The quoted price per month for optional device protection does not include taxes and fees, which may be applicable in addition to the price in some locations. with Skip and Continue buttons. The Cart lists the IMEI, Device $0.00, SIM card $0.00 and Phone number (347) 499-****; there is NO activation fee row. Total due $0.00. CONFIRM BEFORE AUTOMATING: on 2026-11-03 no protection products were listed for this phone and Skip became available after a few seconds; if products are listed, skip them all the same."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? asks Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($60.00 per month, $55 with AutoPay-$60 1st Month) already marked Selected. Because the phone is registered as BYOD DSI, the list also shows the plans the carrier offers for customer-owned phones: Promo 4 FOR 100 BYOD L1 (4F100L1AP, $40.00 per month), $35 UNL w/AutoPay-$40 Month 1 (BYODU35, $35.00 per month) and $30 10GB BYOD PROMO (BYOD10GB3, $30.00 per month), next to BFLX50, L14F100, 4010NP, 4510GBAP, 40L1WEB, 35GBNP and PYWPLAN. The Cart shows Protection Declined, Plan (MAU55) $60.00 / mo., Estimated monthly $60.00 and Total due $60.00. SERVICE CHECK (for the automation engineer): the configure-plan response reads planConfigDetails.selectedPlanSocCode \"MAU55\" and selectedPlanRate 60."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection. CONFIRM BEFORE AUTOMATING: on 2026-11-03 the screen read Great news, customer is eligible for 0 promotions. Select then continue below. with An unexpected error occurred loading options. Click below to retry. and a Retry button - the carrier test system was not answering; if promotion cards show instead, decline them all the same. The buttons Decline and Continue are shown."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied. with the buttons Continue and Back."
+        },
+        {
+          "action": "In that window click Continue",
+          "expected": "The heading changes to Add on services with Skip and Continue buttons. The Cart still shows Device $0.00, SIM card $0.00, Plan (MAU55) $60.00 / mo. and Total due $60.00. SERVICE CHECK (for the automation engineer): the configure-promotions response reads promotionsSkipped true and selectedPromotions empty."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI <the phone's IMEI>. Click create subscriber to continue. with the buttons Create subscriber and Back."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary. (Seen on 2026-11-03 for a phone registered a minute earlier with plan MAU55, order 630036412. If instead a window headed Activation failed reads This activation could not be completed. Contact the support team. Invalid Device Number., the carrier refused the phone - click OK, note the IMEI and the plan and contact the manual QA team; on 2026-11-03 this happened only when the plan BYODU35 had been chosen.)"
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. Under Due Immediately it lists an Order ID, an Account number, Lines in order 1, Total MRC $60.00, Total taxes & fees $0.00 and Edge due immediately $60.00, then the SOS form language choices English and Español, an Enter Metro bill payment box and Back and Continue buttons. The Cart shows the IMEI with $60.00, Device $0.00, SIM card $0.00, Phone number (347) 499-****, Protection Declined, Plan (MAU55) $60.00 / mo., Add-on Declined, Estimated monthly $60.00, Total due $60.00 and an Add a line link."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Add accessories with Scan accessory item and Browse accessories. The Cart adds Inventory $0.00 and still reads Total due $60.00."
+        },
+        {
+          "action": "Click Continue without adding an accessory",
+          "expected": "The heading changes to Collect payment from customer and reads Collect $60.00 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card with an Amount box and a Collect amount button. The Cart lists the phone line $60.00, Customer payments $0.00, Cash $0.00, Total due $60.00, Total collected $0.00, Balance due $60.00 and Change due back to customer $0.00. Below the Cart is the line Receipt: English, small, Quantity 1 - Edit Settings and a greyed-out Submit order button. (On 2026-11-03 no Financing drawer appeared for this $60.00 order; if one does, click No thanks and then Decline.)"
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit order",
+          "expected": "Nothing further is checked. The order is left unpaid so the store phone is not deducted from stock."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to scan a store-sourced (DSI) phone that was already registered with the carrier, so that RT Go skips the device-type step, still sells it as a store device and keeps that even after I refresh the page",
+      "priority": "High",
+      "tags": [
+        "DSI"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the phone as well. Most store phones come through the carrier, but a store may also buy phones on its own - the trade calls these DSI phones (Dealer Sourced Inventory). The carrier does not know such a phone until the store registers it, so the first time a rep scans a DSI phone RT Go opens a screen called Add store device with the choice BYOD DSI already picked; one click on Continue registers the phone and the sale carries on. The phone must then be sold exactly like any other store phone: at the store's own price (which may be nothing), with tax, with a free SIM card, with no activation fee, and it must come out of the store's stock when the sale is finished. Getting this wrong costs the store money: a DSI phone treated as the customer's own phone is given away for nothing and never leaves the stock count. RT Go has no DSI badge anywhere - the phone is recognised by its item number (DSI-SM-A516U1 for the phone used in this test) and its price. A DSI phone is registered with the carrier only once, the first time it is scanned. If the rep scans it again later - for example after a cancelled sale - the carrier already knows it, so RT Go must not ask for the device type again, and must still treat the phone as store stock rather than as the customer's own phone. The same must hold when the rep refreshes the browser page in the middle of the order: an earlier version of RT Go forgot that the phone was store stock after a refresh. This test scans an already registered DSI phone, carries the order to the plan step, refreshes the page, checks the phone is still a store item, and goes on to the payment screen. It stops before any money is taken.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Store stock (also called dealer stock) means a phone the store sells from its own shelves. A DSI phone (Dealer Sourced Inventory) is store stock the store bought on its own rather than through the carrier, so the carrier does not know the phone until the store registers it; in RT Go such a phone is listed under an item number that starts with DSI-. A customer's own phone (also called BYOD) is a phone the customer already owns, which is sold for nothing and never comes out of the store's stock. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan; plan codes that contain BYOD are plans the carrier offers for customer-owned phones. Registering a phone with the carrier means telling the carrier the phone exists so it can be activated.\n\n## Related tickets\nRTPL-3189 (DSI epic), RTPL-3201 (sold as dealer stock), RTPL-3202 (straight to the store-device step), RTPL-3203 (BYOD DSI pre-selected), RTPL-3423 (model check skipped), RTPL-3304 (registered phone scanned again)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself with an Environment box; set it to UAT2 (that is where the store phones below were checked). If the drawer does not open, the same Environment box is in the user menu at the top right.\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The DSI phone below was registered with the carrier on an earlier scan but has not been sold or activated.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name DSI, middle initial T, last name TESTER; email: type a brand-new address each run, for example dsi.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values on every walk)_\n- **DSI phone already registered with the carrier:** IMEI 350320361769993 (store item DSI-SM-A516U1, DSI-SAM GALAXY A51 5G SM-A516U1). Store price today: $0.00  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: registered as BYOD DSI on 2026-11-03 through the Add store device screen; later that day a second scan went straight to SIM validation with Device $0.00 and Item ID DSI-SM-A516U1 (this ticket's path), and the line was cancelled before Create subscriber, so the phone is registered but still not active with the carrier. The same registered-phone path reached the payment screen with 350320367362322 (order 630036370). Do not use 350320367362322 or 350320368456800 (subscribers were created on them on 2026-11-03), 350320360079303 (the carrier refuses its plans) or 350320361929019 (sold). If the phone is refused or opens the Add store device screen, take another registered DSI serial from the manual QA team)_\n- **SIM card:** ICCID 8901260000084313054F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F, ...027F and ...036F were all accepted at SIM validation today and 009F / 036F were then used up by a finished Create subscriber; 045F is pinned on the first-sale ticket, so this ticket takes the next row, 054F. If refused, take the next row up the sheet)_\n- **Plan:** MAU55, $60.00 per month (already marked Selected on the Plan selection screen). The list also shows the customer-owned-phone plans 4F100L1AP $40.00, BYODU35 $35.00 and BYOD10GB3 $30.00  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; Plan selection read the same list on three walks; cart read Plan (MAU55) $60.00 / mo.)_\n- **Expected amounts:** Device $0.00, SIM card $0.00, no activation fee row. After the plan: Estimated monthly $60.00, Total due $60.00. Order summary: Total MRC $60.00, Total taxes & fees $0.00, Edge due immediately $60.00. Payment screen: Collect $60.00  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; read off the Cart, the Order summary and the Collect payment from customer screen on two finished walks (orders 630036370 and 630036412). CONFIRM BEFORE AUTOMATING: these amounts hold while the QA store has no price on item DSI-SM-A516U1; if someone sets a store price, the Device row, Tax and every total change - re-read the Cart at SIM validation and update the figures)_\n\n## Automation Notes\n- Create subscriber uses up the SIM card and activates the phone with the carrier: once that step succeeds, neither the SIM nor the DSI phone can be used for another run (the SIM answers SIM card is active or used). Take the next SIM from the Astock sheet of the UAT2 November data workbook and ask the manual QA team for a fresh DSI serial. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- RT Go has no list of the store's DSI serial numbers. The manual QA team adds them to the QA store with the seed script attached to the RTPL-3203 comment of 2026-10-06 (phone or watch); a serial added that way is unregistered with the carrier until someone clicks Continue on Add store device.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until a number is picked or it is closed.\n- There is no Back button on the Protection, Plan, Promotion and Add-on screens; the browser Back button leaves the order. To abandon a line before Create subscriber, open Cart options in the Cart and pick Cancel line (Cancel line and keep account in cart to continue); a window headed Cancel transaction asks Tell us why you want to cancel this order with the choices No issue to report, Customer changed their mind and System or technical issue and the buttons Yes, cancel transaction and No, go back; after Yes, cancel transaction the order is back at IMEI validation. The phone and SIM are not used up by a cancelled line.\n- CONFIRM BEFORE AUTOMATING: all dollar amounts assume the QA store has no price on item DSI-SM-A516U1 (Device $0.00). A store price of 149.99 was used once on QA for RTPL-3201 and reset; if the price comes back, the Device row shows the price plus tax and every total moves.\n- This ticket needs a DSI phone that is registered but not yet activated. Running the first-scan ticket on a fresh serial and cancelling its order before Create subscriber leaves exactly such a phone.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory. Below the IMEI box a service tip reads If this is a BYOD device, it must be unlocked to activate on the Metro by T-Mobile network. Contact the customer's previous carrier for assistance."
+        },
+        {
+          "action": "Type the registered DSI phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading changes straight to SIM validation - the Add store device screen is NOT shown, and no window headed Add to Edge inventory? and no drawer headed IMEI not found appears. The screen reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with the card IMEI 1 - PSIM showing the phone's IMEI and an ICCID SIM * box. The Cart lists the IMEI with $0.00 and a Device $0.00 row; Estimated monthly $0.00, Total due $0.00. SERVICE CHECK (for the automation engineer): deviceValidationDetails reads isDsi true, isByod false, deviceSource \"D\", localItemSku \"DSI-SM-A516U1\", basePrice 0, isTaxable true."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 - the SIM is free, as for any store phone - and still reads Total due $0.00. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "In the Phone number npa nxx window click the first number offered",
+          "expected": "The window closes and the number shows on the Phone number selection screen; Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, reading The quoted price per month for optional device protection does not include taxes and fees, which may be applicable in addition to the price in some locations. with Skip and Continue buttons. The Cart lists the IMEI, Device $0.00, SIM card $0.00 and Phone number (347) 499-****; there is NO activation fee row. Total due $0.00. CONFIRM BEFORE AUTOMATING: on 2026-11-03 no protection products were listed for this phone and Skip became available after a few seconds; if products are listed, skip them all the same."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? asks Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($60.00 per month, $55 with AutoPay-$60 1st Month) already marked Selected. Because the phone is registered as BYOD DSI, the list also shows the plans the carrier offers for customer-owned phones: Promo 4 FOR 100 BYOD L1 (4F100L1AP, $40.00 per month), $35 UNL w/AutoPay-$40 Month 1 (BYODU35, $35.00 per month) and $30 10GB BYOD PROMO (BYOD10GB3, $30.00 per month), next to BFLX50, L14F100, 4010NP, 4510GBAP, 40L1WEB, 35GBNP and PYWPLAN. The Cart shows Protection Declined, Plan (MAU55) $60.00 / mo., Estimated monthly $60.00 and Total due $60.00. SERVICE CHECK (for the automation engineer): the configure-plan response reads planConfigDetails.selectedPlanSocCode \"MAU55\" and selectedPlanRate 60."
+        },
+        {
+          "action": "Refresh the browser page (F5) while the Plan selection screen is shown",
+          "expected": "The page reloads into the same order: the heading is Plan selection again, MAU55 is still marked Selected and the Cart still reads Device $0.00, SIM card $0.00, Phone number (347) 499-****, Protection Declined, Plan (MAU55) $60.00 / mo. and Total due $60.00. SERVICE CHECK (for the automation engineer): after the reload deviceValidationDetails still reads isDsi true, isByod false, deviceSource \"D\", localItemSku \"DSI-SM-A516U1\"."
+        },
+        {
+          "action": "In the Cart, click the Device row",
+          "expected": "A drawer slides in from the right headed Device detail with Device type Handset, Item ID DSI-SM-A516U1, Description DSI-SAM GALAXY A51 5G SM-A516U1, IMEI (the phone's IMEI), Price $0.00, a Price adjustment link, Tax $0.00, Final price $0.00 and a Back button - the phone is still a store item after the refresh."
+        },
+        {
+          "action": "Click Back in the drawer",
+          "expected": "The drawer closes and the Plan selection screen is unchanged."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection. CONFIRM BEFORE AUTOMATING: on 2026-11-03 the screen read Great news, customer is eligible for 0 promotions. Select then continue below. with An unexpected error occurred loading options. Click below to retry. and a Retry button - the carrier test system was not answering; if promotion cards show instead, decline them all the same. The buttons Decline and Continue are shown."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied. with the buttons Continue and Back."
+        },
+        {
+          "action": "In that window click Continue",
+          "expected": "The heading changes to Add on services with Skip and Continue buttons. The Cart still shows Device $0.00, SIM card $0.00, Plan (MAU55) $60.00 / mo. and Total due $60.00. SERVICE CHECK (for the automation engineer): the configure-promotions response reads promotionsSkipped true and selectedPromotions empty."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI <the phone's IMEI>. Click create subscriber to continue. with the buttons Create subscriber and Back."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary. (Seen on 2026-11-03 for a phone registered a minute earlier with plan MAU55, order 630036412. If instead a window headed Activation failed reads This activation could not be completed. Contact the support team. Invalid Device Number., the carrier refused the phone - click OK, note the IMEI and the plan and contact the manual QA team; on 2026-11-03 this happened only when the plan BYODU35 had been chosen.)"
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. Under Due Immediately it lists an Order ID, an Account number, Lines in order 1, Total MRC $60.00, Total taxes & fees $0.00 and Edge due immediately $60.00, then the SOS form language choices English and Español, an Enter Metro bill payment box and Back and Continue buttons. The Cart shows the IMEI with $60.00, Device $0.00, SIM card $0.00, Phone number (347) 499-****, Protection Declined, Plan (MAU55) $60.00 / mo., Add-on Declined, Estimated monthly $60.00, Total due $60.00 and an Add a line link."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Add accessories with Scan accessory item and Browse accessories. The Cart adds Inventory $0.00 and still reads Total due $60.00."
+        },
+        {
+          "action": "Click Continue without adding an accessory",
+          "expected": "The heading changes to Collect payment from customer and reads Collect $60.00 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card with an Amount box and a Collect amount button. The Cart lists the phone line $60.00, Customer payments $0.00, Cash $0.00, Total due $60.00, Total collected $0.00, Balance due $60.00 and Change due back to customer $0.00. Below the Cart is the line Receipt: English, small, Quantity 1 - Edit Settings and a greyed-out Submit order button. (On 2026-11-03 no Financing drawer appeared for this $60.00 order; if one does, click No thanks and then Decline.)"
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit order",
+          "expected": "Nothing further is checked. The order is left unpaid so the store phone is not deducted from stock."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to leave the Add store device screen without confirming, so that the store phone is not registered with the carrier and I can scan it again later",
+      "priority": "Medium",
+      "tags": [
+        "DSI"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the phone as well. Most store phones come through the carrier, but a store may also buy phones on its own - the trade calls these DSI phones (Dealer Sourced Inventory). The carrier does not know such a phone until the store registers it, so the first time a rep scans a DSI phone RT Go opens a screen called Add store device with the choice BYOD DSI already picked; one click on Continue registers the phone and the sale carries on. The phone must then be sold exactly like any other store phone: at the store's own price (which may be nothing), with tax, with a free SIM card, with no activation fee, and it must come out of the store's stock when the sale is finished. Getting this wrong costs the store money: a DSI phone treated as the customer's own phone is given away for nothing and never leaves the stock count. RT Go has no DSI badge anywhere - the phone is recognised by its item number (DSI-SM-A516U1 for the phone used in this test) and its price. Registering a phone with the carrier cannot be undone, so the rep must be able to leave the Add store device screen - a wrong phone, a customer who changes their mind - without the phone being registered. The screen has no Back button; the way out is the breadcrumb at the top of the order. This test scans a DSI phone the carrier does not know, leaves the Add store device screen through the breadcrumb, checks the order is back at IMEI validation with nothing registered, and scans the same phone again to prove the Add store device screen opens once more. It ends there; nothing is registered and no money is taken.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Store stock (also called dealer stock) means a phone the store sells from its own shelves. A DSI phone (Dealer Sourced Inventory) is store stock the store bought on its own rather than through the carrier, so the carrier does not know the phone until the store registers it; in RT Go such a phone is listed under an item number that starts with DSI-. A customer's own phone (also called BYOD) is a phone the customer already owns, which is sold for nothing and never comes out of the store's stock. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan; plan codes that contain BYOD are plans the carrier offers for customer-owned phones. Registering a phone with the carrier means telling the carrier the phone exists so it can be activated.\n\n## Related tickets\nRTPL-3189 (DSI epic), RTPL-3201 (sold as dealer stock), RTPL-3202 (straight to the store-device step), RTPL-3203 (BYOD DSI pre-selected), RTPL-3423 (model check skipped), RTPL-3304 (registered phone scanned again)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself with an Environment box; set it to UAT2 (that is where the store phones below were checked). If the drawer does not open, the same Environment box is in the user menu at the top right.\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The store phone below is still in the store's stock (it has not been sold).\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name DSI, middle initial T, last name TESTER; email: type a brand-new address each run, for example dsi.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values on every walk)_\n- **DSI phone, not yet registered with the carrier:** IMEI 350320361003534 (store item DSI-SM-A516U1, DSI-SAM GALAXY A51 5G SM-A516U1). Store price today: $0.00 (the QA store has no price on this item)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: opened the Add store device screen on its first scan (twice, with a breadcrumb back-out in between) and was left unregistered - Continue was never clicked on it. The identical path on 350320368456800 (Add store device -> Continue -> ... -> Create subscriber -> Collect payment $60.00, order 630036412) is what this ticket describes. SINGLE USE - clicking Continue on Add store device registers it with the carrier, after which it behaves like the registered phone of the other DSI tickets. The store had 10 of these phones in stock on 2026-11-03 but RT Go shows no list of serial numbers; when this one is used up, ask the manual QA team for a fresh DSI serial (they add them to the QA store with the seed script from the RTPL-3203 comment of 2026-10-06))_\n\n## Automation Notes\n- RT Go has no list of the store's DSI serial numbers. The manual QA team adds them to the QA store with the seed script attached to the RTPL-3203 comment of 2026-10-06 (phone or watch); a serial added that way is unregistered with the carrier until someone clicks Continue on Add store device.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until a number is picked or it is closed.\n- There is no Back button on the Protection, Plan, Promotion and Add-on screens; the browser Back button leaves the order. To abandon a line before Create subscriber, open Cart options in the Cart and pick Cancel line (Cancel line and keep account in cart to continue); a window headed Cancel transaction asks Tell us why you want to cancel this order with the choices No issue to report, Customer changed their mind and System or technical issue and the buttons Yes, cancel transaction and No, go back; after Yes, cancel transaction the order is back at IMEI validation. The phone and SIM are not used up by a cancelled line.\n- Clicking Continue on Add store device registers the phone with the carrier for good - this ticket must never do that. If a run accidentally registers the phone, it can still serve the registered-phone ticket.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory. Below the IMEI box a service tip reads If this is a BYOD device, it must be unlocked to activate on the Metro by T-Mobile network. Contact the customer's previous carrier for assistance."
+        },
+        {
+          "action": "Type the DSI phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows for a few seconds. The heading then changes to Add store device and the screen reads Select the device type to register this store device with the carrier. Under the label Select device type there are exactly two cards, BYOD DSI and Tablet. The BYOD DSI card is already highlighted (selected) when the screen opens; the Tablet card is not. The Continue button is available straight away. No window headed Add to Edge inventory? and no drawer headed IMEI not found appears. The Cart lists the IMEI with $0.00, Estimated monthly $0.00 and Total due $0.00, with no Device row yet. SERVICE CHECK (for the automation engineer): the process state reads reasonCodeForAction \"select-byod-device-type\", availableByodDeviceTypes [\"BYOD-DSI\", \"BYOT\"], and deviceValidationDetails.isDsi true, localItemSku \"DSI-SM-A516U1\", inLocalInventory true, isByod false."
+        },
+        {
+          "action": "Click ADD STORE DEVICE in the breadcrumb at the top of the order (the screen has no Back button)",
+          "expected": "The message Processing request... shows briefly, then the heading changes to IMEI validation with an empty IMEI box. The Cart now reads Line 1 $0.00, Estimated monthly $0.00, Total due $0.00. No window asks for confirmation. SERVICE CHECK (for the automation engineer): the carrier log shows no AddByodDevice call for this IMEI - the phone is not registered."
+        },
+        {
+          "action": "Type the same DSI phone's IMEI into the IMEI box again",
+          "expected": "The message Processing request... shows briefly, then the Add store device screen opens again exactly as before: Select the device type to register this store device with the carrier., the cards BYOD DSI (highlighted) and Tablet, Continue available. The Cart lists the IMEI with $0.00 again. The phone is still unregistered, so the carrier still does not know it. SERVICE CHECK (for the automation engineer): the process state again reads reasonCodeForAction \"select-byod-device-type\" and availableByodDeviceTypes [\"BYOD-DSI\", \"BYOT\"]."
+        },
+        {
+          "action": "Stop here - do NOT click Continue",
+          "expected": "Nothing further is checked. The phone stays unregistered and can be used by the first-sale ticket. To tidy up, click ADD STORE DEVICE in the breadcrumb once more (back to IMEI validation) and then cancel the order from the Cart's Cancel button."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want RT Go to stop treating a DSI phone as store stock once the store has sold it, so that scanning a sold DSI phone is handled as a customer's own phone and never sold from stock twice",
+      "priority": "Medium",
+      "tags": [
+        "DSI"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, the store usually sells them the phone as well. Most store phones come through the carrier, but a store may also buy phones on its own - the trade calls these DSI phones (Dealer Sourced Inventory). The carrier does not know such a phone until the store registers it, so the first time a rep scans a DSI phone RT Go opens a screen called Add store device with the choice BYOD DSI already picked; one click on Continue registers the phone and the sale carries on. The phone must then be sold exactly like any other store phone: at the store's own price (which may be nothing), with tax, with a free SIM card, with no activation fee, and it must come out of the store's stock when the sale is finished. Getting this wrong costs the store money: a DSI phone treated as the customer's own phone is given away for nothing and never leaves the stock count. RT Go has no DSI badge anywhere - the phone is recognised by its item number (DSI-SM-A516U1 for the phone used in this test) and its price. What makes a phone a DSI phone is that it is in the store's stock under a DSI- item number. Once the store has sold it, it is no longer in stock, so if the same phone comes back to the counter it must be handled as a phone the customer already owns: RT Go must not open the Add store device screen, must not price it from the store's price list and must not deduct it from stock again. This test scans a DSI phone that the store sold earlier and checks that RT Go opens the ordinary customer-owned prompt instead. It ends there without accepting the prompt, so nothing is registered.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Store stock (also called dealer stock) means a phone the store sells from its own shelves. A DSI phone (Dealer Sourced Inventory) is store stock the store bought on its own rather than through the carrier, so the carrier does not know the phone until the store registers it; in RT Go such a phone is listed under an item number that starts with DSI-. A customer's own phone (also called BYOD) is a phone the customer already owns, which is sold for nothing and never comes out of the store's stock. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan; plan codes that contain BYOD are plans the carrier offers for customer-owned phones. Registering a phone with the carrier means telling the carrier the phone exists so it can be activated.\n\n## Related tickets\nRTPL-3189 (DSI epic), RTPL-3201 (sold as dealer stock), RTPL-3202 (straight to the store-device step), RTPL-3203 (BYOD DSI pre-selected), RTPL-3423 (model check skipped), RTPL-3304 (registered phone scanned again)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself with an Environment box; set it to UAT2 (that is where the store phones below were checked). If the drawer does not open, the same Environment box is in the user menu at the top right.\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone below was sold by the store on an earlier date and is no longer in the store's stock.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name DSI, middle initial T, last name TESTER; email: type a brand-new address each run, for example dsi.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values on every walk)_\n- **DSI phone the store has already sold:** IMEI 350320360965352 (was store item DSI-SM-A516U1; sold on 2026-10-23)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: scanning it opened the customer-owned path (heading Add BYOD device), not the Add store device screen; nothing was registered or accepted, so it can be scanned again on every run. If it ever opens Add store device or SIM validation instead, the store has restocked it - ask the manual QA team for another sold DSI serial)_\n\n## Automation Notes\n- RT Go has no list of the store's DSI serial numbers. The manual QA team adds them to the QA store with the seed script attached to the RTPL-3203 comment of 2026-10-06 (phone or watch); a serial added that way is unregistered with the carrier until someone clicks Continue on Add store device.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until a number is picked or it is closed.\n- There is no Back button on the Protection, Plan, Promotion and Add-on screens; the browser Back button leaves the order. To abandon a line before Create subscriber, open Cart options in the Cart and pick Cancel line (Cancel line and keep account in cart to continue); a window headed Cancel transaction asks Tell us why you want to cancel this order with the choices No issue to report, Customer changed their mind and System or technical issue and the buttons Yes, cancel transaction and No, go back; after Yes, cancel transaction the order is back at IMEI validation. The phone and SIM are not used up by a cancelled line.\n- Accepting the customer-owned prompt would register the sold phone with the carrier as the customer's own phone and use it up for this ticket - never accept it.\n- If the store restocks this serial (it is added again with the seed script), the scan opens Add store device or SIM validation instead; take another sold DSI serial from the manual QA team.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory. Below the IMEI box a service tip reads If this is a BYOD device, it must be unlocked to activate on the Metro by T-Mobile network. Contact the customer's previous carrier for assistance."
+        },
+        {
+          "action": "Type the sold DSI phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly, then the heading changes to Add BYOD device - the ordinary customer-owned path - and NOT to Add store device. A drawer slides in headed Imei not found reading The IMEI 350320360965352 is invalid or the device is a BYOD Device. Go back to change the IMEI, or continue with this activation as a BYOD Device. with the buttons Back and Continue. No Add store device screen and no Device row: the Cart lists the IMEI with $0.00, Estimated monthly $0.00, Total due $0.00. SERVICE CHECK (for the automation engineer): the process state reads reasonCodeForAction \"device-not-in-inventory\", availableActions [\"accept-add-as-byod\", \"decline-add-as-byod\"], deviceValidationDetails.isDsi false, inLocalInventory false, localItemSku null."
+        },
+        {
+          "action": "Click Back in the drawer - do NOT click Continue",
+          "expected": "The drawer closes and the heading returns to IMEI validation with an empty IMEI box; the Cart reads Line 1 $0.00. Nothing was registered, so the phone can be scanned again on the next run. Stop here and cancel the order from the Cart's Cancel button to tidy up."
+        }
+      ]
+    }
+  ],
+  "folder_name": "DSI - AI"
+}
