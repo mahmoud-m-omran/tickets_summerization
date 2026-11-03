@@ -2,11 +2,12 @@
   "status": "success",
   "filename": "rtgo-prior-art.json",
   "project_id": 3,
-  "count": 652,
+  "count": 658,
   "link_diagnostic": {
-    "detail_endpoint": "/projects/3/cases?ids={id}",
-    "detail_carries_issues": false,
+    "detail_endpoint": "/cases/{id}",
+    "detail_carries_issues": true,
     "list_sample_keys": [
+      "configs",
       "created_at",
       "created_by",
       "custom_automated",
@@ -19,6 +20,7 @@
       "has_automation",
       "has_automation_status",
       "id",
+      "issues",
       "key",
       "name",
       "project_id",
@@ -32,6 +34,146 @@
     ]
   },
   "cases": [
+    {
+      "id": 3859,
+      "name": "As a Metro by T-Mobile authorized dealer, I want an accessory added to a new phone activation to add its own Prepaid Tax and price to one correct total to collect",
+      "folder_id": 447,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the New account tile",
+        "Fill in the customer's first name, last name, email, address, zip code and city",
+        "Type the PIN twice, choose three different security questions and type an answer for each",
+        "Click Continue",
+        "Type the phone number into the Phone box and click Continue",
+        "Click Continue",
+        "Type the phone's IMEI into the IMEI box",
+        "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+        "Under Phone number NPA NXX, click Select, then click the first number in the list",
+        "Click Continue",
+        "Click Skip",
+        "Click Yes, continue",
+        "Click Continue",
+        "On the Promotion selection screen click Decline",
+        "In that window click Continue",
+        "Click Skip",
+        "Click Create subscriber",
+        "Click Continue to order summary",
+        "Click Continue",
+        "Click the Scan or type item # box, type the accessory's item number and press Enter",
+        "Click Continue",
+        "Click No thanks",
+        "Click Decline",
+        "Stop here - do NOT click Collect amount and do NOT click Submit order"
+      ],
+      "issues": [
+        "QA-2918"
+      ]
+    },
+    {
+      "id": 3858,
+      "name": "As a Metro by T-Mobile authorized dealer, I want a new phone activation to show Prepaid Tax as its own amount in the cart, on the Order summary and on the payment screen, so that the amount I ask the customer to pay matches every screen along the way",
+      "folder_id": 447,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the New account tile",
+        "Fill in the customer's first name, last name, email, address, zip code and city",
+        "Type the PIN twice, choose three different security questions and type an answer for each",
+        "Click Continue",
+        "Type the phone number into the Phone box and click Continue",
+        "Click Continue",
+        "Type the phone's IMEI into the IMEI box",
+        "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+        "Under Phone number NPA NXX, click Select, then click the first number in the list",
+        "Click Continue",
+        "Click Skip",
+        "Click Yes, continue",
+        "Click Continue",
+        "On the $55 Device Rebate card click Select, then click Continue",
+        "Click Skip",
+        "Click Create subscriber",
+        "Click Continue to order summary",
+        "Click Continue",
+        "Click Continue without adding an accessory",
+        "Click No thanks",
+        "Click Decline",
+        "Stop here - do NOT click Collect amount and do NOT click Submit order"
+      ],
+      "issues": [
+        "QA-2917"
+      ]
+    },
+    {
+      "id": 3857,
+      "name": "As a Metro by T-Mobile authorized dealer working in Spanish, I want the Prepaid Tax row on the payment screen to be labelled Impuesto PP, so that I can read the invoice to a Spanish-speaking customer in their own language",
+      "folder_id": 447,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the Accessory Sale tile",
+        "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+        "Click the box reading Scan or type item #, type 101026 and press Enter",
+        "Click Continue",
+        "Click Open user menu in the page header",
+        "Click Español",
+        "Click the X at the top right of the User settings panel",
+        "Refresh the browser page",
+        "Click Abrir menú de usuario in the page header",
+        "Click Inglés",
+        "Click the X at the top right of the panel",
+        "Stop here - do NOT click Recolectar monto and do NOT click Enviar"
+      ],
+      "issues": [
+        "QA-2916"
+      ]
+    },
+    {
+      "id": 3856,
+      "name": "As a Metro by T-Mobile authorized dealer, I want an invoice with two different accessories to show one PP Tax amount that adds both items together and to ask the customer for the full total, so that the customer is charged exactly what the screen shows",
+      "folder_id": 447,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the Accessory Sale tile",
+        "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+        "Click the box reading Scan or type item #, type 101026 and press Enter",
+        "Click Continue",
+        "Under Pay with, click Cash",
+        "Stop here - do NOT click Collect amount and do NOT click Submit"
+      ],
+      "issues": [
+        "QA-2915"
+      ]
+    },
+    {
+      "id": 3855,
+      "name": "As a Metro by T-Mobile authorized dealer, I want the details of an accessory on the invoice to show Prepaid Tax as its own amount, so that I can explain to the customer exactly what makes up the final price",
+      "folder_id": 447,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the Accessory Sale tile",
+        "Click the box reading Scan or type item #, type BITTYVENOM and press Enter",
+        "Click the small information icon at the start of the Bitty Boomers MARVEL VENOM Bluetooth Speaker line on the invoice",
+        "Click the X at the top right of the panel",
+        "Stop here - do NOT click Continue and do not take any payment"
+      ],
+      "issues": [
+        "QA-2914"
+      ]
+    },
+    {
+      "id": 3853,
+      "name": "As a Metro by T-Mobile authorized dealer, I want an accessory that is not on the carrier's approved list to be refused when I try to sell it, so that the store never sells a product it is not allowed to carry",
+      "folder_id": 434,
+      "actions": [
+        "Login into the app",
+        "On the dashboard, click the Accessory Sale tile",
+        "Click Browse accessories, type SCREEN REPLACEMENT into the search box, then click that row",
+        "Click Add accessories",
+        "Read the invoice panel",
+        "Stop here - do NOT click Continue and do not take any payment"
+      ],
+      "issues": [
+        "QA-2886"
+      ]
+    },
     {
       "id": 3825,
       "name": "Back out of the home internet acknowledgement and land back on IMEI validation, not the address form",
@@ -57,7 +199,9 @@
         "Select Back on the \"Home internet acknowledgement\" panel without ticking either acknowledgement.",
         "Stop here. Do NOT submit any payment."
       ],
-      "issues": []
+      "issues": [
+        "QA-2857"
+      ]
     },
     {
       "id": 3824,
@@ -76,7 +220,9 @@
         "Read the money rows on the Order Summary",
         "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2844"
+      ]
     },
     {
       "id": 3823,
@@ -99,7 +245,9 @@
         "Read the money rows on the Order Summary",
         "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2843"
+      ]
     },
     {
       "id": 3822,
@@ -126,7 +274,9 @@
         "Choose Continue to order summary and read the Order Summary page",
         "Stop here - do NOT continue to the payment screen and do NOT submit any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2845"
+      ]
     },
     {
       "id": 3821,
@@ -466,9 +616,9 @@
       "name": "As a Metro by T-Mobile authorized dealer, I want a device whose IMEI fails the carrier's own check to be refused clearly, so that I am not left with an order I cannot finish or undo",
       "folder_id": 429,
       "actions": [
-        "Open the RT Go sign-in page, fill in Email address, Password and Application key with the team's QA sign-in, type EZLOGIC in Store and click Verify",
-        "Click the New account tile",
-        "Fill in the customer details from the test data, choose any three security questions, type an answer for each, and click Continue",
+        "<p>Open the RT Go sign-in page, fill in Email address, Password and Application key with the team's QA sign-in, type EZLOGIC in Store and click Verify</p>",
+        "<p>Click the New account tile</p>",
+        "<p>Fill in the customer details from the test data, choose any three security questions, type an answer for each, and click Continue</p>",
         "Click Skip",
         "Click Continue in the dialog",
         "Type the invalid IMEI into the IMEI box and click Continue",
@@ -476,7 +626,9 @@
         "Click the back arrow to the left of the page title Add BYOD device, at the top of the screen",
         "Stop here - do NOT take the order any further"
       ],
-      "issues": []
+      "issues": [
+        "QA-2827"
+      ]
     },
     {
       "id": 3783,
@@ -485,7 +637,9 @@
       "actions": [
         "Do not run this case - it is retired."
       ],
-      "issues": []
+      "issues": [
+        "QA-2826"
+      ]
     },
     {
       "id": 3782,
@@ -494,7 +648,9 @@
       "actions": [
         "Do not run this case - it is retired."
       ],
-      "issues": []
+      "issues": [
+        "QA-2825"
+      ]
     },
     {
       "id": 3781,
@@ -538,7 +694,9 @@
         "Click Continue without adding an accessory",
         "Stop here - do NOT click Collect amount and do NOT click Submit order"
       ],
-      "issues": []
+      "issues": [
+        "QA-2824"
+      ]
     },
     {
       "id": 3778,
@@ -556,7 +714,9 @@
         "Clear the Amount box completely",
         "Stop here - click Close without adding the item"
       ],
-      "issues": []
+      "issues": [
+        "QA-2814"
+      ]
     },
     {
       "id": 3777,
@@ -581,7 +741,9 @@
         "Choose the reason named in the test data",
         "Click Yes, cancel transaction"
       ],
-      "issues": []
+      "issues": [
+        "QA-2813"
+      ]
     },
     {
       "id": 3775,
@@ -596,7 +758,9 @@
         "Try to switch to the option that would show everything",
         "Stop here - close the filter list and leave the invoice empty"
       ],
-      "issues": []
+      "issues": [
+        "QA-2812"
+      ]
     },
     {
       "id": 3774,
@@ -605,18 +769,20 @@
       "actions": [
         "Login into the app",
         "On the dashboard, click the Accessory Sale tile",
-        "Click Browse accessories, type 141761-5085 into the search box, then click that row",
+        "Click Browse accessories, type 77-53942 into the search box, then click that row",
         "Open the Price adjustment section of that panel",
         "Choose Price and type the agreed price into the Amount box",
         "Click Percent",
         "Select everything in the Amount box and type the percentage to take off",
         "Click Amount, select everything in the Amount box and type the dollars to take off",
         "Click Price, select everything in the Amount box, type the agreed price again and click Add accessories",
-        "Click the discounted line in the invoice, open Price adjustment, then click Close",
+        "Click the discounted line in the invoice, open Price adjustment, then close the panel with the X at its top right",
         "Click Continue",
         "Stop here - do NOT take any payment and do NOT click Submit"
       ],
-      "issues": []
+      "issues": [
+        "QA-2811"
+      ]
     },
     {
       "id": 3773,
@@ -631,7 +797,9 @@
         "Read the buttons at the foot of that panel",
         "Click Close and read the invoice panel"
       ],
-      "issues": []
+      "issues": [
+        "QA-2810"
+      ]
     },
     {
       "id": 3772,
@@ -645,7 +813,9 @@
         "Read the invoice panel",
         "Stop here - do NOT click Continue and do not take any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2809"
+      ]
     },
     {
       "id": 3771,
@@ -658,7 +828,9 @@
         "Type the item number from the test data into that field and press Enter",
         "Stop here - do NOT click Continue and do not take any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2808"
+      ]
     },
     {
       "id": 3770,
@@ -674,7 +846,9 @@
         "Click Remove from invoice",
         "Stop here - do NOT click Continue and do not take any payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2807"
+      ]
     },
     {
       "id": 3769,
@@ -693,16 +867,18 @@
         "Click Refund cash payments",
         "Stop here - do NOT click Submit and do not finish the order"
       ],
-      "issues": []
+      "issues": [
+        "QA-2806"
+      ]
     },
     {
       "id": 3768,
       "name": "As a Metro by T-Mobile authorized dealer, I want to sell a single accessory to a walk-in customer for cash, so that the amount I ask them to pay matches the invoice on screen",
       "folder_id": 434,
       "actions": [
-        "Login into the app",
-        "On the dashboard, click the Accessory Sale tile",
-        "With the invoice still empty, click Continue",
+        "<p>Login into the app</p>",
+        "<p>On the dashboard, click the Accessory Sale tile</p>",
+        "<p>With the invoice still empty, click Continue</p>",
         "Click Browse accessories",
         "Click the row for the accessory named in the test data",
         "Click Add accessories",
@@ -711,7 +887,9 @@
         "Leave the pre-filled amount as it is and click Collect amount",
         "Stop here - do NOT click Submit and do not finish the order"
       ],
-      "issues": []
+      "issues": [
+        "QA-2805"
+      ]
     },
     {
       "id": 3765,
@@ -726,7 +904,9 @@
         "Choose Continue to order summary",
         "Pass Add Accessory with zero accessories and collect exact CASH for the full order"
       ],
-      "issues": []
+      "issues": [
+        "QA-2758"
+      ]
     },
     {
       "id": 3764,
@@ -737,7 +917,9 @@
         "Enter the 32-digit EID and Continue",
         "Confirm the device and complete address eligibility with an eligible ZIP"
       ],
-      "issues": []
+      "issues": [
+        "QA-2757"
+      ]
     },
     {
       "id": 3763,
@@ -747,7 +929,9 @@
         "On the acknowledgement panel, verify Continue is gated",
         "Decline the consent (close/decline path)"
       ],
-      "issues": []
+      "issues": [
+        "QA-2756"
+      ]
     },
     {
       "id": 3762,
@@ -757,7 +941,9 @@
         "Attempt Continue with an empty street address",
         "Fill the form but use the invalid-address ZIP and Continue"
       ],
-      "issues": []
+      "issues": [
+        "QA-2755"
+      ]
     },
     {
       "id": 3761,
@@ -767,7 +953,9 @@
         "Submit the address with the outage ZIP",
         "Resubmit the same address unchanged after the error"
       ],
-      "issues": []
+      "issues": [
+        "QA-2754"
+      ]
     },
     {
       "id": 3760,
@@ -776,7 +964,9 @@
       "actions": [
         "Submit the address with the limited-tier ZIP"
       ],
-      "issues": []
+      "issues": [
+        "QA-2753"
+      ]
     },
     {
       "id": 3759,
@@ -787,7 +977,9 @@
         "Choose 'Try a different address'",
         "Correct the ZIP to the eligible one and resubmit"
       ],
-      "issues": []
+      "issues": [
+        "QA-2752"
+      ]
     },
     {
       "id": 3758,
@@ -803,7 +995,9 @@
         "Complete SIM, MDN, protection, plan, promotions, add-ons; confirm Create subscriber; Continue to order summary",
         "Review Order Summary, pass Add Accessory with zero accessories, collect exact CASH"
       ],
-      "issues": []
+      "issues": [
+        "QA-2751"
+      ]
     },
     {
       "id": 3757,
@@ -814,7 +1008,9 @@
         "Force-submit select-plan without selectedPairingMdn (API-level, bypassing the disabled button)",
         "Force-submit select-plan with an MDN NOT in availableSubscriberForPairing"
       ],
-      "issues": []
+      "issues": [
+        "QA-2750"
+      ]
     },
     {
       "id": 3756,
@@ -825,7 +1021,9 @@
         "Continue from Plan selection",
         "Switch back to a PAIRED plan on the same screen (regression toggle)"
       ],
-      "issues": []
+      "issues": [
+        "QA-2749"
+      ]
     },
     {
       "id": 3755,
@@ -841,7 +1039,9 @@
         "Continue through Promotions and Add-ons, confirm Create subscriber, then Continue to order summary",
         "Review Order Summary, pass Add Accessory with zero accessories, collect exact CASH"
       ],
-      "issues": []
+      "issues": [
+        "QA-2748"
+      ]
     },
     {
       "id": 3754,
@@ -851,7 +1051,9 @@
         "On the added line, enter the A-Stock tablet IMEI with the tablet flag OFF",
         "Dismiss the dialog and enter an A-Stock handset IMEI on the same line"
       ],
-      "issues": []
+      "issues": [
+        "QA-2747"
+      ]
     },
     {
       "id": 3753,
@@ -861,7 +1063,9 @@
         "On the added line, enter the previously activated not-in-inventory tablet IMEI",
         "Accept the reactivation"
       ],
-      "issues": []
+      "issues": [
+        "QA-2746"
+      ]
     },
     {
       "id": 3752,
@@ -871,7 +1075,9 @@
         "On the added line, enter the previously activated in-inventory tablet IMEI",
         "Inspect the running cart for the reactivated tablet line"
       ],
-      "issues": []
+      "issues": [
+        "QA-2745"
+      ]
     },
     {
       "id": 3751,
@@ -892,7 +1098,9 @@
         "Proceed through Add Accessory (Review invoice) adding zero accessories",
         "Collect payment in CASH for the exact balance due"
       ],
-      "issues": []
+      "issues": [
+        "QA-2744"
+      ]
     },
     {
       "id": 3750,
@@ -903,7 +1111,9 @@
         "Rep completes the cash payment on the POS while the tablet shows (or has dismissed) the message",
         "Rep runs a standalone bill payment for the capped/Lite account and approves the invoice"
       ],
-      "issues": []
+      "issues": [
+        "QA-2738"
+      ]
     },
     {
       "id": 3749,
@@ -914,7 +1124,9 @@
         "Rep completes SIM validation and walks the flow through plan selection",
         "Rep reviews the Order Summary"
       ],
-      "issues": []
+      "issues": [
+        "QA-2737"
+      ]
     },
     {
       "id": 3748,
@@ -924,7 +1136,9 @@
         "Rep enters the HINT gateway IMEI with the flag OFF",
         "Toggle the flag ON and rep re-enters the same IMEI on a fresh line"
       ],
-      "issues": []
+      "issues": [
+        "QA-2736"
+      ]
     },
     {
       "id": 3747,
@@ -951,7 +1165,9 @@
         "Select Continue on the \"Confirm home internet device\" panel.",
         "Stop here. Do NOT submit any payment."
       ],
-      "issues": []
+      "issues": [
+        "QA-2735"
+      ]
     },
     {
       "id": 3746,
@@ -960,7 +1176,9 @@
       "actions": [
         "Rep submits a valid service address on the flagged line"
       ],
-      "issues": []
+      "issues": [
+        "QA-2734"
+      ]
     },
     {
       "id": 3745,
@@ -991,7 +1209,9 @@
         "Complete the Zip Code to its full five digits.",
         "Stop here. Do NOT select Continue to send this address for checking, and do NOT submit any payment."
       ],
-      "issues": []
+      "issues": [
+        "QA-2733"
+      ]
     },
     {
       "id": 3744,
@@ -1002,7 +1222,9 @@
         "Rep re-opens/inspects the address form",
         "Rep clicks Continue again once the service is healthy"
       ],
-      "issues": []
+      "issues": [
+        "QA-2732"
+      ]
     },
     {
       "id": 3743,
@@ -1012,7 +1234,9 @@
         "Rep submits the Lite/capped-tier service address",
         "Rep clicks \"Try a different address\""
       ],
-      "issues": []
+      "issues": [
+        "QA-2731"
+      ]
     },
     {
       "id": 3742,
@@ -1022,7 +1246,9 @@
         "Rep advances from Protection selection to Plan selection",
         "Rep selects the pre-selected plan and continues"
       ],
-      "issues": []
+      "issues": [
+        "QA-2730"
+      ]
     },
     {
       "id": 3741,
@@ -1033,7 +1259,9 @@
         "Rep submits the eligible service address",
         "Rep accepts both acknowledgements and continues"
       ],
-      "issues": []
+      "issues": [
+        "QA-2729"
+      ]
     },
     {
       "id": 3740,
@@ -1072,7 +1300,9 @@
         "Select Continue without adding an accessory.",
         "Stop here. Do NOT submit the payment and do NOT complete the order."
       ],
-      "issues": []
+      "issues": [
+        "QA-2728"
+      ]
     },
     {
       "id": 3739,
@@ -1083,7 +1313,9 @@
         "Rep clicks \"Remove this line\"",
         "Rep enters a standard phone IMEI from the fixture pool to start a replacement line"
       ],
-      "issues": []
+      "issues": [
+        "QA-2727"
+      ]
     },
     {
       "id": 3738,
@@ -1093,7 +1325,9 @@
         "On the HINT line's address form, rep enters the ineligible service address and clicks Continue",
         "Rep clicks \"Remove this line\""
       ],
-      "issues": []
+      "issues": [
+        "QA-2726"
+      ]
     },
     {
       "id": 3737,
@@ -1104,7 +1338,9 @@
         "Rep clicks \"Try a different address\"",
         "Rep enters the eligible service address and clicks Continue"
       ],
-      "issues": []
+      "issues": [
+        "QA-2725"
+      ]
     },
     {
       "id": 3735,
@@ -1250,7 +1486,9 @@
         "<p>On a brand-new order (no primary line), rep enters the watch IMEI as line 1</p>",
         "<p>Rep adds a primary phone line, then adds the watch as line 2</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2719"
+      ]
     },
     {
       "id": 3720,
@@ -1263,7 +1501,9 @@
         "<p>Rep completes Add Accessory -&gt; cash payment (exact)</p>",
         "<p>Repeat with a Samsung watch as line 2 (pairwise)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2718"
+      ]
     },
     {
       "id": 3719,
@@ -1273,7 +1513,9 @@
         "<p>Rep enters the incompatible watch IMEI</p>",
         "<p>Rep confirms no BYOD entry occurs</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2717"
+      ]
     },
     {
       "id": 3718,
@@ -1283,7 +1525,9 @@
         "<p>Rep selects a standalone watch plan</p>",
         "<p>(Defensive, API) submit a standalone plan WITH a non-null pairing MDN</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2716"
+      ]
     },
     {
       "id": 3717,
@@ -1293,7 +1537,9 @@
         "<p>Rep submits a pairing MDN that is not in the offered list</p>",
         "<p>(No-voice-line account) Rep reaches a paired plan with no eligible voice line</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2715"
+      ]
     },
     {
       "id": 3716,
@@ -1303,7 +1549,9 @@
         "<p>Rep selects a paired watch plan and tries to continue WITHOUT choosing a pairing MDN</p>",
         "<p>Rep selects a pairing MDN from the offered voice lines and continues</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2714"
+      ]
     },
     {
       "id": 3715,
@@ -1315,7 +1563,9 @@
         "<p>Rep enters a valid 32-digit EID and Continues</p>",
         "<p>Rep completes plan -&gt; pairing MDN -&gt; activate -&gt; Order Summary -&gt; Add Accessory -&gt; cash payment</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2713"
+      ]
     },
     {
       "id": 3714,
@@ -1327,7 +1577,9 @@
         "<p>(API bypass) submit select-byod-device-type with deviceType:'BYOD-ANDROID'</p>",
         "<p>Re-read line state</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2712"
+      ]
     },
     {
       "id": 3713,
@@ -1338,7 +1590,9 @@
         "<p>Rep reads the offered options</p>",
         "<p>Rep confirms a Samsung and an Apple watch IMEI both resolve to watch (RTPL-2557)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2711"
+      ]
     },
     {
       "id": 3712,
@@ -1354,7 +1608,9 @@
         "<p>Rep completes promotions(skip) -&gt; add-ons(skip) -&gt; Create subscriber</p>",
         "<p>Rep completes Order Summary -&gt; Add Accessory (none) -&gt; cash payment (exact)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2710"
+      ]
     },
     {
       "id": 3711,
@@ -1375,7 +1631,9 @@
         "Complete protection (Skip), plan, promotions (Skip), add-ons (Skip), Create Subscriber, and open the Order Summary",
         "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2682"
+      ]
     },
     {
       "id": 3707,
@@ -1391,7 +1649,9 @@
         "Re-add the accessory and click Continue to payment",
         "Read the amount to collect on the payment screen - STOP HERE, do NOT submit the payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2681"
+      ]
     },
     {
       "id": 3706,
@@ -1438,7 +1698,9 @@
         "<p>Rep completes Add Accessory -&gt; cash payment (exact)</p>",
         "<p>Repeat with a Samsung watch (BYOW-SAM) as line 2 (pairwise)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2700"
+      ]
     },
     {
       "id": 3702,
@@ -1451,7 +1713,9 @@
         "<p>(Skip run) Rep clicks Skip and confirms \"Decline all protection options?\"</p>",
         "<p>After the protection step, rep reaches plan selection</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2699"
+      ]
     },
     {
       "id": 3701,
@@ -1465,7 +1729,9 @@
         "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment",
         "Repeat the whole run for plan BFLX50, then for BFLX60"
       ],
-      "issues": []
+      "issues": [
+        "QA-2698"
+      ]
     },
     {
       "id": 3700,
@@ -1477,7 +1743,9 @@
         "<p>(R3) Rep selects COUP_NEU3F3 and continues</p>",
         "<p>(R4) Rep selects BYOD10GB3 and skips promotions</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2697"
+      ]
     },
     {
       "id": 3699,
@@ -1489,7 +1757,9 @@
         "<p>Rep re-selects BYOD10GB3</p>",
         "<p>(Negative) Rep takes an A-Stock line to plan selection</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2696"
+      ]
     },
     {
       "id": 3698,
@@ -1501,7 +1771,9 @@
         "Print and email the receipt",
         "Repeat once with a short-code promotion (for example COUP_NEU3F3 on plan 40L1WEB)"
       ],
-      "issues": []
+      "issues": [
+        "QA-2695"
+      ]
     },
     {
       "id": 3697,
@@ -1516,7 +1788,9 @@
         "Click Continue",
         "Continue through add-ons (Skip), Create Subscriber, and open the Order Summary"
       ],
-      "issues": []
+      "issues": [
+        "QA-2694"
+      ]
     },
     {
       "id": 3696,
@@ -1529,7 +1803,9 @@
         "Complete phone number, protection (Skip), plan, promotions (Skip), add-ons (Skip), Create Subscriber, Order Summary",
         "Continue to Add Accessory (add none) and open the cash payment screen - STOP HERE, do NOT submit the payment"
       ],
-      "issues": []
+      "issues": [
+        "QA-2693"
+      ]
     },
     {
       "id": 3695,
@@ -1542,7 +1818,9 @@
         "<p>Rep completes MDN -&gt; protection(skip) -&gt; plan -&gt; promotions(skip) -&gt; add-ons(skip) -&gt; activate -&gt; Order Summary -&gt; Add Accessory -&gt; cash payment (first eligible values)</p>",
         "<p>(Run B, fresh line) Rep clicks Decline</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2692"
+      ]
     },
     {
       "id": 3694,
@@ -1553,7 +1831,9 @@
         "<p>Rep leaves the EID blank and clicks Continue</p>",
         "<p>Rep enters a 12-digit partial EID and clicks Continue</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2691"
+      ]
     },
     {
       "id": 3693,
@@ -1567,7 +1847,9 @@
         "<p>Rep enters a valid 32-digit EID and Continues</p>",
         "<p>Rep completes plan -&gt; promotions(skip) -&gt; add-ons(skip) -&gt; activate -&gt; Order Summary -&gt; Add Accessory -&gt; cash payment</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2690"
+      ]
     },
     {
       "id": 3692,
@@ -1579,7 +1861,9 @@
         "<p>Rep observes the flow did not advance</p>",
         "<p>Rep corrects IMEI2 to a different value and Continues</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2689"
+      ]
     },
     {
       "id": 3691,
@@ -1592,7 +1876,9 @@
         "<p>(R1) Rep enters a valid 15-digit IMEI2 != primary and Continues</p>",
         "<p>(R1) Rep enters a non-15-digit IMEI2 (14 digits)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2688"
+      ]
     },
     {
       "id": 3690,
@@ -1604,7 +1890,9 @@
         "<p>(API bypass) Submit select-byod-device-type with deviceType:\"BYOW-SAM\" via direct API call</p>",
         "<p>Re-read line state</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2687"
+      ]
     },
     {
       "id": 3689,
@@ -1618,7 +1906,9 @@
         "<p>Rep completes Order Summary -&gt; Add Accessory -&gt; cash payment (exact)</p>",
         "<p>Repeat runs for BYOD-IPHONE and BYOT (BYOT as line 2)</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2686"
+      ]
     },
     {
       "id": 3688,
@@ -1630,7 +1920,9 @@
         "<p>Rep confirms DSI is not offered</p>",
         "<p>Rep clicks Continue with nothing selected</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2684"
+      ]
     },
     {
       "id": 3687,
@@ -1642,7 +1934,9 @@
         "<p>(Run A) Rep clicks Continue</p>",
         "<p>(Run B, fresh line) Rep clicks Back</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2683"
+      ]
     },
     {
       "id": 3686,
@@ -1673,7 +1967,9 @@
         "<p>Rep clicks Continue to payment</p>",
         "<p>Rep pays cash, exact amount</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2685"
+      ]
     },
     {
       "id": 3685,
@@ -2086,7 +2382,9 @@
       "name": "As a Metro by T-Mobile authorized dealer, I want to Create subscriber using HINT Lite",
       "folder_id": 378,
       "actions": [],
-      "issues": []
+      "issues": [
+        "QA-2840"
+      ]
     },
     {
       "id": 3618,
@@ -3367,7 +3665,9 @@
         "<p>click on no go back </p>",
         "<p>Click on any option then yes cancel transaction </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2575"
+      ]
     },
     {
       "id": 3091,
@@ -3390,7 +3690,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click order summary </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2574"
+      ]
     },
     {
       "id": 3090,
@@ -3413,7 +3715,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click order summary </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2573"
+      ]
     },
     {
       "id": 3089,
@@ -3436,7 +3740,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on add another  line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2572"
+      ]
     },
     {
       "id": 3088,
@@ -3459,7 +3765,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on add a line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2571"
+      ]
     },
     {
       "id": 3087,
@@ -3488,7 +3796,9 @@
         "<p>Click on cancel process </p>",
         "<p>click on yes cancel transaction </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2576"
+      ]
     },
     {
       "id": 3086,
@@ -3513,7 +3823,9 @@
         "<p>Click on cancel process  button  </p>",
         "<p>click on no go back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2569"
+      ]
     },
     {
       "id": 3085,
@@ -3537,7 +3849,9 @@
         "<p>Click on continue to order summary  button </p>",
         "<p>Click on cancel process  button  and choose \"system or technical issue\" option </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2568"
+      ]
     },
     {
       "id": 3084,
@@ -3561,7 +3875,9 @@
         "<p>Click on continue to order summary  button </p>",
         "<p>Click on cancel process  button  and choose \"customer changed their mind\" option </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2567"
+      ]
     },
     {
       "id": 3083,
@@ -3585,7 +3901,9 @@
         "<p>Click on continue to order summary  button </p>",
         "<p>Click on cancel process  button  and choose \"no issue to report\" option </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2566"
+      ]
     },
     {
       "id": 3082,
@@ -3676,7 +3994,9 @@
         "<p>Click on x </p>",
         "<p>check in dark mode </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2586"
+      ]
     },
     {
       "id": 3047,
@@ -3701,7 +4021,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2547"
+      ]
     },
     {
       "id": 3046,
@@ -3724,7 +4046,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2546"
+      ]
     },
     {
       "id": 3045,
@@ -3747,7 +4071,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2545"
+      ]
     },
     {
       "id": 3044,
@@ -3773,7 +4099,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2544"
+      ]
     },
     {
       "id": 3043,
@@ -3798,7 +4126,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2543"
+      ]
     },
     {
       "id": 3042,
@@ -3823,7 +4153,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2542"
+      ]
     },
     {
       "id": 3041,
@@ -3834,7 +4166,9 @@
         "<p>Go to new account page</p>",
         "<p>Click on continue</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2540"
+      ]
     },
     {
       "id": 3040,
@@ -3845,7 +4179,9 @@
         "<p>Go to new account page</p>",
         "<p>Click on continue</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2539"
+      ]
     },
     {
       "id": 3039,
@@ -3856,7 +4192,9 @@
         "<p>Go to new account page</p>",
         "<p>Click on continue</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2538"
+      ]
     },
     {
       "id": 3038,
@@ -3879,7 +4217,9 @@
         "<p>Click on x to cancel the line</p>",
         "<p>Click on yes remove line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2536"
+      ]
     },
     {
       "id": 3037,
@@ -3901,7 +4241,9 @@
         "<p>Click on x to cancel the line</p>",
         "<p>Click on yes remove line</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2535"
+      ]
     },
     {
       "id": 3036,
@@ -3922,7 +4264,9 @@
         "<p>Click on x to cancel the line </p>",
         "<p>Click on yes remove line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2534"
+      ]
     },
     {
       "id": 3035,
@@ -3943,7 +4287,9 @@
         "<p>Click on x to cancel the line </p>",
         "<p>Click on yes remove line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2533"
+      ]
     },
     {
       "id": 3034,
@@ -3962,7 +4308,9 @@
         "<p>Click on x to cancel the line</p>",
         "<p>Click on yes remove line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2532"
+      ]
     },
     {
       "id": 3032,
@@ -3979,7 +4327,9 @@
         "<p>Click on x to cancel the line </p>",
         "<p>Click on yes remove line </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2531"
+      ]
     },
     {
       "id": 3031,
@@ -4003,7 +4353,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Back  button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2530"
+      ]
     },
     {
       "id": 3030,
@@ -4027,7 +4379,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on order summary </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2529"
+      ]
     },
     {
       "id": 3029,
@@ -4051,7 +4405,9 @@
         "<p>Click on continue to order summary  button </p>",
         "<p>Click on Add a line  button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2528"
+      ]
     },
     {
       "id": 3028,
@@ -4077,7 +4433,9 @@
         "<p>Click on Create Subscriber </p>",
         "<p>Click on Add Another Line button </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2541"
+      ]
     },
     {
       "id": 3027,
@@ -4102,7 +4460,9 @@
         "<p>Go to new account page</p>",
         "<p>Click on continue</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2537"
+      ]
     },
     {
       "id": 3018,
@@ -4179,7 +4539,9 @@
       "name": "Try card Payment with Terminal not  configured",
       "folder_id": 277,
       "actions": [],
-      "issues": []
+      "issues": [
+        "QA-2523"
+      ]
     },
     {
       "id": 2986,
@@ -4254,7 +4616,9 @@
         "<p>Choose Dark mode </p>",
         "<p>Close user settings and check the icons </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2458"
+      ]
     },
     {
       "id": 2792,
@@ -4448,7 +4812,9 @@
         "<p>Click <strong>Continue</strong>.</p>",
         "<p>Click <strong>Submit</strong>.</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2406"
+      ]
     },
     {
       "id": 2608,
@@ -4458,7 +4824,9 @@
         "<p>Login into the app </p>",
         "<p>Set or resize the browser window so that the width is <strong>greater than 1280px</strong><br />(Example: 1366px or full screen).</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2404"
+      ]
     },
     {
       "id": 2607,
@@ -4468,7 +4836,9 @@
         "<p>Login into the app</p>",
         "<p>Resize the browser window so the screen width becomes <strong>less than 1280px</strong><br />(Example: 1100px).</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2403"
+      ]
     },
     {
       "id": 2606,
@@ -4489,7 +4859,9 @@
         "<p>Click no go back </p>",
         "<p>Click x to remove </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2402"
+      ]
     },
     {
       "id": 2605,
@@ -4510,7 +4882,9 @@
         "<p>Click no go back </p>",
         "<p>Click x to remove </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2401"
+      ]
     },
     {
       "id": 2604,
@@ -4529,7 +4903,9 @@
         "<p>Click on try again </p>",
         "<p>CLick on x to remove </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2400"
+      ]
     },
     {
       "id": 2603,
@@ -4553,7 +4929,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2399"
+      ]
     },
     {
       "id": 2602,
@@ -4571,7 +4949,9 @@
         "<p>Click on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2396"
+      ]
     },
     {
       "id": 2601,
@@ -4586,7 +4966,9 @@
         "<p>Click on continue to payment </p>",
         "<p>Collect payment then print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2425"
+      ]
     },
     {
       "id": 2600,
@@ -4599,7 +4981,9 @@
         "<p>click on Review &amp; add products</p>",
         "<p>Enter  an Item Not in ICITEM but Existing in Alphacomm</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2393"
+      ]
     },
     {
       "id": 2599,
@@ -4617,7 +5001,9 @@
         "<p>Click on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2395"
+      ]
     },
     {
       "id": 2593,
@@ -4638,7 +5024,9 @@
         "<p>Click on collect amount </p>",
         "<p>Click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2369"
+      ]
     },
     {
       "id": 2592,
@@ -4661,7 +5049,9 @@
         "<p>choose credit then Click on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2361"
+      ]
     },
     {
       "id": 2591,
@@ -4682,7 +5072,9 @@
         "<p>choose credit then Click on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2360"
+      ]
     },
     {
       "id": 2590,
@@ -4704,7 +5096,9 @@
         "<p>Choose credit then click on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2359"
+      ]
     },
     {
       "id": 2582,
@@ -4725,7 +5119,9 @@
         "<p>Enter item with quantity =1 </p>",
         "<p>Renter the same item </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2367"
+      ]
     },
     {
       "id": 2579,
@@ -4738,7 +5134,9 @@
         "<p>click on review &amp;add  products</p>",
         "<p>Enter serialized  item </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2366"
+      ]
     },
     {
       "id": 2578,
@@ -4751,7 +5149,9 @@
         "<p>click on review &amp;add products</p>",
         "<p>Enter an inactive item </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2368"
+      ]
     },
     {
       "id": 2577,
@@ -4764,7 +5164,9 @@
         "<p>click on review &amp;add products</p>",
         "<p>Enter an item </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2364"
+      ]
     },
     {
       "id": 2576,
@@ -4777,7 +5179,9 @@
         "<p>click on review &amp; add products</p>",
         "<p>Enter an accessory with zero quantity </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2363"
+      ]
     },
     {
       "id": 2575,
@@ -4790,7 +5194,9 @@
         "<p>click on review &amp;dd products</p>",
         "<p>Enter non tangible item </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2365"
+      ]
     },
     {
       "id": 2560,
@@ -4810,7 +5216,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2344"
+      ]
     },
     {
       "id": 2559,
@@ -4830,7 +5238,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2343"
+      ]
     },
     {
       "id": 2558,
@@ -4850,7 +5260,9 @@
         "<p>Click on the menu </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2342"
+      ]
     },
     {
       "id": 2554,
@@ -4870,7 +5282,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2341"
+      ]
     },
     {
       "id": 2553,
@@ -4890,7 +5304,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2340"
+      ]
     },
     {
       "id": 2552,
@@ -4910,7 +5326,9 @@
         "<p>Click on the menu </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2339"
+      ]
     },
     {
       "id": 2551,
@@ -5035,7 +5453,9 @@
         "<p>click on Review &amp; add products</p>",
         "<p>Enter any invalid metro </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2362"
+      ]
     },
     {
       "id": 2504,
@@ -5056,7 +5476,9 @@
         "<p>CLick on collect amount </p>",
         "<p>Click on submit  and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2358"
+      ]
     },
     {
       "id": 2502,
@@ -5069,7 +5491,9 @@
         "<p>Click on collect payment </p>",
         "<p>choose debit then click on collect amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2331"
+      ]
     },
     {
       "id": 2496,
@@ -5088,7 +5512,9 @@
         "<p>enter amount then click on collect amount </p>",
         "<p>click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2322"
+      ]
     },
     {
       "id": 2495,
@@ -5106,7 +5532,9 @@
         "<p>click on collect amount </p>",
         "<p>Click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2305"
+      ]
     },
     {
       "id": 2494,
@@ -5124,7 +5552,9 @@
         "<p>Enter amount then click on collect </p>",
         "<p>click on submit and print</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2308"
+      ]
     },
     {
       "id": 2493,
@@ -5142,7 +5572,9 @@
         "<p>Enter amount then click on collect amount </p>",
         "<p>click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2323"
+      ]
     },
     {
       "id": 2492,
@@ -5156,7 +5588,9 @@
         "<p>choose debit</p>",
         "<p>Enter amount&gt;  invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2306"
+      ]
     },
     {
       "id": 2489,
@@ -5180,7 +5614,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2310"
+      ]
     },
     {
       "id": 2488,
@@ -5201,7 +5637,9 @@
         "<p>CLick on cancel order </p>",
         "<p>Click on yes</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2324"
+      ]
     },
     {
       "id": 2487,
@@ -5220,7 +5658,9 @@
         "<p>CLick on cancel order </p>",
         "<p>Click yes</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2307"
+      ]
     },
     {
       "id": 2486,
@@ -5240,7 +5680,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2301"
+      ]
     },
     {
       "id": 2485,
@@ -5260,7 +5702,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2300"
+      ]
     },
     {
       "id": 2484,
@@ -5280,7 +5724,9 @@
         "<p>Click on cancel order </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2299"
+      ]
     },
     {
       "id": 2482,
@@ -5294,7 +5740,9 @@
         "<p>choose debit or credit then click on collect payment </p>",
         "<p>Click “Cancel” on terminal.</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2330"
+      ]
     },
     {
       "id": 2481,
@@ -5309,14 +5757,18 @@
         "<p>click on collect amount </p>",
         "<p>Wait until terminal times out (no card interaction).</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2329"
+      ]
     },
     {
       "id": 2480,
       "name": "Internet Lost During Payment Processing (After Card Tap)",
       "folder_id": 277,
       "actions": [],
-      "issues": []
+      "issues": [
+        "QA-2328"
+      ]
     },
     {
       "id": 2479,
@@ -5331,7 +5783,9 @@
         "<p>Click on collect amount </p>",
         "<p>Disconnect internet on the UI side (disable network).</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2327"
+      ]
     },
     {
       "id": 2132,
@@ -5362,7 +5816,9 @@
         "<p>Click on Submit &amp; print </p>",
         "<p>Click on try again </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2325"
+      ]
     },
     {
       "id": 2120,
@@ -5383,7 +5839,9 @@
         "<p>click on collect amount </p>",
         "<p>click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2321"
+      ]
     },
     {
       "id": 2118,
@@ -5396,7 +5854,9 @@
         "<p>click on collect payment </p>",
         "<p>choose credit and enter amount &lt;invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2320"
+      ]
     },
     {
       "id": 2117,
@@ -5408,7 +5868,9 @@
         "<p>click on collect payment </p>",
         "<p>choose credit and enter amount &gt; total invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2319"
+      ]
     },
     {
       "id": 2116,
@@ -5432,7 +5894,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2326"
+      ]
     },
     {
       "id": 2111,
@@ -5456,7 +5920,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2314"
+      ]
     },
     {
       "id": 2110,
@@ -5479,7 +5945,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2318"
+      ]
     },
     {
       "id": 2108,
@@ -5501,7 +5969,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2313"
+      ]
     },
     {
       "id": 2107,
@@ -5526,7 +5996,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2312"
+      ]
     },
     {
       "id": 2103,
@@ -5545,7 +6017,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2317"
+      ]
     },
     {
       "id": 2102,
@@ -5565,7 +6039,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2316"
+      ]
     },
     {
       "id": 2101,
@@ -5584,7 +6060,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2315"
+      ]
     },
     {
       "id": 2100,
@@ -5608,7 +6086,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2311"
+      ]
     },
     {
       "id": 2099,
@@ -5629,7 +6109,9 @@
         "<p>click on submit and print </p>",
         "<p>choose Spanish as language and reprint </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2335"
+      ]
     },
     {
       "id": 2098,
@@ -5642,7 +6124,9 @@
         "<p>click on collect </p>",
         "<p>enter cash 100/debit 6/credit 0</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2338"
+      ]
     },
     {
       "id": 2097,
@@ -5656,7 +6140,9 @@
         "<p>enter 25 as cash /50debit/50 credit </p>",
         "<p>void cash </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2337"
+      ]
     },
     {
       "id": 2093,
@@ -5671,7 +6157,9 @@
         "<p>Enter 5.2 -cash </p>",
         "<p>Enter amount &gt; remaining </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2336"
+      ]
     },
     {
       "id": 2091,
@@ -5687,7 +6175,9 @@
         "<p>choose credit  and collect 15 as amount </p>",
         "<p>Click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2334"
+      ]
     },
     {
       "id": 2090,
@@ -5705,7 +6195,9 @@
         "<p>Do the same for debit and credit, each with amount = 1.3</p>",
         "<p>Click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2333"
+      ]
     },
     {
       "id": 2089,
@@ -5726,7 +6218,9 @@
         "<p>click on submit and print </p>",
         "<p>Click on try again</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2309"
+      ]
     },
     {
       "id": 2083,
@@ -5747,7 +6241,9 @@
         "<p>click on collect amount </p>",
         "<p>Click on submit and print </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2304"
+      ]
     },
     {
       "id": 2071,
@@ -5761,7 +6257,9 @@
         "<p>Choose debit card </p>",
         "<p>Enter amount &gt; invoice amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2303"
+      ]
     },
     {
       "id": 2056,
@@ -5786,7 +6284,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2295"
+      ]
     },
     {
       "id": 2055,
@@ -5808,7 +6308,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2302"
+      ]
     },
     {
       "id": 2047,
@@ -5830,7 +6332,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2296"
+      ]
     },
     {
       "id": 2046,
@@ -5857,7 +6361,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2298"
+      ]
     },
     {
       "id": 2037,
@@ -5881,7 +6387,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2297"
+      ]
     },
     {
       "id": 1877,
@@ -5899,7 +6407,9 @@
         "<p>Click on collect payment </p>",
         "<p>Click on<strong> Invoice Payment</strong> breadcrumb in the top bar</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2215"
+      ]
     },
     {
       "id": 1875,
@@ -5921,7 +6431,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2158"
+      ]
     },
     {
       "id": 1874,
@@ -5943,7 +6455,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2147"
+      ]
     },
     {
       "id": 1873,
@@ -5965,7 +6479,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2117"
+      ]
     },
     {
       "id": 1872,
@@ -5986,7 +6502,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2093"
+      ]
     },
     {
       "id": 1871,
@@ -6008,7 +6526,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2186"
+      ]
     },
     {
       "id": 1765,
@@ -6021,7 +6541,9 @@
         "<p>Click on a POS station that is checked</p>",
         "<p>Click on delete  POS station </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1792"
+      ]
     },
     {
       "id": 1763,
@@ -6044,7 +6566,9 @@
         "<p>click on exist </p>",
         "<p>Repeat steps from 1-9 </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2163"
+      ]
     },
     {
       "id": 1761,
@@ -6068,7 +6592,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2146"
+      ]
     },
     {
       "id": 1760,
@@ -6089,7 +6615,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2162"
+      ]
     },
     {
       "id": 1759,
@@ -6103,7 +6631,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2159"
+      ]
     },
     {
       "id": 1758,
@@ -6117,7 +6647,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2138"
+      ]
     },
     {
       "id": 1754,
@@ -6139,7 +6671,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2214"
+      ]
     },
     {
       "id": 1753,
@@ -6159,7 +6693,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2135"
+      ]
     },
     {
       "id": 1752,
@@ -6182,7 +6718,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2136"
+      ]
     },
     {
       "id": 1751,
@@ -6204,7 +6742,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2157"
+      ]
     },
     {
       "id": 1750,
@@ -6227,7 +6767,9 @@
         "<p>click on exist </p>",
         "<p>repeat steps from1 -7</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2133"
+      ]
     },
     {
       "id": 1746,
@@ -6249,7 +6791,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2156"
+      ]
     },
     {
       "id": 1745,
@@ -6271,7 +6815,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2132"
+      ]
     },
     {
       "id": 1744,
@@ -6289,7 +6835,9 @@
         "<p>Choose the third option</p>",
         "<p>Click No,go back to invoice</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2153"
+      ]
     },
     {
       "id": 1743,
@@ -6307,7 +6855,9 @@
         "<p>Choose the third option</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2152"
+      ]
     },
     {
       "id": 1741,
@@ -6325,7 +6875,9 @@
         "<p>Choose the second option</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2151"
+      ]
     },
     {
       "id": 1740,
@@ -6338,7 +6890,9 @@
         "<p>Select continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2134"
+      ]
     },
     {
       "id": 1734,
@@ -6352,7 +6906,9 @@
         "<p>Click on collect payment </p>",
         "<p>Enter 25.00</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2130"
+      ]
     },
     {
       "id": 1731,
@@ -6366,7 +6922,9 @@
         "<p>Click on collect payment </p>",
         "<p>Click on <strong>Invoice Payment</strong> breadcrumb in the top bar</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2155"
+      ]
     },
     {
       "id": 1730,
@@ -6380,7 +6938,9 @@
         "<p>Click on Review invoice </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2154"
+      ]
     },
     {
       "id": 1726,
@@ -6397,7 +6957,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2150"
+      ]
     },
     {
       "id": 1725,
@@ -6408,7 +6970,9 @@
         "<p>Enter metro phone number from the search  bar </p>",
         "<p>Click on metro payment </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2131"
+      ]
     },
     {
       "id": 1724,
@@ -6421,7 +6985,9 @@
         "<p>Select continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2149"
+      ]
     },
     {
       "id": 1720,
@@ -6442,7 +7008,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2129"
+      ]
     },
     {
       "id": 1719,
@@ -6462,7 +7030,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2148"
+      ]
     },
     {
       "id": 1718,
@@ -6485,7 +7055,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2128"
+      ]
     },
     {
       "id": 1717,
@@ -6507,7 +7079,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2213"
+      ]
     },
     {
       "id": 1716,
@@ -6528,7 +7102,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2109"
+      ]
     },
     {
       "id": 1715,
@@ -6551,7 +7127,9 @@
         "<p>click on exist </p>",
         "<p>Repeat steps from 1-9</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2115"
+      ]
     },
     {
       "id": 1702,
@@ -6572,7 +7150,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2201"
+      ]
     },
     {
       "id": 1701,
@@ -6596,7 +7176,9 @@
         "<p>Repeat steps from 1-9</p>",
         "<p>Click on back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2200"
+      ]
     },
     {
       "id": 1700,
@@ -6620,7 +7202,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2199"
+      ]
     },
     {
       "id": 1699,
@@ -6642,7 +7226,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2224"
+      ]
     },
     {
       "id": 1698,
@@ -6658,7 +7244,9 @@
         "<p>Click on continue </p>",
         "<p>Enter 25.00</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2190"
+      ]
     },
     {
       "id": 1697,
@@ -6671,7 +7259,9 @@
         "<p>Select continue</p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2189"
+      ]
     },
     {
       "id": 1696,
@@ -6684,7 +7274,9 @@
         "<p>Select continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2188"
+      ]
     },
     {
       "id": 1695,
@@ -6706,7 +7298,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2210"
+      ]
     },
     {
       "id": 1694,
@@ -6726,7 +7320,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2185"
+      ]
     },
     {
       "id": 1693,
@@ -6749,7 +7345,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2184"
+      ]
     },
     {
       "id": 1692,
@@ -6765,7 +7363,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Invoice payment Topbar Breadcrumb</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2197"
+      ]
     },
     {
       "id": 1691,
@@ -6781,7 +7381,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2196"
+      ]
     },
     {
       "id": 1690,
@@ -6798,7 +7400,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click No,go back to invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2195"
+      ]
     },
     {
       "id": 1689,
@@ -6816,7 +7420,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2194"
+      ]
     },
     {
       "id": 1688,
@@ -6834,7 +7440,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2193"
+      ]
     },
     {
       "id": 1687,
@@ -6851,7 +7459,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2192"
+      ]
     },
     {
       "id": 1686,
@@ -6862,7 +7472,9 @@
         "<p>Enter metro phone number from the search  bar </p>",
         "<p>Click on metro payment </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2191"
+      ]
     },
     {
       "id": 1685,
@@ -6875,7 +7487,9 @@
         "<p>Select continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2187"
+      ]
     },
     {
       "id": 1684,
@@ -6897,7 +7511,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2183"
+      ]
     },
     {
       "id": 1683,
@@ -6920,7 +7536,9 @@
         "<p>click on exist </p>",
         "<p>Repeat steps from 1-9</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2098"
+      ]
     },
     {
       "id": 1668,
@@ -6944,7 +7562,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2097"
+      ]
     },
     {
       "id": 1663,
@@ -6965,7 +7585,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2094"
+      ]
     },
     {
       "id": 1662,
@@ -6986,7 +7608,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2211"
+      ]
     },
     {
       "id": 1661,
@@ -7009,7 +7633,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2099"
+      ]
     },
     {
       "id": 1652,
@@ -7031,7 +7657,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2092"
+      ]
     },
     {
       "id": 1648,
@@ -7055,7 +7683,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2114"
+      ]
     },
     {
       "id": 1647,
@@ -7077,7 +7707,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2127"
+      ]
     },
     {
       "id": 1643,
@@ -7099,7 +7731,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2212"
+      ]
     },
     {
       "id": 1642,
@@ -7119,7 +7753,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2111"
+      ]
     },
     {
       "id": 1641,
@@ -7142,7 +7778,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2116"
+      ]
     },
     {
       "id": 1608,
@@ -7208,7 +7846,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click No,go back to invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2143"
+      ]
     },
     {
       "id": 1576,
@@ -7226,7 +7866,9 @@
         "<p>Choose the third  option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2141"
+      ]
     },
     {
       "id": 1575,
@@ -7244,7 +7886,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2140"
+      ]
     },
     {
       "id": 1556,
@@ -7260,7 +7904,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2145"
+      ]
     },
     {
       "id": 1555,
@@ -7276,7 +7922,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2144"
+      ]
     },
     {
       "id": 1551,
@@ -7293,7 +7941,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2139"
+      ]
     },
     {
       "id": 1550,
@@ -7309,7 +7959,9 @@
         "<p>Click on continue</p>",
         "<p>Add cash amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2160"
+      ]
     },
     {
       "id": 1544,
@@ -7320,7 +7972,9 @@
         "<p>Enter metro phone number from the search  bar </p>",
         "<p>Click on metro payment </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2142"
+      ]
     },
     {
       "id": 1543,
@@ -7334,7 +7988,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2137"
+      ]
     },
     {
       "id": 1505,
@@ -7350,7 +8006,9 @@
         "<p>Choose the third option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2123"
+      ]
     },
     {
       "id": 1504,
@@ -7366,7 +8024,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2122"
+      ]
     },
     {
       "id": 1503,
@@ -7379,7 +8039,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2119"
+      ]
     },
     {
       "id": 1502,
@@ -7392,7 +8054,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2112"
+      ]
     },
     {
       "id": 1500,
@@ -7408,7 +8072,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back <strong>Invoice Payment</strong> breadcrumb in the top bar</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2126"
+      ]
     },
     {
       "id": 1499,
@@ -7424,7 +8090,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2125"
+      ]
     },
     {
       "id": 1498,
@@ -7441,7 +8109,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click No,go back to invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2124"
+      ]
     },
     {
       "id": 1495,
@@ -7456,7 +8126,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2121"
+      ]
     },
     {
       "id": 1494,
@@ -7472,7 +8144,9 @@
         "<p>Click on continue</p>",
         "<p>Add cash amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2113"
+      ]
     },
     {
       "id": 1488,
@@ -7483,7 +8157,9 @@
         "<p>Enter metro phone number from the search  bar </p>",
         "<p>Click on metro payment </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2120"
+      ]
     },
     {
       "id": 1487,
@@ -7496,7 +8172,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2118"
+      ]
     },
     {
       "id": 1484,
@@ -7512,7 +8190,9 @@
         "<p>Click on continue </p>",
         "<p>Click on <strong>Invoice Payment</strong> breadcrumb in the top bar</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2108"
+      ]
     },
     {
       "id": 1483,
@@ -7528,7 +8208,9 @@
         "<p>Choose the third  option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2105"
+      ]
     },
     {
       "id": 1482,
@@ -7544,7 +8226,9 @@
         "<p>Choose the second option </p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2104"
+      ]
     },
     {
       "id": 1464,
@@ -7560,7 +8244,9 @@
         "<p>Click on continue </p>",
         "<p>Click on Back </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2107"
+      ]
     },
     {
       "id": 1463,
@@ -7577,7 +8263,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click No,go back to invoice </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2106"
+      ]
     },
     {
       "id": 1460,
@@ -7592,7 +8280,9 @@
         "<p>Click on Cancel</p>",
         "<p>Click on Yes </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2103"
+      ]
     },
     {
       "id": 1459,
@@ -7608,7 +8298,9 @@
         "<p>Click on continue</p>",
         "<p>Add cash amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2096"
+      ]
     },
     {
       "id": 1458,
@@ -7621,7 +8313,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2101"
+      ]
     },
     {
       "id": 1457,
@@ -7634,7 +8328,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2095"
+      ]
     },
     {
       "id": 1453,
@@ -7645,7 +8341,9 @@
         "<p>Enter metro phone number from the search  bar </p>",
         "<p>Click on metro payment </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2102"
+      ]
     },
     {
       "id": 1452,
@@ -7658,7 +8356,9 @@
         "<p>Click on continue </p>",
         "<p>Enter amount </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2100"
+      ]
     },
     {
       "id": 1319,
@@ -7819,7 +8519,9 @@
         "<p>click on cancel </p>",
         "<p>click on exist </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-2110"
+      ]
     },
     {
       "id": 849,
@@ -7831,7 +8533,9 @@
         "<p>Click on user menu </p>",
         "<p>click on the \"Logout\" button</p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1825"
+      ]
     },
     {
       "id": 567,
@@ -7844,7 +8548,9 @@
         "<p>Enter the valid credential </p>",
         "<p>Click on Sign in </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1806"
+      ]
     },
     {
       "id": 566,
@@ -7857,7 +8563,9 @@
         "<p>Click on a POS station  under manage stations sections </p>",
         "<p>Click on delete  POS station </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1792"
+      ]
     },
     {
       "id": 555,
@@ -7935,7 +8643,9 @@
         "<p>Select the station from the header</p>",
         "<p>Click on any Station </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1787"
+      ]
     },
     {
       "id": 547,
@@ -8143,7 +8853,9 @@
         "<p>Edit any field </p>",
         "<p>save update </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1791"
+      ]
     },
     {
       "id": 526,
@@ -8159,7 +8871,9 @@
         "<p>Enter Remark </p>",
         "<p>Click on save updates </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1790"
+      ]
     },
     {
       "id": 524,
@@ -8174,7 +8888,9 @@
         "<p>Enter Remark </p>",
         "<p>Click on save updates </p>"
       ],
-      "issues": []
+      "issues": [
+        "QA-1789"
+      ]
     },
     {
       "id": 506,
