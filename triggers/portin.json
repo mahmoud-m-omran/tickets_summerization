@@ -1,0 +1,527 @@
+﻿{
+  "ticket_key": "Port-In Activations",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to activate a store-stock phone while the customer keeps their existing number from another carrier, so that the port is accepted, the old carrier is shown and no extra charge appears up to the payment screen",
+      "priority": "Critical",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. This test walks the whole thing with a phone from store stock and a number the carrier reports as Verizon: the port is accepted, the carrier details are shown in the cart drawer, the port-specific rebate is offered, and the order reaches the payment screen with the same amount as a new-number order. It stops before any money is taken.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-2018 (Port-In Activations epic), RTPL-2063 (port-in screens), RTPL-2022 (port check), RTPL-3023 (current carrier shown), RTPL-2409 (port rebate on the Promotion screen)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Number to port:** 2483031112 - the carrier reports it as VERIZON WIRELESS-CA, submarket Detroit  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted at the port check, activated with Create subscriber and walked to the payment screen. Alternates that passed the port check but were not walked further: 2483036904 and 5038750770 (both Verizon). Never use 2146641469 (Create subscriber is refused with Activation failed) and do not use 5038751234 for a port-rebate check (it is a T-Mobile number, so no port rebate is offered))_\n- **Old-carrier account number and PIN:** Account number 123456789, PIN 1234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted; the test carrier takes any digits here (confirmed by the product owner on QA-2682, 2026-08-21))_\n- **Plan:** MAU55, $60.00 per month (already marked Selected on the Plan selection screen)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; cart read Plan (MAU55) $60.00 / mo.)_\n- **Promotions offered for this ported number:** $55 Device Rebate (COUP_NEUVQ4) and $55 Port Device Rebate (COUP_NEUVQ5), both against the $229.99 phone  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the Promotion selection screen read Great news, customer is eligible for 2 promotions.)_\n- **Expected amounts:** Cart Total due $255.29 before and after the port; after the plan: Estimated monthly $60.00, Total due $315.29. Order summary: Total MRC $60.00, Total taxes & fees $0.00, Total PP Tax $2.30, Edge due immediately $60.00. Payment screen: Collect $315.29  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; read off the Cart, the Order summary and the Collect payment from customer screen)_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- If 2483031112 is ever refused at the port check, try 2483036904 and then 5038750770 (both reported as Verizon on 2026-11-03, accepted at the port check but not walked to Create subscriber). Never use 2146641469: it passes the port check and then Create subscriber fails with Activation failed - This activation could not be completed. Contact the support team. Number is not eligible for Port In.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.\n- CONFIRM BEFORE AUTOMATING: the note Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. is old text that is still shown even though porting now works (raised with the product owner). Do not fail the test on that sentence if it disappears.\n- CONFIRM BEFORE AUTOMATING: PP Tax ($2.30 on the $229.99 phone) is what the UAT2 store charged on 2026-11-03 (1% of the price). If the store's rate or the phone price changes, re-read the Cart at the SIM validation step and update the figures.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Type the number to port in both Phone number to port and Confirm phone number to port, the old-carrier account number in both account number boxes and the old-carrier PIN in both PIN boxes",
+          "expected": "The phone boxes show the number as (248) 303-1112. The account number shows exactly as typed. The PIN boxes show dots. Continue becomes available (purple)."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window reading Adding phone number port... covers the screen for a few seconds and no second click is possible. It closes and the heading changes to Protection selection, listing Metro Complete Protection $10.00 per month, Metro Advanced Protection $6.00 per month and Metro Basic Protection $3.00 per month with Skip and Continue buttons. The Cart now shows a new row Phone number port (248) 303-1112 under the SIM card row, and Total due still reads $255.29 - the port adds no charge. SERVICE CHECK (for the automation engineer): the configure-mdn response's mdnConfigDetails reads type \"port-in\", mdn \"2483031112\", currentCarrier \"VERIZON WIRELESS-CA\", submarketName \"Detroit\", providerId \"6006\", submarketCode \"070\", stateCode \"MI\", accountNumber \"123456789\"."
+        },
+        {
+          "action": "In the Cart, click the Phone number port row",
+          "expected": "A drawer slides in from the right headed Phone number port with these rows: Phone number type port-in, Port-in MDN (248) 303-1112, Current carrier VERIZON WIRELESS-CA, Carrier account number 123456789, Submarket Detroit, and a Back button. The PIN is not shown anywhere in the drawer."
+        },
+        {
+          "action": "Click Back in the drawer",
+          "expected": "The drawer closes and the Protection selection screen is unchanged."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? asks Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($60.00 per month) already marked Selected. The Cart shows Protection Declined, Plan (MAU55) $60.00 / mo., Phone number port (248) 303-1112, Estimated monthly $60.00 and Total due $315.29. SERVICE CHECK (for the automation engineer): the configure-plan response reads planConfigDetails.selectedPlanSocCode \"MAU55\" and selectedPlanRate 60."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 2 promotions. Select then continue below. Two cards show, each with the phone's price $229.99: $55 Device Rebate (COUP_NEUVQ4) - Customers who activate a new line of service on select plans are eligible for discounts off select phones. - and $55 Port Device Rebate (COUP_NEUVQ5) - Customers who port a new line of service on select plans are eligible for discounts off select phones. Limit 2 Instant Rebates per account during promo period. Each card has a Select button; below are Decline and Continue buttons."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied. with the buttons Continue and Back."
+        },
+        {
+          "action": "In that window click Continue",
+          "expected": "The heading changes to Add on services. The Cart still shows Phone number port (248) 303-1112, Device $255.29 and Total due $315.29. SERVICE CHECK (for the automation engineer): the configure-promotions response reads promotionsSkipped true and selectedPromotions empty."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999939175460833. Click create subscriber to continue. with the buttons Create subscriber and Back."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. Under Due Immediately it lists an Order ID, an Account number, Lines in order 1, Total MRC $60.00, Total taxes & fees $0.00, Total PP Tax $2.30 and Edge due immediately $60.00, then the SOS form language choices English and Español, a Metro bill payment box and Back and Continue buttons. The Cart still shows the Phone number port (248) 303-1112 row, Add-on Declined and Total due $315.29."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Add accessories with Scan accessory item and Browse accessories. The Cart reads Inventory $0.00, PP Tax $2.30 and Total due $315.29."
+        },
+        {
+          "action": "Click Continue without adding an accessory",
+          "expected": "A drawer slides in from the right headed Financing reading Congratulations, financing is available! Buy now, pay later. No hidden fees. with Affirm and SmartPay and the buttons No thanks and Continue."
+        },
+        {
+          "action": "Click No thanks",
+          "expected": "A window headed Decline Financing asks Are you sure you want to continue this payment without a financing loan? with the buttons Decline and Go back."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "The heading changes to Collect payment from customer and reads Collect $315.29 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card with an Amount box and a Collect amount button. The Cart lists the phone line $315.29, Customer payments $0.00, Cash $0.00, PP Tax $2.30, Total due $315.29, Total collected $0.00, Balance due $315.29 and Change due back to customer $0.00. Below the Cart is the line Receipt: English, small, Quantity 1 - Edit Settings and a greyed-out Submit order button."
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit order",
+          "expected": "Nothing further is checked. The phone, SIM and ported number stay reusable for the next run."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to apply the port-in device rebate when a customer brings their number from another carrier, so that the port promotion is selected and the order still reaches the payment screen",
+      "priority": "High",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. Some promotions are only for customers who bring their number from another carrier. This test ports a Verizon number on a store-stock phone and, on the Promotion selection screen, picks the $55 Port Device Rebate instead of declining promotions, then carries on to the payment screen. The point is that the port rebate can be chosen and the order still goes through to payment. It stops before any money is taken.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-2409 (port coupons on the Promotion screen), RTPL-3024 (the carrier decides port promotion eligibility), RTPL-2018 (epic)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Number to port:** 2483031112 - the carrier reports it as VERIZON WIRELESS-CA, submarket Detroit  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted at the port check, activated with Create subscriber and walked to the payment screen. Alternates that passed the port check but were not walked further: 2483036904 and 5038750770 (both Verizon). Never use 2146641469 (Create subscriber is refused with Activation failed) and do not use 5038751234 for a port-rebate check (it is a T-Mobile number, so no port rebate is offered))_\n- **Old-carrier account number and PIN:** Account number 123456789, PIN 1234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted; the test carrier takes any digits here (confirmed by the product owner on QA-2682, 2026-08-21))_\n- **Plan:** MAU55, $60.00 per month (already marked Selected on the Plan selection screen)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; cart read Plan (MAU55) $60.00 / mo.)_\n- **Promotions offered for this ported number:** $55 Device Rebate (COUP_NEUVQ4) and $55 Port Device Rebate (COUP_NEUVQ5), both against the $229.99 phone  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the Promotion selection screen read Great news, customer is eligible for 2 promotions.)_\n- **Expected amounts:** Cart Total due $255.29 before and after the port; after the plan: Estimated monthly $60.00, Total due $315.29. Order summary: Total MRC $60.00, Total taxes & fees $0.00, Total PP Tax $2.30, Edge due immediately $60.00. Payment screen: Collect $315.29  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; read off the Cart, the Order summary and the Collect payment from customer screen)_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- If 2483031112 is ever refused at the port check, try 2483036904 and then 5038750770 (both reported as Verizon on 2026-11-03, accepted at the port check but not walked to Create subscriber). Never use 2146641469: it passes the port check and then Create subscriber fails with Activation failed - This activation could not be completed. Contact the support team. Number is not eligible for Port In.\n- Never click Collect amount or Submit order. The test ends before any payment is taken.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.\n- CONFIRM BEFORE AUTOMATING: the note Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. is old text that is still shown even though porting now works (raised with the product owner). Do not fail the test on that sentence if it disappears.\n- CONFIRM BEFORE AUTOMATING: PP Tax ($2.30 on the $229.99 phone) is what the UAT2 store charged on 2026-11-03 (1% of the price). If the store's rate or the phone price changes, re-read the Cart at the SIM validation step and update the figures.\n- The port rebate is offered only when the carrier reports the number as belonging to another company. 5038751234 reports as T-MOBILE USA, INC. and shows a single promotion ($55 Device Rebate), so it cannot be used for this test.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Type the number to port in both Phone number to port and Confirm phone number to port, the old-carrier account number in both account number boxes and the old-carrier PIN in both PIN boxes",
+          "expected": "The phone boxes show the number as (248) 303-1112. The account number shows exactly as typed. The PIN boxes show dots. Continue becomes available (purple)."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window reading Adding phone number port... covers the screen for a few seconds and no second click is possible. It closes and the heading changes to Protection selection, listing Metro Complete Protection $10.00 per month, Metro Advanced Protection $6.00 per month and Metro Basic Protection $3.00 per month with Skip and Continue buttons. The Cart now shows a new row Phone number port (248) 303-1112 under the SIM card row, and Total due still reads $255.29 - the port adds no charge. SERVICE CHECK (for the automation engineer): the configure-mdn response's mdnConfigDetails reads type \"port-in\", mdn \"2483031112\", currentCarrier \"VERIZON WIRELESS-CA\", submarketName \"Detroit\", providerId \"6006\", submarketCode \"070\", stateCode \"MI\", accountNumber \"123456789\"."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? asks Are you sure you want to decline protection? with the buttons Yes, continue and Back."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($60.00 per month) already marked Selected. The Cart shows Protection Declined, Plan (MAU55) $60.00 / mo., Phone number port (248) 303-1112, Estimated monthly $60.00 and Total due $315.29. SERVICE CHECK (for the automation engineer): the configure-plan response reads planConfigDetails.selectedPlanSocCode \"MAU55\" and selectedPlanRate 60."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 2 promotions. Select then continue below. Two cards show, each with the phone's price $229.99: $55 Device Rebate (COUP_NEUVQ4) - Customers who activate a new line of service on select plans are eligible for discounts off select phones. - and $55 Port Device Rebate (COUP_NEUVQ5) - Customers who port a new line of service on select plans are eligible for discounts off select phones. Limit 2 Instant Rebates per account during promo period. Each card has a Select button; below are Decline and Continue buttons."
+        },
+        {
+          "action": "On the $55 Port Device Rebate card click Select",
+          "expected": "The $55 Port Device Rebate card now reads Selected; the $55 Device Rebate card still reads Select. CONFIRM BEFORE AUTOMATING: on 2026-11-03 the Cart briefly read Device $252.99 and Total due $312.99 after the click and went back to $255.29 / $315.29 after the next step, so the rebate's value in this environment looks like $0.00 - ask the product owner what this promotion should take off before asserting an amount."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window reading Setting promotion... shows briefly, then the heading changes to Add on services. The Cart shows Phone number port (248) 303-1112, Device $255.29 and Total due $315.29. SERVICE CHECK (for the automation engineer): the configure-promotions response lists COUP_NEUVQ5 under selectedPromotions - CONFIRM BEFORE AUTOMATING, this response was not read on 2026-11-03."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999939175460833. Click create subscriber to continue. with the buttons Create subscriber and Back."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. Under Due Immediately it lists an Order ID, an Account number, Lines in order 1, Total MRC $60.00, Total taxes & fees $0.00, Total PP Tax $2.30 and Edge due immediately $60.00, then the SOS form language choices English and Español, a Metro bill payment box and Back and Continue buttons. The Cart still shows the Phone number port (248) 303-1112 row, Add-on Declined and Total due $315.29."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Add accessories with Scan accessory item and Browse accessories. The Cart reads Inventory $0.00, PP Tax $2.30 and Total due $315.29."
+        },
+        {
+          "action": "Click Continue without adding an accessory",
+          "expected": "A drawer slides in from the right headed Financing reading Congratulations, financing is available! Buy now, pay later. No hidden fees. with Affirm and SmartPay and the buttons No thanks and Continue."
+        },
+        {
+          "action": "Click No thanks",
+          "expected": "A window headed Decline Financing asks Are you sure you want to continue this payment without a financing loan? with the buttons Decline and Go back."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "The heading changes to Collect payment from customer and reads Collect $315.29 with cash, card, or split the payment across multiple methods. The Pay with choices are Cash, Debit card and Credit card with an Amount box and a Collect amount button. The Cart lists the phone line $315.29, Customer payments $0.00, Cash $0.00, PP Tax $2.30, Total due $315.29, Total collected $0.00, Balance due $315.29 and Change due back to customer $0.00. Below the Cart is the line Receipt: English, small, Quantity 1 - Edit Settings and a greyed-out Submit order button."
+        },
+        {
+          "action": "Stop here - do NOT click Collect amount and do NOT click Submit order",
+          "expected": "Nothing further is checked. The phone, SIM and ported number stay reusable for the next run."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to be told when a number cannot be ported and correct it on the same screen, so that the customer is never activated with a number the carrier refuses",
+      "priority": "High",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. Not every number can be moved: the carrier refuses some of them. This test types a number the carrier refuses, checks the refusal message and that nothing typed is lost, then corrects the number to one the carrier accepts and checks the order moves on. It ends as soon as the corrected port is accepted.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-2022 (port check and its refusal), RTPL-2021 (re-enter port details), RTPL-2018 (epic)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Number to port:** 2483031112 - the carrier reports it as VERIZON WIRELESS-CA, submarket Detroit  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted at the port check, activated with Create subscriber and walked to the payment screen. Alternates that passed the port check but were not walked further: 2483036904 and 5038750770 (both Verizon). Never use 2146641469 (Create subscriber is refused with Activation failed) and do not use 5038751234 for a port-rebate check (it is a T-Mobile number, so no port rebate is offered))_\n- **Old-carrier account number and PIN:** Account number 123456789, PIN 1234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: accepted; the test carrier takes any digits here (confirmed by the product owner on QA-2682, 2026-08-21))_\n- **Number the carrier refuses:** 5555551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: refused with the message quoted in the steps (Metro code 500000034); 3055551234 and 7865551234 are refused the same way and can be used instead)_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- If 2483031112 is ever refused at the port check, try 2483036904 and then 5038750770 (both reported as Verizon on 2026-11-03, accepted at the port check but not walked to Create subscriber). Never use 2146641469: it passes the port check and then Create subscriber fails with Activation failed - This activation could not be completed. Contact the support team. Number is not eligible for Port In.\n- The refusal shows as a message box at the top right that closes by itself after a few seconds - read it as soon as Continue is clicked, do not look for it later.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.\n- CONFIRM BEFORE AUTOMATING: RTPL-2021 says the three confirm boxes should be cleared after a refusal; on 2026-11-03 they kept their values. This ticket describes what the screen does today - ask the product owner which is wanted before asserting either way.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Type the refused number in both Phone number to port and Confirm phone number to port, the old-carrier account number in both account number boxes and the old-carrier PIN in both PIN boxes",
+          "expected": "The phone boxes show (555) 555-1234, the account number shows exactly as typed, the PIN boxes show dots and Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The window Adding phone number port... shows briefly and closes. The heading stays Phone number selection. A message box appears at the top right headed Port in not eligible reading Phone number 5555551234 is not eligible for port-in: Number is not eligible for Port In (Metro code: 500000034) followed by Code: port-in-not-eligible, a Correlation ID and a Timestamp. All six boxes still hold the values typed, including the three confirm boxes. The Cart has no Phone number port row and Total due still reads $255.29."
+        },
+        {
+          "action": "Replace the number in both Phone number to port and Confirm phone number to port with the number to port; leave the account number and PIN boxes as they are",
+          "expected": "The phone boxes now show (248) 303-1112 and Continue is available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The window Adding phone number port... shows briefly, then the heading changes to Protection selection. The Cart now shows the row Phone number port (248) 303-1112 and Total due still reads $255.29. SERVICE CHECK (for the automation engineer): the configure-mdn response's mdnConfigDetails reads type \"port-in\", mdn \"2483031112\", currentCarrier \"VERIZON WIRELESS-CA\", submarketName \"Detroit\"."
+        },
+        {
+          "action": "Stop here - do not go on to protection, plan or payment",
+          "expected": "Nothing further is checked. Nothing was activated, so the phone, SIM and ported number stay reusable; no payment is ever taken in this test."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the port screen to stop me when a confirmation box does not match, so that a mistyped number, account number or PIN never reaches the carrier",
+      "priority": "Medium",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. Because a wrong digit in the number, the account number or the PIN makes the carrier refuse the port, every detail is typed twice. This test fills the three confirm boxes with values that do not match, checks the message under each one and that Continue stays greyed out, then fixes them and checks Continue becomes available. Nothing is submitted to the carrier.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-2260 (each detail typed twice), RTPL-2375 point 1 (wrong mismatch messages, fixed), RTPL-2018 (epic)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Port details with mismatched confirmations:** Phone number to port 2483031112 but Confirm phone number to port 2483031113; Current account number abc123 but Confirm current account number ABC124; Current PIN 1234 but Confirm current PIN 4321  _(verified: UAT2 2026-11-03 (build 5.954.0): these exact values were typed on screen - the three confirm boxes went red with the three messages quoted in the steps and Continue stayed greyed out (screenshot p7-pi004-mismatch))_\n- **Port details that match:** 2483031112 in both phone boxes, ABC123 in both account boxes, 1234 in both PIN boxes  _(verified: UAT2 2026-11-03 (build 5.954.0): typed on screen after the mismatch above; the red outlines cleared and Continue became available)_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.\n- CONFIRM BEFORE AUTOMATING: the three mismatch messages end with the box's internal name (portPhoneNumber, accountNumber, pinCode) as shown on 2026-11-03. That wording has been raised as a copy fix; if it changes, update the expected text rather than failing the test.\n- CONFIRM BEFORE AUTOMATING: the PIN boxes only take digits on the keyboard (letters are ignored). The boxes show dots, so this could not be checked on screen on 2026-11-03 - verify once with the eye icon, if one is offered, before asserting it.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Click the greyed-out Continue button",
+          "expected": "Nothing happens: the heading stays Phone number selection, the six boxes stay empty and Continue stays greyed out."
+        },
+        {
+          "action": "Type the mismatched port details: the number in Phone number to port and the different number in Confirm phone number to port, the account number in lower case in Current account number and the different one in Confirm current account number, the PIN in Current PIN and the different PIN in Confirm current PIN, then click outside the last box",
+          "expected": "The phone boxes show (248) 303-1112 and (248) 303-1113. Current account number shows ABC123 in capital letters even though it was typed in lower case. Under the three confirm boxes, in red: Confirm phone number to port does not match with portPhoneNumber, Confirm current account number does not match with accountNumber, Confirm current PIN does not match with pinCode. The three confirm boxes have a red outline. Continue stays greyed out."
+        },
+        {
+          "action": "Retype the three confirm boxes so they match the first boxes",
+          "expected": "The three red messages disappear, the red outlines go, and Continue becomes available (purple)."
+        },
+        {
+          "action": "Stop here - do not click Continue",
+          "expected": "Nothing is sent to the carrier and nothing was activated, so the phone and SIM stay reusable for the next run."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want Continue to lock again when I change a port detail after confirming it, so that the two boxes always agree before the carrier check runs",
+      "priority": "Medium",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. A past defect let the rep change the PIN after confirming it and still continue, so the carrier got a PIN that did not match what the customer meant. This test fills all six boxes so they match, then changes the first PIN box only, and checks that Continue locks again until the confirm box is corrected too. Nothing is submitted to the carrier.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-3124 (changing the first box after confirming let the rep continue - fixed), RTPL-2018 (epic)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Port details that match:** 2483031112 in both phone boxes, 123456789 in both account boxes, 1234 in both PIN boxes  _(verified: UAT2 2026-11-03 (build 5.954.0): typed on screen; Continue became available)_\n- **Changed PIN:** 9999 typed into Current PIN only  _(verified: UAT2 2026-11-03 (build 5.954.0): typed on screen; the Confirm current PIN box went red and Continue went grey again, and became available once 9999 was typed into Confirm current PIN as well)_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.\n- The same lock applies when the first phone box or the first account box is changed after confirming; this ticket checks the PIN, which was the box in the original defect.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Type the matching port details into all six boxes and click outside the last box",
+          "expected": "No red message shows under any box and Continue becomes available (purple)."
+        },
+        {
+          "action": "Clear Current PIN and type the changed PIN into it, leaving Confirm current PIN as it was, then click outside the box",
+          "expected": "Under Confirm current PIN, in red: Confirm current PIN does not match with pinCode. Continue goes grey again and cannot be clicked."
+        },
+        {
+          "action": "Type the changed PIN into Confirm current PIN as well",
+          "expected": "The red message disappears and Continue becomes available again."
+        },
+        {
+          "action": "Stop here - do not click Continue",
+          "expected": "Nothing is sent to the carrier and nothing was activated, so the phone and SIM stay reusable for the next run."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to change my mind from porting back to a new Metro number on the same screen, so that the port boxes disappear and nothing typed in them is kept",
+      "priority": "Low",
+      "tags": [
+        "PortIn"
+      ],
+      "custom_requirements": "## What this test is about\nWhen a customer comes into a Metro by T-Mobile store to start service, they can take a brand-new Metro phone number or keep the number they already have with another carrier. Keeping the number is called porting it in. On the Phone number selection screen the rep picks Port phone number and types the customer's current number, the account number and the PIN the customer has with the old carrier, each twice to catch typing mistakes. RT Go then asks the carrier whether that number can be moved. If it can, the order carries on exactly like a new-number order: protection, plan, promotions, add-ons, create subscriber, order summary, accessories and payment. The port itself costs nothing. Getting this wrong loses the customer their number or activates them on a number the carrier refuses, so the port details must be checked, shown back to the rep and carried through to the payment screen unchanged. Sometimes the customer decides at the counter to take a new number after all. This test chooses Port phone number, types the port details, then chooses New phone number again and checks the port boxes are gone and the new-number boxes are back, then chooses Port phone number once more and checks the port boxes come back empty. Nothing is submitted to the carrier.\n\nWords used in this test: a line activation is the sale that puts a phone on the Metro network for a customer. The rep is the store employee at the counter. Porting (or a port-in) means moving a phone number the customer already has with another carrier over to Metro, so the customer keeps the number. The old carrier is the company the customer is leaving; to allow the move, that carrier needs the customer's account number and the account PIN with them. An IMEI is the 15-digit serial number of a phone. A SIM number (also called ICCID) is the long number printed on the SIM card. A plan code such as MAU55 is the carrier's short name for a monthly plan. A rebate is money taken off the phone's price when a promotion applies. Store stock means a phone the store sells from its own inventory, as opposed to a phone the customer already owns.\n\n## Related tickets\nRTPL-2063 (two phone number type cards), RTPL-2018 (epic)\n\n## Preconditions\n- The rep can sign in to RT Go on the QA site (go-mbyt-qa.rt2.com) with the team's QA sign-in. On a fresh sign-in a User settings drawer opens by itself; in it the Environment box must be set to UAT2 (the November UAT2 data workbook is where the phones and SIMs below come from).\n- No other sale or activation is open on this till. If one is, cancel it before beginning.\n- The till has no customer tablet paired to it, so the PIN and the three security questions are typed on the till screen.\n- The phone and SIM below have not been used by a finished sale.\n\n## Test data\n- **Store:** EZLOGIC, dealer code 30247306; station SCOTT-TEST (the station is the one you sign in on)  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; shown in the page header after sign-in)_\n- **New customer:** First name PORT, middle initial T, last name TESTER; email: type a brand-new address each run, for example port.<today's date and time>@rt2.com; address 405 LEXINGTON AVE, zip 10174 (city NEW YORK, state fills in as NY); PIN 628193; any three different security questions with any answers; ID check phone 2125551234  _(verified: UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com; the account was created and the ID check passed with these values three times)_\n- **Phone from store stock:** IMEI 999939175460833 (SKU 610214688811), physical SIM. Device line $255.29 = $229.99 price + $23.00 sales tax + $2.30 PP Tax  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring rows 999939177538073 and 999939173297229 were accepted and activated (orders 630036286, 630036287) and this row is the next unused one. If it is refused, take 999939173294978, then the next row up the sheet)_\n- **SIM card:** ICCID 8901260000084313027F  _(verified: UAT2 Nov workbook, Astock sheet; UAT2 2026-11-03 (build 5.954.0), walked click by click on go-mbyt-qa.rt2.com: the neighbouring SIMs 8901260000084313009F and 8901260000084313018F were accepted; this is the next unused one. If refused, take 8901260000084313036F)_\n- **Port details:** 2483031112 in both phone boxes, 123456789 in both account boxes, 1234 in both PIN boxes  _(verified: UAT2 2026-11-03 (build 5.954.0): typed on screen, then the New phone number card was clicked (port boxes gone, zip code and NPA NXX boxes back) and the Port phone number card clicked again (all six boxes empty))_\n\n## Automation Notes\n- If the phone or SIM is refused, or the amounts differ from this ticket, take the next phone and SIM from the Astock sheet of the UAT2 November data workbook (999939173294978 / 8901260000084313036F, then the next row up) and re-read the Cart. If the pool is exhausted or the data behaves differently than described, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- The Phone number npa nxx window opens by itself on the Phone number selection screen and blocks every click until it is closed - close it first.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "A User settings drawer opens by itself with an Environment box. Pick UAT2 in it and close the drawer. The dashboard shows and the header reads STORE ID EZLOGIC and DEALER CODE 30247306. Open the user menu (top right) and check the Environment box reads UAT2."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with a form headed Account information with First name, Middle initial, Last name, Email, Address, Address 2, Zip code, City, State, PIN, Confirm PIN and three Security question and Answer pairs. The Cart on the right shows Account with no lines."
+        },
+        {
+          "action": "Fill in the customer's first name, middle initial, last name, email, address and zip code",
+          "expected": "The City box fills in by itself with NEW YORK and the State box with NY after the zip code is typed."
+        },
+        {
+          "action": "Type the PIN twice, choose three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The message Adding account... shows briefly, then the heading changes to ID verification with the customer's name and email already filled in and a Phone box."
+        },
+        {
+          "action": "Type the phone number into the Phone box and click Continue",
+          "expected": "The screen reads Congratulations, your customer's ID has been verified. followed by Your customer qualifies for the best promotional pricing whenever available. and an ID Verification Reference # with a Continue button."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to IMEI validation and reads Enter the IMEI of the device to verify network compatibility and inventory."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The message Processing request... shows briefly. The heading then changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM selected. The Cart lists the IMEI with Device $255.29, PP Tax $2.30 and Total due $255.29."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box and click Continue",
+          "expected": "The heading changes to Phone number selection. The Cart now also lists SIM card $0.00 and still reads Total due $255.29. A window headed Phone number npa nxx opens by itself listing numbers such as (347) 499-* NWYRCYZN05, NY."
+        },
+        {
+          "action": "Close the Phone number npa nxx window (click its X or press Escape)",
+          "expected": "The Phone number selection screen is fully visible. Under the heading a note reads Currently RTGO supports new phone number activations. Please continue to use RTPOS for port activations. Below it, Select phone number type * offers two cards: New phone number - Get a new Metro phone number (already selected) and Port phone number - Switch carrier and keep existing phone number. Under the cards are Enter service area zip code * and Phone number NPA NXX * with a Select button. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card",
+          "expected": "The card shows a tick. The zip code and NPA NXX boxes disappear and six boxes appear in two columns: Phone number to port *, Confirm phone number to port *, Current account number *, Confirm current account number *, Current PIN *, Confirm current PIN *. Continue is greyed out."
+        },
+        {
+          "action": "Type the port details into all six boxes",
+          "expected": "Continue becomes available."
+        },
+        {
+          "action": "Click the New phone number card",
+          "expected": "The tick moves to the New phone number card. The six port boxes disappear and Enter service area zip code * and Phone number NPA NXX * with its Select button are back. Continue is greyed out."
+        },
+        {
+          "action": "Click the Port phone number card again",
+          "expected": "The six port boxes are back and all six are empty - nothing typed before is kept. Continue is greyed out."
+        },
+        {
+          "action": "Stop here - do not click Continue",
+          "expected": "Nothing is sent to the carrier and nothing was activated, so the phone and SIM stay reusable for the next run."
+        }
+      ]
+    }
+  ],
+  "folder_name": "Port-In Activations - AI"
+}
