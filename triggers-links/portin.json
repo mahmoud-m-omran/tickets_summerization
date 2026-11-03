@@ -26,5 +26,6 @@
       "case_id": 4033,
       "display_id": "QA-2946"
     }
-  ]
+  ],
+  "retry": "2026-11-03 second push (first run left no completed-links result)"
 }
