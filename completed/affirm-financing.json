@@ -1,0 +1,23 @@
+{
+  "status": "success",
+  "filename": "affirm-financing.json",
+  "ticket_key": "Financing (Affirm) - Checkout Integration",
+  "ticket_title": "AI",
+  "folder_id": 451,
+  "folder_name": "Financing (Affirm) - AI",
+  "cases_created": 12,
+  "case_ids": [
+    4045,
+    4046,
+    4047,
+    4048,
+    4049,
+    4050,
+    4051,
+    4052,
+    4053,
+    4054,
+    4055,
+    4056
+  ]
+}
