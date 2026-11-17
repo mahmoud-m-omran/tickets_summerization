@@ -1,0 +1,1879 @@
+{
+  "ticket_key": "Financing (Affirm) - Checkout Integration",
+  "ticket_title": "AI",
+  "test_cases": [
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to choose Affirm for a new customer's phone and get to the send-link step, so that the phone's full price with tax is what goes to Affirm",
+      "priority": "Critical",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks the main path: one phone, no accessories, financed with Affirm up to the last window before a link would be sent, which is closed without sending. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n- **Customer mobile:** 2125550123 (made up; typed only into the contact window, never sent)  _(verified: seen on UAT2 on 2026-11-16 in a one-phone new-customer sale, and seen on UAT2 on 2026-11-12 in bill payments with an accessory)_\n\n## Screens (design reference)\n- **Pay-over-time options (bill-payment version: it shows only the Affirm card; in this test SmartPay is shown too)** — screenshot: `walk/screens/w1-09-pay-over-time-options.jpg` (attach from the run folder)\n- **Finance Items (taken in a bill payment; same screen)** — screenshot: `walk/screens/w1-14-finance-items.jpg` (attach from the run folder)\n- **Affirm Cart & Agreement window (taken in a bill payment; same screen)** — screenshot: `walk/screens/w1-15-send-window.jpg` (attach from the run folder)\n\n## Automation Notes\n- Money check: the amount that goes to Affirm is the phone's price plus its tax ($189.99 + $20.90 = $210.89). Select Items must never list the plan, the SIM card or the fees.\n- The card with Accessories $0.00 and Available balance $150.00 shows that the phone does not use up the $150.00 accessory allowance.\n- The offer does not open by itself after Continue: the banner appears and the rep opens the offer with Get started here. This is the behaviour checked here.\n- CONFIRM BEFORE AUTOMATING: in the November new-customer sales the Affirm Application window opened when Continue was clicked on Select Items; in the older bill payments it opened together with Select Items. If it opens at a different moment, report it to the manual QA team.\n- CONFIRM BEFORE AUTOMATING: step(s) 33 (changing the email) and 38 (closing the window with the X) were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Tick the phone's row",
+          "expected": "Total items 1 and Total amount $210.89. Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window headed Affirm Application reads Send a link to the customer to complete the process. with an Email box already filled in with the email typed on the new-account form, an empty Phone number box, and the buttons Close and Continue. Continue is unavailable."
+        },
+        {
+          "action": "Select all text in the Email box and type affirm.qa.changed@example.com",
+          "expected": "The Email box shows the new address and no message appears."
+        },
+        {
+          "action": "Type the customer mobile into the Phone number box",
+          "expected": "The box shows (212) 555-0123 and Continue becomes available."
+        },
+        {
+          "action": "Click Continue in the Affirm Application window",
+          "expected": "The window closes. Under the grid a card shows Device $189.99, Accessory available amount $150.00, Accessories $0.00 and Available balance $150.00."
+        },
+        {
+          "action": "Click Continue on Select Items",
+          "expected": "The screen changes to Finance Items listing SAM A166U A16 5G 128G BLU KIT $210.89, Total items 1 and Total amount $210.89. The Cart shows Affirm Payment $210.89, Affirm Finance $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Click Continue on Finance Items",
+          "expected": "A window headed Affirm Cart & Agreement reads The customer has not completed all Affirm steps. Send an email and text with instructions to the customer to complete., a TALK TRACK box reading Please check your email and SMS for the link to complete your Affirm checkout., the button Send link to customer to complete, and an X at the top right."
+        },
+        {
+          "action": "Click the X at the top right of that window",
+          "expected": "The window closes and Finance Items shows the same item and amounts. No Financed items screen and no payment terms appear."
+        },
+        {
+          "action": "Stop here - do not click Send link to customer to complete, Collect amount or Submit order",
+          "expected": "No link is sent, nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the Affirm contact window to refuse an empty email, so that a link is never sent without an email address",
+      "priority": "High",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that an emptied Email box is refused with a clear message before any link can be sent. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Email is required (taken in a bill payment; same screen)** — screenshot: `walk/screens/w3-09-email-required.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 33 to 34 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run. In a bill payment the Email box starts empty; here it starts filled in and is cleared first.\n- Messages push the boxes below them down: find boxes by their label, not by screen position.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Tick the phone's row",
+          "expected": "Total items 1 and Total amount $210.89. Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window headed Affirm Application reads Send a link to the customer to complete the process. with an Email box already filled in with the email typed on the new-account form, an empty Phone number box, and the buttons Close and Continue. Continue is unavailable."
+        },
+        {
+          "action": "Select all text in the Email box and delete it",
+          "expected": "The Email box is empty."
+        },
+        {
+          "action": "Click into the Phone number box",
+          "expected": "The message Email is required shows under the Email box. Continue stays unavailable."
+        },
+        {
+          "action": "Stop here - do not click Send link to customer to complete, Collect amount or Submit order",
+          "expected": "No link is sent, nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the Affirm contact window to refuse an email that is not a real address, so that the link goes to an address that can receive it",
+      "priority": "High",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that an email without the form name@domain is refused with a clear message. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Invalid Email (taken in a bill payment; same screen)** — screenshot: `walk/screens/w1-11a-invalid-email.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 33 to 34 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run. In a bill payment the Email box starts empty; here it starts filled in and is cleared first.\n- Messages push the boxes below them down: find boxes by their label, not by screen position.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Tick the phone's row",
+          "expected": "Total items 1 and Total amount $210.89. Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window headed Affirm Application reads Send a link to the customer to complete the process. with an Email box already filled in with the email typed on the new-account form, an empty Phone number box, and the buttons Close and Continue. Continue is unavailable."
+        },
+        {
+          "action": "Select all text in the Email box and type abc",
+          "expected": "The Email box shows abc."
+        },
+        {
+          "action": "Click into the Phone number box",
+          "expected": "The message Invalid Email shows under the Email box. Continue stays unavailable."
+        },
+        {
+          "action": "Stop here - do not click Send link to customer to complete, Collect amount or Submit order",
+          "expected": "No link is sent, nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the Affirm contact window to refuse a mobile number shorter than 10 digits, so that the text message goes to a complete number",
+      "priority": "High",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that a short mobile number is refused while it is typed and is cleared when the rep leaves the box. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Invalid Phone number while typing (taken in a bill payment; same screen)** — screenshot: `walk/screens/w3-06b-phone-short-while-typing.jpg` (attach from the run folder)\n- **Phone number is required after leaving (taken in a bill payment; same screen)** — screenshot: `walk/screens/w3-06c-phone-short-after-leaving.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 33 to 34 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run. In a bill payment the Email box starts empty; here it starts filled in and is cleared first.\n- Messages push the boxes below them down: find boxes by their label, not by screen position.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Tick the phone's row",
+          "expected": "Total items 1 and Total amount $210.89. Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window headed Affirm Application reads Send a link to the customer to complete the process. with an Email box already filled in with the email typed on the new-account form, an empty Phone number box, and the buttons Close and Continue. Continue is unavailable."
+        },
+        {
+          "action": "Type 555123 into the Phone number box and keep the cursor in it",
+          "expected": "The box shows (555) 123-____ and the message Invalid Phone number. Continue stays unavailable."
+        },
+        {
+          "action": "Click into the Email box",
+          "expected": "The Phone number box empties itself and the message changes to Phone number is required. Continue stays unavailable."
+        },
+        {
+          "action": "Stop here - do not click Send link to customer to complete, Collect amount or Submit order",
+          "expected": "No link is sent, nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to go back from Finance Items without losing the items I picked, so that I can correct the pick before a link is sent",
+      "priority": "Medium",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that going back from the Finance Items screen keeps the items the rep ticked. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n- **Customer mobile:** 2125550123 (made up; typed only into the contact window, never sent)  _(verified: seen on UAT2 on 2026-11-16 in a one-phone new-customer sale, and seen on UAT2 on 2026-11-12 in bill payments with an accessory)_\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 36 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Tick the phone's row",
+          "expected": "Total items 1 and Total amount $210.89. Continue becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A window headed Affirm Application reads Send a link to the customer to complete the process. with an Email box already filled in with the email typed on the new-account form, an empty Phone number box, and the buttons Close and Continue. Continue is unavailable."
+        },
+        {
+          "action": "Type the customer mobile into the Phone number box",
+          "expected": "Continue becomes available."
+        },
+        {
+          "action": "Click Continue in the Affirm Application window",
+          "expected": "The window closes."
+        },
+        {
+          "action": "Click Continue on Select Items",
+          "expected": "The screen changes to Finance Items with Total amount $210.89."
+        },
+        {
+          "action": "Click the back arrow in the header",
+          "expected": "The screen returns to Select Items with the phone's row still ticked, Total items 1 and Total amount $210.89."
+        },
+        {
+          "action": "Stop here - do not click Send link to customer to complete, Collect amount or Submit order",
+          "expected": "No link is sent, nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want Affirm to refuse a pick of items under $50.00 including tax, so that I cannot start a loan that is too small",
+      "priority": "Critical",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that the $50.00 minimum counts only the ticked items: the whole sale is far above $50.00, but a pick of one $11.09 item is refused. The exact edge ($50.00 and $49.99) is not tested, because no item adding up to it is known. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n- **PopSocket:** Item number 101026, POPSOCKETS CEILING, $9.99 before tax; on Select Items Net $9.99, Tax $1.10, Price $11.09  _(verified: seen on UAT2 on 2026-11-17 in a two-phone new-customer sale; the same price was seen on 2026-11-12)_\n\n## Screens (design reference)\n- **Minimum message (taken in a bill payment; same screen)** — screenshot: `walk/screens/w3-15-minimum-message.jpg` (attach from the run folder)\n\n## Automation Notes\n- The item detail window shows Tax $1.00 and Final price $10.99 for POPSOCKETS CEILING, while the Cart and Select Items show $11.09 with Tax $1.10, in every walk. The extra $0.10 fits this store's PP Tax of 1% of the price, and the Cart's PP Tax line in the two-phone sale adds up the same way ($5.40 = $1.90 + $1.90 + $1.50 + $0.10). This is worked out from the numbers, not shown on screen. Do not report it as a defect unless the amounts change.\n- CONFIRM BEFORE AUTOMATING: step(s) 35 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run. A one-phone sale with this item was not walked; the item's rows were seen in the two-phone sale.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Browse accessories",
+          "expected": "A list opens with the columns Item number, Description, QTY and SRP and a search box."
+        },
+        {
+          "action": "Search for 101026",
+          "expected": "The list shows POPSOCKETS CEILING."
+        },
+        {
+          "action": "Click the POPSOCKETS CEILING row",
+          "expected": "An item detail window opens showing Price $9.99, Tax $1.00, Discount ($0.00) and Final price $10.99."
+        },
+        {
+          "action": "Click Add accessories in the item detail window",
+          "expected": "The Cart lists POPSOCKETS CEILING at $11.09."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89; and a row POPSOCKETS CEILING, QTY 1, Net $9.99, Tax $1.10, Price $11.09. Nothing is ticked, Total items 0 and Total amount $0.00."
+        },
+        {
+          "action": "Tick only the POPSOCKETS CEILING row",
+          "expected": "Total items 1 and Total amount $11.09. The message The selected items must total at least $50.00 including tax. shows and Continue stays unavailable."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to go back from the pay-over-time item list to the accessories screen, so that I can still add an accessory",
+      "priority": "Medium",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that the back arrow on Select Items returns the rep to the accessories screen and removes the Affirm panel. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Back on the accessories screen (taken in a bill payment; same screen)** — screenshot: `walk/screens/w1-18-back-to-invoice-review.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 31 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Click the back arrow in the header (PAY OVER TIME)",
+          "expected": "The header changes back to INVOICE REVIEW, Scan accessory item and Browse accessories are available again, and the Affirm Payment panel is gone from the Cart."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want Affirm to warn me when accessories go over $150.00 before tax, so that I finance a phone with no more than $150.00 of accessories",
+      "priority": "Critical",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that a two-phone order lists both phones and the accessories (no plan, SIM or fee), that only the ticked phone is counted, and the $150.00 accessory limit: $149.99 of accessories (one cent under the limit) shows no message even with a phone ticked, adding the $9.99 grip ($159.98) shows the message, and unticking it removes the message. The phone never counts toward the limit, and the limit is counted before tax (the speaker is $166.49 with tax). The exact edge ($150.00 and $150.01) is not tested, because no items adding up to it are known. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n- **Phone, line 2:** IMEI 999977129231066 (Samsung A16, row 61 of the UAT2_Devices tab); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-17 in a two-phone new-customer sale, accepted at IMEI validation)_\n- **SIM, line 2:** ICCID 8901260000073717031F (row 157 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-17 in a two-phone new-customer sale, accepted)_\n- **Speaker:** Item number 27945VRP, ZIZO - ROAR Z7 Portable Wireless Speaker - Black, $149.99 before tax; on Select Items Net $149.99, Tax $16.50, Price $166.49  _(verified: seen on UAT2 on 2026-11-17 in a two-phone new-customer sale; the same price was seen on 2026-11-12)_\n- **PopSocket:** Item number 101026, POPSOCKETS CEILING, $9.99 before tax; on Select Items Net $9.99, Tax $1.10, Price $11.09  _(verified: seen on UAT2 on 2026-11-17 in a two-phone new-customer sale; the same price was seen on 2026-11-12)_\n\n## Screens (design reference)\n- **Accessory limit message (taken in a bill payment; same screen)** — screenshot: `walk/screens/w3-16-accessory-limit-message.jpg` (attach from the run folder)\n- **No limit message at $149.99 (taken in a bill payment; same screen)** — screenshot: `walk/screens/w4-a2-149-99-no-limit-message.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: the speaker must still sell at $149.99 at this store; if its price changed, ask the manual QA team for an accessory at exactly $149.99.\n- The walk ticked the phone, then the speaker and the grip, then unticked the grip; the step with only the phone and the speaker ticked is the state after that untick, seen with the same totals.\n- Both phones are the same model at the same price, so the first tick shows one price counted, not which phone. A two-model order was not tried.\n- The item detail window shows Tax $1.00 and Final price $10.99 for POPSOCKETS CEILING, while the Cart and Select Items show $11.09 with Tax $1.10, in every walk. The extra $0.10 fits this store's PP Tax of 1% of the price, and the Cart's PP Tax line in the two-phone sale adds up the same way ($5.40 = $1.90 + $1.90 + $1.50 + $0.10). This is worked out from the numbers, not shown on screen. Do not report it as a defect unless the amounts change.\n- CONFIRM BEFORE AUTOMATING: for line 2 the walk recorded only the IMEI, SIM, trade-in, plan and promotion screens; the other line-2 screens are expected to look the same as line 1.\n- CONFIRM BEFORE AUTOMATING: that clicking the scan result puts the speaker straight into the Cart, without an item detail window, was seen in a bill payment (2026-11-12).\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Add another line",
+          "expected": "The heading changes to IMEI validation for the second line."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55AAL ($35.00 / mo.) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977129231066. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 2, Total MRC $95.00, Total taxes & fees $23.08, Total PP Tax $3.80 and Edge due immediately $118.08."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Type 27945VRP into the Item #, SKU, or Barcode box",
+          "expected": "The result ZIZO - ROAR Z7 Portable Wireless Speaker - Black appears."
+        },
+        {
+          "action": "Click the result",
+          "expected": "The speaker goes into the Cart at $166.49."
+        },
+        {
+          "action": "Click Browse accessories",
+          "expected": "A list opens with the columns Item number, Description, QTY and SRP and a search box."
+        },
+        {
+          "action": "Search for 101026",
+          "expected": "The list shows POPSOCKETS CEILING."
+        },
+        {
+          "action": "Click the POPSOCKETS CEILING row",
+          "expected": "An item detail window opens showing Price $9.99, Tax $1.00, Discount ($0.00) and Final price $10.99."
+        },
+        {
+          "action": "Click Add accessories in the item detail window",
+          "expected": "The Cart lists POPSOCKETS CEILING at $11.09."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The Cart shows PP Tax $5.40 and Total due $717.44. The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with two rows SAM A166U A16 5G 128G BLU KIT, each QTY 1, Net $189.99, Tax $20.90, Price $210.89; a row ZIZO - ROAR Z7 Portable Wireless Speaker - Black, QTY 1, Net $149.99, Tax $16.50, Price $166.49; and a row POPSOCKETS CEILING, QTY 1, Net $9.99, Tax $1.10, Price $11.09. There is no row for a plan, a SIM card or a fee. Nothing is ticked, Total items 0 and Total amount $0.00."
+        },
+        {
+          "action": "Tick the upper SAM A166U A16 5G 128G BLU KIT row",
+          "expected": "Total items 1 and Total amount $210.89."
+        },
+        {
+          "action": "Tick the ZIZO - ROAR Z7 Portable Wireless Speaker - Black row",
+          "expected": "Total items 2 and Total amount $377.38. No limit message shows."
+        },
+        {
+          "action": "Tick the POPSOCKETS CEILING row",
+          "expected": "Total items 3 and Total amount $388.47. The message The selected accessories exceed the $150.00 limit for financing. shows. Continue stays available."
+        },
+        {
+          "action": "Untick the POPSOCKETS CEILING row",
+          "expected": "Total items 2 and Total amount $377.38. The limit message is gone."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to remove Affirm from a new customer's sale before any link is sent, so that the customer pays the full amount and is not offered financing again",
+      "priority": "Critical",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks removing financing from the Cart before a link is sent: the two questions the rep is asked, the full amount on the payment screen, and that going back does not bring the offer back. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: this was seen in the two-phone sale, where the payment screen asked for $717.44, the Cart's Total due. For this one-phone sale the expected amount is the Cart's Total due ($282.43 on Order summary); it was not seen on the payment screen.\n- The back arrow and the second Continue are consequence checks of the decline (does the offer come back?), not a second decline.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Click the round X on the Affirm Payment panel in the Cart",
+          "expected": "A window headed Affirm Cart & Agreement reads Before you decline financing, the customer can still try SmartPay. with the buttons Decline financing and Use SmartPay instead."
+        },
+        {
+          "action": "Click Decline financing",
+          "expected": "A second window asks Are you sure you want to decline financing for this sale? with the buttons Cancel, go back and Decline financing."
+        },
+        {
+          "action": "Click Decline financing in the second window",
+          "expected": "The header changes to CUSTOMER PAYMENT and the screen reads Collect payment from customer and Collect $282.43 with cash, card, or split the payment across multiple methods. (Amount expected from the Cart; see the notes.)"
+        },
+        {
+          "action": "Click the back arrow in the header",
+          "expected": "The screen returns to Add accessories with no Pay over time banner."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen goes straight to CUSTOMER PAYMENT again, with no banner and no Pay-over-time options window."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want the cancel window to tell me that any financed amount will be released, so that I can reassure a customer who cancels after choosing Affirm",
+      "priority": "Medium",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks the note in the cancel window when the rep cancels the whole sale after choosing Affirm. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Cancel transaction window (bill-payment version; same window)** — screenshot: `walk/screens/w1-27b-cancel-transaction.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 31 to 33 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run. In a new-customer sale the same windows were seen after financing was removed; there the first window offered 3 options, in a bill payment 2.\n- Ending the test by cancelling should free the phone and SIM, but a cancel by the rep has not been tried yet; if the next run refuses them, use the next row of the workbook.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the Affirm card",
+          "expected": "The Affirm card is selected and the main button reads Continue, pay with Affirm."
+        },
+        {
+          "action": "Click Continue, pay with Affirm",
+          "expected": "The header changes to PAY OVER TIME and the screen Select Items shows the columns Name, QTY, Net, Tax and Price with one row: SAM A166U A16 5G 128G BLU KIT, QTY 1, Net $189.99, Tax $20.90, Price $210.89. Nothing is ticked, Total items 0 and Total amount $0.00. The Cart shows Affirm Payment with Affirm Finance $0.00, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Click Cancel at the top of the Cart",
+          "expected": "A small window asks Save or cancel your cart? and reads You have 3 options: save your cart, cancel the lines and keep the account, or cancel your cart. with Save cart, Cancel lines and Cancel cart."
+        },
+        {
+          "action": "Click Cancel cart",
+          "expected": "A window headed Cancel transaction reads Tell us why you want to cancel this order and If a financed amount was authorized, it will be released by the financing provider., with the reasons No issue to report (already chosen), Customer changed their mind and System or technical issue, and the buttons Yes, cancel transaction and No, go back."
+        },
+        {
+          "action": "Click Yes, cancel transaction",
+          "expected": "The dashboard opens."
+        },
+        {
+          "action": "Stop here - the sale is cancelled and nothing was paid",
+          "expected": "The dashboard is on screen with its tiles; no sale screen is open."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want to close the pay-over-time window and open it again from the banner, so that I can talk with the customer first without losing the offer",
+      "priority": "Medium",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that the offer window can be closed without a choice and opened again from the banner. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **Banner (bill-payment version: it reads Pay over time with Affirm.)** — screenshot: `walk/screens/w2-04-banner.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 29 and 30 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click the X at the top right of the Pay-over-time options window",
+          "expected": "The window closes. The header still reads INVOICE REVIEW and the banner with Get started here is still shown."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "The Pay-over-time options window opens again with the same cards and buttons."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    },
+    {
+      "name": "As a Metro by T-Mobile authorized dealer, I want Continue, pay in full to only close the pay-over-time window, so that I stay on the accessories screen and can still add items before payment",
+      "priority": "Medium",
+      "tags": [
+        "Affirm"
+      ],
+      "custom_requirements": "## What this test is about\nThis test checks that choosing pay in full only closes the offer window and leaves the rep on the accessories screen. In a Metro by T-Mobile store, a rep (the dealer's employee at the counter) sells phones, opens new phone lines and sells accessories such as speakers and phone grips. A new-customer sale (activation) gives a new customer a phone, a SIM card and a monthly plan. After the accessories step the store app offers to let the customer pay over time. One way is Affirm, a lending company: the rep picks the items to spread out, Affirm sends the customer a link by email and text, and the customer applies on their own phone. The picked items must total at least $50.00 including tax, and accessories may add at most $150.00 before tax. SmartPay (lease-to-own) is offered beside Affirm when the sale has a phone.\n\nWords used in this test:\n- IMEI: the phone's serial number.\n- ICCID: the SIM card's serial number.\n- Cart: the panel on the right of the screen that lists everything in the sale and the totals.\n- Banner: a strip of text with a button that appears above the Cart's Continue button.\n- PP Tax: Prepaid Tax, a tax shown separately from sales tax. The Cart shows the sale's total PP Tax on its own line.\n- MRC: the monthly charge for the plan.\n- MAU55, MAU55AAL, COUP_NEUVQ4, NYMCP10 and similar: plan, promotion and protection names exactly as the screen shows them.\n- NPA NXX: the area code and the first three digits of the new phone number.\n- TALK TRACK: suggested words for the rep to say to the customer.\n- UAT2: a test environment of the store app. User settings must show Environment UAT2.\n- EZLOGIC: the test store.\n\n## Related tickets\nRTPL-2037 (Affirm checkout), RTPL-3256 (Affirm parity list), RTPL-3401 (SmartPay beside Affirm)\n\n## Preconditions\n- The rep has a sign-in for store EZLOGIC on UAT2 (from the team; never written in a ticket).\n- No sale is open on this till. If one is left from an earlier run, cancel it first: Cancel in the Cart, then Cancel cart, then Yes, cancel transaction.\n- The phones and SIMs in the test data have not been used by a submitted order.\n\n## Test data\n- **Store:** Store EZLOGIC, dealer code 30247306  _(verified: seen on UAT2 from 2026-11-12, in the page header after sign-in)_\n- **New customer:** First name AFFIRM, last name TESTER; email: a brand-new made-up address each run, for example affirm.qa.<today's date and time>@example.com; address 405 LEXINGTON AVE, zip code 10174, city NEW YORK; PIN 628193; any three different security questions from the lists, with any answers  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales (account created, ID verification skipped); address and PIN also accepted on UAT2 on 2026-10-23)_\n- **Phone, line 1:** IMEI 999977128538057 (Samsung A16, item SAM A166U A16 5G 128G BLU KIT, row 60 of the UAT2_Devices tab in the RTGO Data workbook); price $189.99, tax $20.90, line amount $210.89  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted at IMEI validation both days)_\n- **SIM, line 1:** ICCID 8901260000073716997F (row 153 of the UAT2_SIMS tab)  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales, accepted both days)_\n- **Number area:** Service area zip code 10174, then the number group (347) 499  _(verified: seen on UAT2 on 2026-11-16 and 2026-11-17 in new-customer sales)_\n\n## Screens (design reference)\n- **After pay in full (bill-payment version: the banner names only Affirm)** — screenshot: `walk/screens/w2-06-after-pay-in-full.jpg` (attach from the run folder)\n\n## Automation Notes\n- CONFIRM BEFORE AUTOMATING: step(s) 29 were seen on the same screens in a bill payment with an accessory (UAT2, 2026-11-12), not yet in a new-customer sale. Check the wording on the first run.\n- CONFIRM BEFORE AUTOMATING: every value was checked on UAT2, the environment chosen for this feature. After signing in, open the user menu and check that User settings shows Environment UAT2: signing in has been seen to change it.\n- CONFIRM BEFORE AUTOMATING: the live walks recorded the screen reached after each group of clicks. Where an expected result only says that a choice is marked, a box shows a value or a list closes, that single click was not recorded on its own. The ID-skip window text was recorded on 2026-11-13.\n- If a phone or SIM in the test data is refused when you run this (for example Sim card active or used), try the next unused row of the same tab in the RTGO Data workbook. If none work, or a screen differs from this ticket, contact the manual QA team to help get working data - do not sit blocked and do not hunt for data alone.\n- Each run creates a new test customer account on UAT2 and reserves the phone and SIM with Create subscriber. They are used up only when payment is submitted, which this test never does. Whether the same phone and SIM are accepted again after the rep cancels a sale has not been tried; after the system cancelled a sale they were accepted again.",
+      "steps": [
+        {
+          "action": "Login into the app",
+          "expected": "The dashboard opens and the header shows STORE ID EZLOGIC and DEALER CODE 30247306."
+        },
+        {
+          "action": "On the dashboard, click the New account tile",
+          "expected": "The screen opens with the heading NEW ACCOUNT and the form Account information."
+        },
+        {
+          "action": "Type the first name, last name, email, address, zip code and city",
+          "expected": "Each box shows what was typed."
+        },
+        {
+          "action": "Type the PIN in PIN and in Confirm PIN, then pick three different security questions and type an answer for each",
+          "expected": "The Continue button becomes available."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to ID verification."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Are you sure you want to skip reads You are skipping ID Verification and will not be able to come back to this step. Your customer may not qualify for the best phone deals. Are you sure you want to continue? with the buttons Continue and Back."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to IMEI validation."
+        },
+        {
+          "action": "Type the phone's IMEI into the IMEI box",
+          "expected": "The heading changes to SIM validation and reads The device is physical SIM compatible. Confirm your IMEI and SIM card pair below, then click continue. with IMEI 1 - PSIM and an ICCID SIM box."
+        },
+        {
+          "action": "Type the SIM's ICCID into the ICCID SIM box",
+          "expected": "The box shows the ICCID."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "A panel headed Trade-in reads Check whether the customer has a device to trade in toward this purchase. Select an option below to continue. with the choices No, skip trade in and Yes, customer has a trade-in."
+        },
+        {
+          "action": "Click No, skip trade in",
+          "expected": "No, skip trade in is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Phone number selection, with New phone number chosen and the boxes Enter service area zip code and Phone number NPA NXX."
+        },
+        {
+          "action": "Type the zip code into Enter service area zip code",
+          "expected": "The box shows 10174."
+        },
+        {
+          "action": "Open the Phone number NPA NXX list",
+          "expected": "The list shows (347) 499-* NWYRCYZN05, NY, (347) 488-* NWYRCYZN04, NY and (718) 705-* NWYRCYZN11, NY."
+        },
+        {
+          "action": "Click (347) 499-* NWYRCYZN05, NY",
+          "expected": "The list closes and the box shows the chosen group."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Protection selection, listing NYMCP10 $10.00, NYMAP6 $6.00, NYMBP3 $3.00, NYINSC $0.38, NYINSA $0.33 and NYINSB $0.22, with Skip and Continue buttons."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Decline all protection options? opens."
+        },
+        {
+          "action": "Click Yes, continue",
+          "expected": "The heading changes to Plan selection with MAU55 ($55 with AutoPay-$60 1st Month, $60.00) marked Selected."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The heading changes to Promotion selection and reads Great news, customer is eligible for 1 promotions. with a $55 Device Rebate card (COUP_NEUVQ4) and a Decline button."
+        },
+        {
+          "action": "Click Decline",
+          "expected": "A window headed Decline all promotions and continue? reads Decline available promotions? This customer is eligible for promotional offers. The device will be sold at full price if none are applied."
+        },
+        {
+          "action": "Click Continue in that window",
+          "expected": "The heading changes to Add on services."
+        },
+        {
+          "action": "Click Skip",
+          "expected": "A window headed Create subscriber reads Great job configuring IMEI 999977128538057. Click create subscriber to continue."
+        },
+        {
+          "action": "Click Create subscriber",
+          "expected": "After a short wait a window headed Subscriber created asks Would you like to add another line to the order, or view Charge Summary and checkout? with the buttons Add another line and Continue to order summary."
+        },
+        {
+          "action": "Click Continue to order summary",
+          "expected": "The heading changes to Order summary. It shows Lines in order 1, Total PP Tax $1.90 and Edge due immediately $71.54. The Cart shows Device $210.89, PP Tax $1.90 and Total due $282.43."
+        },
+        {
+          "action": "Under Select SOS form language, click English",
+          "expected": "English is chosen."
+        },
+        {
+          "action": "Click Continue",
+          "expected": "The header reads INVOICE REVIEW and the screen shows Add accessories with Scan accessory item and Browse accessories."
+        },
+        {
+          "action": "Click Continue in the Cart",
+          "expected": "The screen stays on Add accessories and a banner above the Cart's Continue reads Pay over time with SmartPay or Affirm. with a Get started here button. No window opens by itself."
+        },
+        {
+          "action": "Click Get started here",
+          "expected": "A window headed Pay-over-time options opens with a TALK TRACK box reading Get the phone you really want with financing or leasing. Choose one of our flexible payment options to take it home today and pay over time., then Select a pay-over-time option: with the cards SmartPay (Lease-to-own with payments over time.), already selected, and Affirm (Buy now, pay later with flexible payments.), and the buttons Continue, pay with SmartPay and Continue, pay in full."
+        },
+        {
+          "action": "Click Continue, pay in full",
+          "expected": "The window closes with no further question. The header still reads INVOICE REVIEW and the banner with Get started here is still shown."
+        },
+        {
+          "action": "Stop here - do not click Collect amount or Submit order",
+          "expected": "Nothing is paid and no order is submitted."
+        }
+      ]
+    }
+  ],
+  "folder_name": "Financing (Affirm) - AI"
+}
