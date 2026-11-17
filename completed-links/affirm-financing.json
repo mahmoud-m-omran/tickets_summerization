@@ -1,0 +1,80 @@
+{
+  "status": "success",
+  "filename": "affirm-financing.json",
+  "links": [
+    {
+      "case_id": 4045,
+      "display_id": "QA-2999",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4046,
+      "display_id": "QA-3000",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4047,
+      "display_id": "QA-3001",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4048,
+      "display_id": "QA-3002",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4049,
+      "display_id": "QA-3003",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4050,
+      "display_id": "QA-3004",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4051,
+      "display_id": "QA-3005",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4052,
+      "display_id": "QA-3006",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4053,
+      "display_id": "QA-3007",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4054,
+      "display_id": "QA-3008",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4055,
+      "display_id": "QA-3009",
+      "http": "200",
+      "linked": true
+    },
+    {
+      "case_id": 4056,
+      "display_id": "QA-3010",
+      "http": "200",
+      "linked": true
+    }
+  ],
+  "linked": 12,
+  "total": 12
+}
